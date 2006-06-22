@@ -1,0 +1,107 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>mojo</artifactId>
+        <version>9</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>nbm-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+    <name>NBM Maven Plugin</name>
+    <description>Maven plugin for creating Netbeans Modules.
+        It defines custom lifecycle called "nbm". During packaging, the module's jar artifact will be enhanced with Netbeans specific manifest entries and along with other required files packed into a nbm file, ready for distribution.
+        Additionally the plugin provides agregator goals to create autoupdate centers or module cluster for your module projects.
+    </description>
+    <version>2.1.1</version>
+    <inceptionYear>2005</inceptionYear>
+    <url>http://mojo.codehaus.org/nbm-maven-plugin</url>
+    <developers>
+        <developer>
+            <id>mkleint</id>
+            <name>Milos Kleint</name>
+            <email>mkleint@codehaus.org</email>
+            <organization>Codehaus</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.modello</groupId>
+                <artifactId>modello-maven-plugin</artifactId>
+                <version>1.0-alpha-10</version>
+                <executions>
+                    <execution>
+                        <id>build</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>xpp3-reader</goal>
+                            <goal>java</goal>
+                            <goal>xdoc</goal>
+                            <goal>xsd</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <model>src/main/mdo/descriptor.mdo</model>
+                    <version>1.0.0</version>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.6.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-project</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>netbeans</groupId>
+            <artifactId>nbantext</artifactId>
+            <version>4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>1.0.3</version>
+        </dependency>   
+    
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+            </plugin>
+      
+        </plugins>
+    </reporting>
+</project>
