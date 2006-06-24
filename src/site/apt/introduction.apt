@@ -17,5 +17,56 @@ an autoupdate site content.
  The plugin is also capable of populating the local maven repository with module jars from a given Netbeans installation. Useful for 
 module development, modules with public APIs are separated from those without a public API.
 
+ Sample pom.xml excerpts for creating of netbeans modules:
 
+------
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>example-netbeans-module</artifactId>
+  <groupId>org.mycompany.yproject</groupId>
+  <!--here is the packaging and lifecycle defined>
+  <packaging>nbm</packaging>
 
+....
+  <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <version>LATEST</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <descriptor>src/main/nbm/module.xml</descriptor>
+                </configuration>
+            </plugin>
+        </plugins>
+  </build>
+
+ ....
+    <!-- this section is important only to access the binaries of netbeans that you use as dependencies -->
+    <repositories>
+        <repository>
+            <id>netbeans</id>
+            <name>repository hosting netbeans.org api artifacts</name>
+            <url>http://208.44.201.216:18080/maven</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+------
+
+ The {{{nbm.html}nbm descriptor format}} documentation, and {{{descriptor.html}example descriptors}} are also available.
+
+ To build the project then, just type
+
++-------------------------------------------------------------------------------+
+nbm:install
++-------------------------------------------------------------------------------+
+
+ For more information on plugin configuration and customization, see {{{plugin-info.html}goal documentation}}. 

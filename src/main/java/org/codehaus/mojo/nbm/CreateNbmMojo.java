@@ -48,8 +48,6 @@ import org.codehaus.mojo.nbm.model.NetbeansModule;
 /**
  * Create the Netbeans module artifact (nbm file)
  * <p/>
- * If you are looking for an existing remote repository for netbeans artifacts, check out
- * http://208.44.201.216:18080/maven/ it contains API artifacts for 4.1 and 5.0 releases.
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal nbm
