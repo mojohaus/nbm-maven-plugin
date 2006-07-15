@@ -15,6 +15,10 @@
     <version>2.3-SNAPSHOT</version>
     <inceptionYear>2005</inceptionYear>
     <url>http://mojo.codehaus.org/nbm-maven-plugin</url>
+    <issueManagement>
+        <system>jira</system>
+        <url>http://jira.codehaus.org/browse/MNBMODULE</url>
+    </issueManagement>
     <developers>
         <developer>
             <id>mkleint</id>
