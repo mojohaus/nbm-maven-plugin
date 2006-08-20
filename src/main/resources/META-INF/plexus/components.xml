@@ -16,6 +16,9 @@
       <configuration>
         <type>nbm</type>
         <extension>jar</extension>
+        <packaging>nbm</packaging>
+        <addedToClasspath>true</addedToClasspath>
+        <language>java</language>
       </configuration>
     </component>
     <component>
