@@ -72,7 +72,7 @@ public class PopulateRepositoryMojo
 
     /**
      * an url where to deploy the netbeans artifacts.. optional, if not specified, the artifacts will be only installed
-     * in local repository
+     * in local repository, if you need to give credentials to access remote repo, the id of the server is hardwired to "netbeans".
      * @parameter expression="${deployUrl}"
      */
     private String deployUrl;
