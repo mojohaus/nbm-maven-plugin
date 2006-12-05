@@ -223,7 +223,7 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
                 }
             }
             if (classPath.length() > 0) {
-                conditionallyAddAttribute(mainSection, "Class-Path", classPath);
+                conditionallyAddAttribute(mainSection, "Class-Path", classPath.trim());
             }
             if (dependencies.length() > 0) {
                 conditionallyAddAttribute(mainSection, "OpenIDE-Module-Module-Dependencies", dependencies);
