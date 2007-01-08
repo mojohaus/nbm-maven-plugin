@@ -114,12 +114,20 @@ public class CreateNbmMojo
      */
     private MavenProject project;
     
+    /**
+     * custom distribution URL, overriding the value in the nbm descriptor
+     * 
+     * @parameter expression="${maven.nbm.distributionURL}"
+     */
+    private String distributionUrl;
     
     public void execute()
     throws MojoExecutionException {
         Project antProject = registerNbmAntTasks();
         NetbeansModule module = readModuleDescriptor(descriptor);
-
+        if (distributionUrl != null) {
+            module.setDistributionUrl(distributionUrl);
+        }
         String type = module.getModuleType();
         boolean autoload = "autoload".equals(type);
         boolean eager = "eager".equals(type);

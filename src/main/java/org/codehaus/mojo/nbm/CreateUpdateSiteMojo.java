@@ -48,14 +48,16 @@ public class CreateUpdateSiteMojo
     
     /**
      * autoupdate site xml file name.
-     * @parameter expression="Autoupdate_Site.xml"
+     * @parameter expression="${maven.nbm.updatesitexml}" default-value="Autoupdate_Site.xml"
      * @required
      */
     protected String fileName;
     
     /**
-     * dist base.??
-     *@parameter
+     * A custom distribution base for the nbms in the update site.
+     * The actual download URL for the module's nbm is composed of
+     * ${distBase}/${name of module}.nbm
+     *@parameter expression="${maven.nbm.customDistBase}"
      */
     protected String distBase;
     
