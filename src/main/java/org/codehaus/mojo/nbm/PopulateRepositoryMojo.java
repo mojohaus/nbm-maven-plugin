@@ -52,7 +52,8 @@ import org.apache.tools.ant.types.FileSet;
  * repository with them. Optionally you can also deploy to a remote repository.
    <p/>
  * If you are looking for an existing remote repository for netbeans artifacts, check out
- * http://208.44.201.216:18080/maven/ it contains API artifacts for 4.1 and 5.0 releases.
+ * http://208.44.201.216:18080/maven/ it contains API artifacts for 4.1, 5.0 and 5.5 releases. 
+ * 6.0 Milestone 4 and 6 also included.
  
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal populate-repository
@@ -217,6 +218,8 @@ public class PopulateRepositoryMojo
             }
         }
         List wrapperList = new ArrayList(moduleDefinitions.keySet());
+        int count = wrapperList.size() + 1;
+        int index = 0;
         Iterator it = moduleDefinitions.entrySet().iterator();
         File javadocRoot = null;
         if (netbeansJavadocDirectory != null) {
@@ -230,7 +233,8 @@ public class PopulateRepositoryMojo
             Map.Entry elem = (Map.Entry) it.next();
             ModuleWrapper man = (ModuleWrapper)elem.getKey();
             Artifact art = (Artifact)elem.getValue();
-            
+            index = index + 1;
+            getLog().info("Processing " + index + "/" + count);
             File pom = createMavenProject(man, wrapperList);
             ArtifactMetadata metadata = new ProjectArtifactMetadata(art, pom);
             art.addMetadata( metadata );
