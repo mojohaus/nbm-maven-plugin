@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -194,9 +195,12 @@ public class PopulateRepositoryMojo
         String prop = antProject.getProperty("netbeansincludes");
         StringTokenizer tok = new StringTokenizer(prop, ",");
         HashMap moduleDefinitions = new HashMap();
+        HashMap clusters = new HashMap();
         while (tok.hasMoreTokens()) {
             String token = tok.nextToken();
             File module = new File(token);
+            String clust = module.getAbsolutePath().substring(rootDir.getAbsolutePath().length() + 1);
+            clust = clust.substring(0, clust.indexOf(File.separator));
             ExamineManifest examinator = new ExamineManifest();
             examinator.setPopulateDependencies(true);
             examinator.setJarFile(module);
@@ -214,7 +218,14 @@ public class PopulateRepositoryMojo
                 m = m.trim();
                 examinator.setModule(m);
                 Artifact art = createArtifact(artifact, version, group);
-                moduleDefinitions.put(new ModuleWrapper(artifact, version, group, examinator, module), art);
+                ModuleWrapper wr = new ModuleWrapper(artifact, version, group, examinator, module);
+                moduleDefinitions.put(wr, art);
+                Collection col = (Collection)clusters.get(clust);
+                if (col == null) {
+                    col = new ArrayList();
+                    clusters.put(clust, col);
+                }
+                col.add(wr);
             }
         }
         List wrapperList = new ArrayList(moduleDefinitions.keySet());
@@ -272,6 +283,36 @@ public class PopulateRepositoryMojo
             }
             
         }
+        
+        index = 0;
+        count = clusters.size() + 1;
+        // now process cluster poms..
+        it = clusters.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry elem = (Map.Entry) it.next();
+            Collection modules = (Collection) elem.getValue();
+            String cluster = (String) elem.getKey();
+            index = index + 1;
+            getLog().info("Processing cluster poms " + index + "/" + count);
+            String version = forcedVersion == null ? cluster : forcedVersion;
+            Artifact art = createClusterArtifact(cluster, version);
+            File file = createClusterProject(art, modules);
+//            ArtifactMetadata metadata = new ProjectArtifactMetadata(art, file);
+//            art.addMetadata( metadata );
+            try {
+                artifactInstaller.install(file, art, localRepository );
+            } catch ( ArtifactInstallationException e ) {
+                // TODO: install exception that does not give a trace
+                throw new MojoExecutionException( "Error installing artifact", e );
+            }
+            try {
+                if (deploymentRepository != null) {
+                    artifactDeployer.deploy(file, art, deploymentRepository, localRepository);
+                }
+            } catch (ArtifactDeploymentException ex) {
+                throw new MojoExecutionException( "Error Deploying artifact", ex );
+            }
+        }
     }
     
     
@@ -283,7 +324,7 @@ public class PopulateRepositoryMojo
         
         mavenModel.setGroupId(wrapper.getGroup());
         mavenModel.setArtifactId(wrapper.getArtifact());
-        mavenModel.setVersion(wrapper.getArtifact());
+        mavenModel.setVersion(wrapper.getVersion());
         mavenModel.setPackaging("jar");
         mavenModel.setModelVersion("4.0.0");
         ExamineManifest man = wrapper.getModuleManifest();
@@ -335,10 +376,56 @@ public class PopulateRepositoryMojo
         }
         return fil;
     }
+
+    private File createClusterProject(Artifact cluster, Collection mods) {
+        Model mavenModel = new Model();
+        
+        mavenModel.setGroupId(cluster.getGroupId());
+        mavenModel.setArtifactId(cluster.getArtifactId());
+        mavenModel.setVersion(cluster.getVersion());
+        mavenModel.setPackaging("pom");
+        mavenModel.setModelVersion("4.0.0");
+        List deps = new ArrayList();
+        Iterator it = mods.iterator();
+        while (it.hasNext()) {
+            ModuleWrapper wr = (ModuleWrapper) it.next();
+            Dependency dep = new Dependency();
+            dep.setArtifactId(wr.getArtifact());
+            dep.setGroupId(wr.getGroup());
+            dep.setVersion(wr.getVersion());
+            dep.setType("jar");
+            deps.add(dep);
+        }
+        mavenModel.setDependencies(deps);
+        FileWriter writer = null;
+        File fil = null;
+        try {
+            MavenXpp3Writer xpp = new MavenXpp3Writer();
+            fil = File.createTempFile("maven", "pom");
+            writer = new FileWriter(fil);
+            xpp.write(writer, mavenModel);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException io) {
+                    io.printStackTrace();
+                }
+            }
+        }
+        return fil;
+    }
     
     
     private Artifact createArtifact(String artifact, String version, String group) {
         return artifactFactory.createBuildArtifact(group, artifact, version, "jar");
+    }
+    
+    private Artifact createClusterArtifact(String artifact, String version) {
+        return artifactFactory.createBuildArtifact("org.netbeans.cluster", artifact, version, "pom");
     }
     
     private class ModuleWrapper  {
