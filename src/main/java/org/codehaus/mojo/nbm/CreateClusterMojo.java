@@ -40,7 +40,7 @@ public class CreateClusterMojo
         extends AbstractNbmMojo {
     /**
      * directory where the the netbeans cluster will be created.
-     * @parameter expression="${project.build.directory}/netbeans_clusters"
+     * @parameter default-value="${project.build.directory}/netbeans_clusters"
      * @required
      */
     protected String nbmBuildDir;
