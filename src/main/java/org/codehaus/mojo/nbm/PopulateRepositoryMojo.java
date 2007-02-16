@@ -283,7 +283,8 @@ public class PopulateRepositoryMojo
             }
             
         }
-        
+
+        /**
         index = 0;
         count = clusters.size() + 1;
         // now process cluster poms..
@@ -313,6 +314,7 @@ public class PopulateRepositoryMojo
                 throw new MojoExecutionException( "Error Deploying artifact", ex );
             }
         }
+         */ 
     }
     
     
