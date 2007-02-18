@@ -115,7 +115,7 @@ public class RunNetBeansMojo extends AbstractMojo {
             buff.append(":");
         }
         buff.deleteCharAt(buff.lastIndexOf(":"));
-        buff.append("\"\n");
+        buff.append("\"");
         StringReader sr = new StringReader(buff.toString());
         File confFile  = new File(etc, "netbeans.conf");
         FileOutputStream conf = null;
@@ -138,7 +138,7 @@ public class RunNetBeansMojo extends AbstractMojo {
         try {
             String[] args = new String[] {
                 //TODO --jdkhome
-                "-userdir",
+                "--userdir",
                 Commandline.quoteArgument(userDir.getAbsolutePath()),
                 "-J-Dnetbeans.logger.console=true",
                 "-J-ea",
