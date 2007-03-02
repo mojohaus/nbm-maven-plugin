@@ -77,9 +77,9 @@
             <version>2.0</version>
         </dependency>
         <dependency>
-            <groupId>netbeans</groupId>
-            <artifactId>nbantext</artifactId>
-            <version>4.0</version>
+            <groupId>org.netbeans.nbbuild</groupId>
+            <artifactId>tasks</artifactId>
+            <version>5.5</version>
         </dependency>
         <dependency>
             <groupId>plexus</groupId>
