@@ -52,7 +52,7 @@ public class RunPlatformAppMojo extends AbstractMojo {
     protected String clusterBuildDir;
 
     /**
-     * directory where the the netbeans platform/IDE installation is,
+     * directory where the the NetBeans platform/IDE installation is,
      * denotes the root directory of netbeans installation.
      * @parameter expression="${netbeans.installation}"
      * @required

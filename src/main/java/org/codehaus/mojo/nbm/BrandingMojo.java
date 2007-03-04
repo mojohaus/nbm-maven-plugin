@@ -27,10 +27,24 @@ import org.apache.tools.ant.taskdefs.Taskdef;
 import org.netbeans.nbbuild.Branding;
 
 /**
- * Package branding for NetBeans platform/IDE based application.
- * TODO more docs.
- * </p>
- *
+ * Package branding resources for NetBeans platform/IDE based application.
+ * The format of branding resources is the same as in
+ * NetBeans Ant-based projects.
+ * 
+ * The <code>src/main/nbm-branding</code> folder of the project is assumed to 
+ * contain the branding content. Within the directory, the following folder structure is assumed:
+ * <ul>
+ * <li>
+ * 1. pick the IDE/platform module which contents you want to brand. eg. org-openide-windows.jar
+ * </li><li>
+ * 2. locate the jar within the IDE/platform installation and it's cluster, eg. modules/org-openide-windows.jar 
+ * </li><li>
+ * 3. create the same folder structure in src/main/nbm-branding, make folder with the module's jar name as well.
+ * eg. create folder by name modules/org-openide-windows.jar
+ * </li><li>
+ * 4. within that folder place your branding modifications at the same location, as if they were withn the jar,
+ * eg. org/openide/windows/ui/Bundle.properties and place the changed bundle keys there.
+ * </li></ul>
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal branding
  * @phase package
@@ -41,7 +55,7 @@ public class BrandingMojo
         extends AbstractNbmMojo {
     
     /**
-     * directory where the the netbeans jar and nbm file will be constructed
+     * directory where the the binary content is created.
      * @parameter expression="${project.build.directory}/nbm"
      * @required
      */
@@ -64,7 +78,7 @@ public class BrandingMojo
     /**
      * cluster of the branding.
      *
-     * @parameter
+     * @parameter default-value="maven1"
      * @required
      */
     protected String cluster;
