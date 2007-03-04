@@ -8,16 +8,16 @@
 
 Netbeans Module plugin
 
- This m2 plugin is able to create Netbeans module artifacts. It registers a new packaging type "nbm". Any project with
-this packaging will be automatically turned into a netbeans module. Additionally it allows to create clusters of modules and to generate
-an autoupdate site content. 
+ This m2 plugin is able to create Netbeans module(plugin) artifacts. It registers a new packaging type "nbm". Any project with
+this packaging will be automatically turned into a netbeans module project. Additionally it allows to create clusters of modules, generate
+an autoupdate site content or build application on top of NetBeans platform.
 
  To get access to Netbeans.org API artifacts, add http://208.44.201.216:18080/maven/ to the list of remote repositories for your project.
 
  The plugin is also capable of populating the local maven repository with module jars from a given Netbeans installation. Useful for 
 module development, modules with public APIs are separated from those without a public API.
 
- Sample pom.xml excerpts for creating of netbeans modules:
+ Sample pom.xml excerpts for creation of a NetBeans module:
 
 ------
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -66,7 +66,41 @@ module development, modules with public APIs are separated from those without a 
  To build the project then, just type
 
 +-------------------------------------------------------------------------------+
-nbm:install
+mvn install
 +-------------------------------------------------------------------------------+
+
+Multi module setup
+
+ If you have a set of NetBeans modules, or are building on top of NetBeans platform,
+you will make use of the additional goals provided by the plugin.
+
++-------------------------------------------------------------------------------+
+mvn nbm:cluster
++-------------------------------------------------------------------------------+
+
+ This goal aggregates output of multiple netbeans module projects and creates one 
+or more clusters in the current project. So usually one runs this goal on parent pom project,
+and aggregates the content of all it's modules. 
+The resulting cluster structure can later be used for running the application, creating an installer or similar.
+
++-------------------------------------------------------------------------------+
+mvn nbm:branding
++-------------------------------------------------------------------------------+
+
+ Branding is to used when one builds an application based on NetBenans platform (as opposed to creating set of modules for the IDE)
+Branding contains all the resources that are to be changed in the platform binaries (resource bundles, images, html files etc) 
+to give the application it's unique touch. 
+
+ This goal can be attached either to one of the nbm module projects or directly to the parent pom project that 
+is the root of your platform based application project tree.
+
++-------------------------------------------------------------------------------+
+mvn nbm:run-ide nbm:run-platform
++-------------------------------------------------------------------------------+
+ 
+ These two goals do almost the same, they allow you to execute your projects content within
+the IDE or NetBeans platform. Usually one wants to prepent the nbm:cluster goal to any execution of these goals. (in case it's not part of your regular build cycle).
+run-platform allows to include/exclude clusters from the executed application and runs with the branded resources, while
+run-ide runs only adds your modules to an instance of the IDE.
 
  For more information on plugin configuration and customization, see {{{plugin-info.html}goal documentation}}. 
