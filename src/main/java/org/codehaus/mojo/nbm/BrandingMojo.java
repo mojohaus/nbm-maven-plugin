@@ -56,7 +56,7 @@ public class BrandingMojo
 
     /**
      * The branding token used by the application.
-     * @parameter 
+     * @parameter expression="${netbeans.branding.token}"
      * @required
      */
     private String brandingToken;
