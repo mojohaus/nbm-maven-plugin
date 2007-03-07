@@ -96,6 +96,7 @@ public class CreateClusterMojo
                     }
                 }
             }
+            getLog().info("Created NetBeans module cluster(s) at " + nbmBuildDir);
         } else {
             throw new MojoExecutionException("This goal only makes sense on reactor projects.");
         }
