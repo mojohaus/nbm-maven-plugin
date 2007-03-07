@@ -72,7 +72,7 @@ public class RunNetBeansMojo extends AbstractMojo {
      * additional command line arguments. Eg. 
      * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
      * can be used to debug the IDE.
-     * @parameter
+     * @parameter expresion="${netbeans.run.params}"
      */
     protected String additionalArguments;
     
