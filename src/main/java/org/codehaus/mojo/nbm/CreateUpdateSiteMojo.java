@@ -127,6 +127,7 @@ public class CreateUpdateSiteMojo
                 getLog().error("Cannot create autoupdate site xml file");
                 throw new MojoExecutionException("Cannot create autoupdate site xml file", ex);
             }
+            getLog().info("Generated autoupdate site content at " + nbmBuildDir);
         } else {
             throw new MojoExecutionException("This goal only makes sense on reactor projects.");
         }
