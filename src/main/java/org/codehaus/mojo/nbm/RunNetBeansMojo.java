@@ -72,7 +72,7 @@ public class RunNetBeansMojo extends AbstractMojo {
      * additional command line arguments. Eg. 
      * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
      * can be used to debug the IDE.
-     * @parameter expresion="${netbeans.run.params}"
+     * @parameter expression="${netbeans.run.params}"
      */
     protected String additionalArguments;
     
@@ -144,7 +144,11 @@ public class RunNetBeansMojo extends AbstractMojo {
                 "-J-ea",
             };
             cmdLine.addArguments(args);
+            getLog().info("Additional arguments=" + additionalArguments);
             cmdLine.addArguments(cmdLine.translateCommandline(additionalArguments));
+            for (int i = 0; i < cmdLine.getArguments().length; i++) {
+                getLog().info("      " + cmdLine.getArguments()[i]);
+            }
             getLog().info("Executing: " + cmdLine.toString());
             StreamConsumer out = new StreamConsumer() {
                 public void consumeLine(String line) {
