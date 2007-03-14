@@ -63,7 +63,7 @@ public class RunNetBeansMojo extends AbstractMojo {
     
     /**
      * netbeans user directory for the executed instance.
-     * @parameter default-value="${project.build.directory}/userdir"
+     * @parameter default-value="${project.build.directory}/userdir" expression="${netbeans.userdir}"
      * @required
      */
     protected String netbeansUserdir;
