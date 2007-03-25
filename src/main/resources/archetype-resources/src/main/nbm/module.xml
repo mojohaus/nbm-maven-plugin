@@ -1,5 +1,5 @@
 <nbm>
-   <moduleType>autoload</moduleType>
+   <!--moduleType>autoload</moduleType-->
    <!--codeNameBase>${package}/1</codeNameBase-->
    <!-- the cluster where you want the module to be located. -->
    <!--cluster>mycluster1</cluster-->

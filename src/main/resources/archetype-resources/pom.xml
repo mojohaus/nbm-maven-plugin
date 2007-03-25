@@ -5,7 +5,7 @@
     <artifactId>${artifactId}</artifactId>
     <packaging>nbm</packaging>
     <version>${version}</version>
-    <name>Maven Netbeans Module ${artifactId}</name>
+    <name>Netbeans Module ${artifactId}</name>
     
     <repositories>
         <!-- this is a remote repository hosting the netbeans api artifacts.
@@ -32,7 +32,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>2.2</version>
+                <version>LATEST</version>
                 <extensions>true</extensions>
                 <configuration>
                     <descriptor>src/main/nbm/module.xml</descriptor>
