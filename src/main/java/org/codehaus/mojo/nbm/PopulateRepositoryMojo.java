@@ -97,6 +97,12 @@ public class PopulateRepositoryMojo
     protected String netbeansJavadocDirectory;
     
     /**
+     * Assumes a folder with &lt;code-name-base&gt;.zip files containing sources for modules.
+     * @parameter expression="${netbeansSourcesDirectory}"
+     */
+    
+    protected String netbeansSourcesDirectory;
+    /**
      * Optional parameter, when specified, will force all modules to have the designated version.
      * Good when depending on releases. Then you would for example specify RELEASE50 in this parameter and
      * all modules get this version in the repository.
@@ -237,7 +243,15 @@ public class PopulateRepositoryMojo
             javadocRoot = new File(netbeansJavadocDirectory);
             if (!javadocRoot.exists()) {
                 javadocRoot = null;
-                throw new MojoExecutionException("The netbeansJavadocFolder parameter doesn't point to an existing folder");
+                throw new MojoExecutionException("The netbeansJavadocDirectory parameter doesn't point to an existing folder");
+            }
+        }
+        File sourceRoot = null;
+        if (netbeansSourcesDirectory != null) {
+            sourceRoot = new File(netbeansSourcesDirectory);
+            if (!sourceRoot.exists()) {
+                sourceRoot = null;
+                throw new MojoExecutionException("The netbeansSourceDirectory parameter doesn't point to an existing folder");
             }
         }
         while (it.hasNext()) {
@@ -261,10 +275,25 @@ public class PopulateRepositoryMojo
                                                                               "jar", "javadoc");
                 }
             }
+            File source = null;
+            Artifact sourceArt = null;
+            if (sourceRoot != null) {
+                File zip = new File(sourceRoot, art.getArtifactId() + ".zip");
+                if (zip.exists()) {
+                    source = zip;
+                    sourceArt = artifactFactory.createArtifactWithClassifier(art.getGroupId(), 
+                                                                              art.getArtifactId(),
+                                                                              art.getVersion(),
+                                                                              "jar", "sources");
+                }
+            }
             
             try {
                 if (javadoc != null) {
-                    artifactInstaller.install(javadoc,javadocArt, localRepository);
+                    artifactInstaller.install(javadoc, javadocArt, localRepository);
+                }
+                if (source != null) {
+                    artifactInstaller.install(source, sourceArt, localRepository);
                 }
                 artifactInstaller.install(man.getFile(), art, localRepository );
             } catch ( ArtifactInstallationException e ) {
@@ -276,6 +305,9 @@ public class PopulateRepositoryMojo
                     if (javadoc != null) {
                         artifactDeployer.deploy(javadoc, javadocArt, deploymentRepository, localRepository);
                     }
+                    if (source != null) {
+                        artifactDeployer.deploy(source, sourceArt, deploymentRepository, localRepository);
+                    }
                     artifactDeployer.deploy(man.getFile(), art, deploymentRepository, localRepository);
                 }
             } catch (ArtifactDeploymentException ex) {
@@ -283,42 +315,7 @@ public class PopulateRepositoryMojo
             }
             
         }
-
-        /**
-        index = 0;
-        count = clusters.size() + 1;
-        // now process cluster poms..
-        it = clusters.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry elem = (Map.Entry) it.next();
-            Collection modules = (Collection) elem.getValue();
-            String cluster = (String) elem.getKey();
-            index = index + 1;
-            getLog().info("Processing cluster poms " + index + "/" + count);
-            String version = forcedVersion == null ? cluster : forcedVersion;
-            Artifact art = createClusterArtifact(cluster, version);
-            File file = createClusterProject(art, modules);
-//            ArtifactMetadata metadata = new ProjectArtifactMetadata(art, file);
-//            art.addMetadata( metadata );
-            try {
-                artifactInstaller.install(file, art, localRepository );
-            } catch ( ArtifactInstallationException e ) {
-                // TODO: install exception that does not give a trace
-                throw new MojoExecutionException( "Error installing artifact", e );
-            }
-            try {
-                if (deploymentRepository != null) {
-                    artifactDeployer.deploy(file, art, deploymentRepository, localRepository);
-                }
-            } catch (ArtifactDeploymentException ex) {
-                throw new MojoExecutionException( "Error Deploying artifact", ex );
-            }
-        }
-         */ 
     }
-    
-    
-    
     
     
     private File createMavenProject(ModuleWrapper wrapper, List wrapperList) {
