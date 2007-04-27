@@ -352,6 +352,13 @@ public class PopulateRepositoryMojo
                     getLog().warn("No module found for dependency '" + elem + "'");
                 }
             }
+            //need some generic way to handle Classpath: items.
+            if ("org.netbeans.api".equals(wrapper.getGroup()) && "org-jdesktop-layout".equals(wrapper.getArtifact())) {
+                //how to figure the right version?
+            }
+            if ("org.netbeans.api".equals(wrapper.getGroup()) && "org-netbeans-libs-javacapi".equals(wrapper.getArtifact())) {
+                //how to figure the right version?
+            }
             mavenModel.setDependencies(deps);
         }
         FileWriter writer = null;
