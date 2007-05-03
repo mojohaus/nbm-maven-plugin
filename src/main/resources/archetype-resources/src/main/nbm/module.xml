@@ -14,8 +14,7 @@
    </libraries--> 
     <dependencies>
        <dependency>
-          <id>org.netbeans.api:org-openide-io</id>
-	  <type>spec</type>
+          <id>org.netbeans.api:org-openide-util</id>
        </dependency>
     </dependencies> 
 </nbm>

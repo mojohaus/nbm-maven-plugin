@@ -10,7 +10,7 @@
     <repositories>
         <!-- this is a remote repository hosting the netbeans api artifacts.
          the versions of the artifacts are netbeans IDE release based, eg. RELEASE41, RELEASE50.
-         You might want to use your own repository, to create one use the nbm:populate-repository goal.
+         You might want to use your own repository. To create one, use the nbm:populate-repository goal.
           -->
         <repository>
             <id>netbeans</id>
@@ -22,9 +22,8 @@
     <dependencies>
         <dependency>
             <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-io</artifactId>
+            <artifactId>org-openide-util</artifactId>
             <version>RELEASE50</version>
-            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
@@ -32,7 +31,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>LATEST</version>
+                <version>RELEASE</version>
                 <extensions>true</extensions>
                 <configuration>
                     <descriptor>src/main/nbm/module.xml</descriptor>
