@@ -1,0 +1,19 @@
+<nbm>
+   <!--moduleType>autoload</moduleType-->
+   <!--codeNameBase>${package}/1</codeNameBase-->
+   <cluster>${cluster}</cluster>
+   <manifest>src/main/nbm/manifest.mf</manifest>
+   <!-- base url of the autoupdate center (where the nbm will be located -->
+   <!--distributionUrl>http://myorg.org/autoupdate</distributionUrl-->
+   <licenseName>Apache License, Version 2.0</licenseName>
+   <licenseFile>license.txt</licenseFile>
+   <!--dependencies that are not part of existing module, you need to include as part of this module -->
+   <!--libraries>
+      <library>jdom:jdom</library>
+   </libraries--> 
+    <dependencies>
+       <dependency>
+          <id>org.netbeans.api:org-openide-util</id>
+       </dependency>
+    </dependencies> 
+</nbm>

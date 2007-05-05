@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor id="netbeans-platform-app-archetype">
+    <requiredProperties>
+        <requiredProperty key="cluster" defaultValue="mavencluster"/>
+        <requiredProperty key="brandingtoken" defaultValue="mavenbranding"/>
+    </requiredProperties>
+    <fileSets>
+        <fileSet filtered="true">
+            <directory>src/main/nbm-branding</directory>
+            <includes>
+                <include>**/*.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <includes>
+                <include>./profiles.xml</include>
+                <include>./nbactions.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="false">
+            <directory>src/main/nbm-branding</directory>
+            <includes>
+                <include>**/*.gif</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+    <!--modules>
+        <module id="module1">
+            <fileSets>
+                <fileSet filtered="true" packaged="true">
+                    <directory>src/main/resources</directory>
+                    <includes>
+                        <include>**/*.*</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true">
+                    <directory>src/main/nbm</directory>
+                    <includes>
+                        <include>**/*.*</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true" packaged="true">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/deleteme.txt</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true" packaged="true">
+                    <directory>src/test/java</directory>
+                    <includes>
+                        <include>**/deleteme.txt</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+    </modules-->
+</archetype-descriptor>
