@@ -9,7 +9,7 @@
   <artifactId>module1</artifactId>
   <packaging>nbm</packaging>
   <version>${version}</version>
-  <name>NetBeans Module - ${artifactId}</name>
+  <name>${artifactId} - sample NetBeans Module</name>
   <dependencies>
     <dependency>
       <groupId>org.netbeans.api</groupId>

@@ -5,7 +5,7 @@
     <artifactId>${artifactId}</artifactId>
     <packaging>pom</packaging>
     <version>${version}</version>
-    <name>NetBeans Platform Application - ${artifactId}</name>
+    <name>${artifactId} - NetBeans Platform Application</name>
     <repositories>
         <!-- this is a remote repository hosting the netbeans api artifacts.
          the versions of the artifacts are netbeans IDE release based, eg. RELEASE41, RELEASE50.
@@ -35,39 +35,22 @@
                     <extensions>true</extensions>
                     <configuration>
                         <descriptor>src/main/nbm/module.xml</descriptor>
+                        <brandingToken>${brandingtoken}</brandingToken>
+                        <cluster>${cluster}</cluster>
+                        <enabledClusters>
+                            <enabledCluster>${cluster}</enabledCluster>
+                            <enabledCluster>platform</enabledCluster>
+                            <!--enabledCluster>ide</enabledCluster-->
+                            <!--enabledCluster>enterprise</enabledCluster-->
+                        </enabledClusters>
                     </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
-        
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>nbm-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>branding</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>branding</goal>
-                        </goals>
-                        <configuration>
-                            <cluster>${cluster}</cluster>
-                            <brandingToken>${brandingtoken}</brandingToken>
-                            <enabledClusters>
-                                <enabledCluster>${cluster}</enabledCluster>
-                                <enabledCluster>platform</enabledCluster>
-                                <!--enabledCluster>ide</enabledCluster-->
-                                <!--enabledCluster>enterprise</enabledCluster-->
-                            </enabledClusters>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
     
-    <!--modules>
+    <modules>
         <module>module1</module>
-    </modules-->    
+        <module>branding</module>
+    </modules>    
 </project>

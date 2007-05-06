@@ -6,23 +6,63 @@
     </requiredProperties>
     <fileSets>
         <fileSet filtered="true">
-            <directory>src/main/nbm-branding</directory>
+            <directory>branding/src/main/nbm-branding</directory>
             <includes>
                 <include>**/*.properties</include>
             </includes>
         </fileSet>
-        <fileSet filtered="true">
+        <!--fileSet filtered="true">
+            <directory>${basedir}</directory>
             <includes>
-                <include>./profiles.xml</include>
-                <include>./nbactions.xml</include>
+                <include>profiles.xml</include>
+                <include>nbactions.xml</include>
             </includes>
-        </fileSet>
+        </fileSet-->
         <fileSet filtered="false">
-            <directory>src/main/nbm-branding</directory>
+            <directory>branding/src/main/nbm-branding</directory>
             <includes>
                 <include>**/*.gif</include>
             </includes>
         </fileSet>
+        <fileSet filtered="true">
+            <directory>branding</directory>
+            <includes>
+                <include>pom.xml</include>
+            </includes>
+        </fileSet>
+        
+        
+        <fileSet filtered="true" packaged="true">
+            <directory>module1/src/main/resources</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>module1/src/main/nbm</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>module1</directory>
+            <includes>
+                <include>pom.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true" packaged="true">
+            <directory>module1/src/main/java</directory>
+            <includes>
+                <include>**/deleteme.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true" packaged="true">
+            <directory>module1/src/test/java</directory>
+            <includes>
+                <include>**/deleteme.txt</include>
+            </includes>
+        </fileSet>
+        
     </fileSets>
     <!--modules>
         <module id="module1">
