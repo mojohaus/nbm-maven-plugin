@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Taskdef;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -72,16 +73,29 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
         String artId = artifact.getArtifactId();
         String grId = artifact.getGroupId();
         String id = grId + ":" + artId;
-        return libraries.remove(id);
+        boolean explicit =  libraries.remove(id);
+        if (explicit) {
+            getLog().debug(id + " included as module library, explicitly declared in module descriptor.");
+            return explicit;
+        }
+        if (Artifact.SCOPE_PROVIDED.equals(artifact.getScope()) || Artifact.SCOPE_SYSTEM.equals(artifact.getScope())) {
+            getLog().debug(id + " omitted as module library, has scope 'provided/system'");
+            return false;
+        }
+        if ("nbm".equals(artifact.getType())) {
+            return false;
+        }
+        //only direct deps matter to us..
+        if (artifact.getDependencyTrail().size() > 2) {
+            getLog().debug(id + " omitted as module library, not direct dependency.");
+            return false;
+        }
+        getLog().debug(id + " included as module library, squeezed through all the filters.");
+        getLog().info("Adding as module's library:" + id);
+        return true;
     }
     
-    protected Dependency resolveNetbeansDependency(Artifact artifact, List deps) {
-// when we have classifier like jar-assembly this condition is not true..
-// just take everything that is a dependecy, no matter of what type..        
-//        if (!"jar".equals(artifact.getType())) {
-//            // just jars make sense.
-//            return null;
-//        }
+    protected Dependency resolveNetbeansDependency(Artifact artifact, List deps, ExamineManifest manifest) {
         String artId = artifact.getArtifactId();
         String grId = artifact.getGroupId();
         String id = grId + ":" + artId;
@@ -91,6 +105,28 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
             if (id.equals(dep.getId())) {
                 return dep;
             }
+        }
+        //TODO this kind of thing works when building but the current
+        // embedder in netbeans is not capable of figuring out the ArtifactHandlers in extensions
+        // thus the compilation classpath in netbeans doens't have them in (which is not acceptable)
+        if ("nbm".equals(artifact.getType())) {
+            Dependency dep = new Dependency();
+            dep.setId(id);
+            dep.setType("spec");
+            getLog().debug("Adding nbm module dependency - " + id);
+            return dep;
+        }
+        //only direct deps matter to us..
+        if (manifest.isNetbeansModule() && artifact.getDependencyTrail().size() > 2) {
+            getLog().debug(id + " omitted as NetBeans module dependency, not a direct one. Declare it in the pom for inclusion.");
+            return null;
+        }
+        if (manifest.isNetbeansModule()) {
+            Dependency dep = new Dependency();
+            dep.setId(id);
+            dep.setType("spec");
+            getLog().debug("Adding direct NetBeans module dependency - " + id);
+            return dep;
         }
         return null;
     }
@@ -119,6 +155,23 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
             }
         }
         return null;
+    }
+    
+    protected NetbeansModule createDefaultDescriptor(MavenProject project, boolean log) {
+        
+        if (log) getLog().info("No Module Descriptor defined, trying to fallback to generated values:");
+        NetbeansModule module = new NetbeansModule();
+        module.setAuthor("Nobody");
+        module.setCluster("maven");
+        if (log) getLog().info("   Cluster:" + module.getCluster());
+        String codename = project.getGroupId() + "." + project.getArtifactId();
+        codename = codename.replaceAll("-", ".");
+        module.setCodeNameBase(codename);
+        if (log) getLog().info("   Codenamebase:" + module.getCodeNameBase());
+        module.setModuleType("normal");
+        if (log) getLog().info("   Type:" + module.getModuleType());
+        module.setRequiresRestart(false);
+        return module;
     }
 
 }

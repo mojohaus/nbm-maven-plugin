@@ -19,6 +19,7 @@
         <packaging>nbm</packaging>
         <addedToClasspath>true</addedToClasspath>
         <language>java</language>
+        <includesDependencies>true</includesDependencies>
       </configuration>
     </component>
     <component>

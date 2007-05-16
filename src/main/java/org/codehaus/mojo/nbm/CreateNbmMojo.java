@@ -102,8 +102,7 @@ public class CreateNbmMojo
     /**
      * a netbeans module descriptor containing dependency information and more
      *
-     * @parameter
-     * @required
+     * @parameter default-value="${basedir}/src/main/nbm/module.xml"
      */
     protected File descriptor;
     
@@ -124,7 +123,12 @@ public class CreateNbmMojo
     public void execute()
     throws MojoExecutionException {
         Project antProject = registerNbmAntTasks();
-        NetbeansModule module = readModuleDescriptor(descriptor);
+        NetbeansModule module;
+        if (descriptor != null && descriptor.exists()) {
+            module = readModuleDescriptor(descriptor);
+        } else {
+            module = createDefaultDescriptor(project, false);
+        }
         if (distributionUrl != null) {
             module.setDistributionUrl(distributionUrl);
         }
@@ -139,6 +143,7 @@ public class CreateNbmMojo
         String moduleName = module.getCodeNameBase();
         if (moduleName == null) {
             moduleName = project.getGroupId() + "." + project.getArtifactId();
+            moduleName = moduleName.replaceAll("-", ".");
         }
         String moduleJarName = moduleName.replace('.', '-');
         String cluster = module.getCluster();
@@ -169,17 +174,23 @@ public class CreateNbmMojo
             getLog().error("Cannot copy module jar");
             throw new MojoExecutionException("Cannot copy module jar", ex);
         }
+        
+        ExamineManifest modExaminator = new ExamineManifest();
+        modExaminator.setJarFile(jarFile);
+        modExaminator.checkFile();
+        String classpathValue = modExaminator.getClasspath();
+        
         if(module != null) {
             // copy libraries to the designated place..            
             List librList = new ArrayList();
             if (module.getLibraries() != null) {
                 librList.addAll(module.getLibraries());
             };
-            Set artifacts = project.getArtifacts();
+            List artifacts = project.getCompileArtifacts();
             for ( Iterator iter = artifacts.iterator(); iter.hasNext();) {
                 Artifact artifact = (Artifact) iter.next();
-                if (matchesLibrary(artifact, librList)) {
-                    File source = artifact.getFile();
+                File source = artifact.getFile();
+                if (classpathValue.contains("ext/" + source.getName()) && matchesLibrary(artifact, librList)) {
                     File targetDir = new File(moduleJarLocation, "ext");
                     targetDir.mkdirs();
                     File target = new File(targetDir, source.getName());

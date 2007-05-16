@@ -75,8 +75,7 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
     /**
      * a netbeans module descriptor containing dependency information and more
      *
-     * @parameter
-     * @required
+     * @parameter default-value="${basedir}/src/main/nbm/module.xml"
      */
     protected File descriptor;
     
@@ -107,11 +106,17 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
             getLog().error("Cannot copy module jar");
             throw new MojoExecutionException("Cannot copy module jar", ex);
         }
-        NetbeansModule module = readModuleDescriptor(descriptor);
+        NetbeansModule module;
+        if (descriptor != null && descriptor.exists() ) {
+            module = readModuleDescriptor(descriptor);
+        } else {
+            module = createDefaultDescriptor(project, false);
+        }
         
         String moduleName = module.getCodeNameBase();
         if (moduleName == null) {
             moduleName = project.getGroupId() + "." + project.getArtifactId();
+            moduleName = moduleName.replaceAll("-", ".");
         }
 //<!-- if a netbeans specific manifest is defined, examine this one, otherwise the already included one.
 // ignoring the case when some of the netbeans attributes are already defined in the jar and more is included.
@@ -183,20 +188,20 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
                 librList.addAll(module.getLibraries());
             };
             List deps = module.getDependencies();
-            Set artifacts = project.getArtifacts();
+            List artifacts = project.getCompileArtifacts();
             for ( Iterator iter = artifacts.iterator(); iter.hasNext();) {
                 Artifact artifact = (Artifact) iter.next();
-                if (matchesLibrary(artifact, librList)) {
+                ExamineManifest depExaminator = new ExamineManifest();
+                depExaminator.setJarFile(artifact.getFile());
+                depExaminator.checkFile();
+                if (!depExaminator.isNetbeansModule() && matchesLibrary(artifact, librList)) {
                     classPath = classPath + " ext/" + artifact.getFile().getName();
                 }
-                Dependency dep = resolveNetbeansDependency(artifact, deps);
+                Dependency dep = resolveNetbeansDependency(artifact, deps, depExaminator);
                 if (dep != null) {
                     String type = dep.getType();
                     String depToken = dep.getExplicitValue();
                     if (depToken == null) {
-                        ExamineManifest depExaminator = new ExamineManifest();
-                        depExaminator.setJarFile(artifact.getFile());
-                        depExaminator.checkFile();
                         if ("loose".equals(type)) {
                             depToken = depExaminator.getModule();
                         } else if ("spec".equals(type)) {
@@ -242,7 +247,7 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
             jarTask.setUpdate(true);
             jarTask.execute();
         } catch (ManifestException ex) {
-            getLog().error( "Cannot set udated manifest" );
+            getLog().error( "Cannot set updated manifest" );
             throw new MojoExecutionException( ex.getMessage(), ex );
         } catch (BuildException e) {
             getLog().error( "Cannot update jar" );
@@ -266,7 +271,7 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
             try {
                 section.addConfiguredAttribute(attr);
             } catch (ManifestException ex) {
-                getLog().error( "Cannot update moanifest (key="  + key + ")");
+                getLog().error( "Cannot update manifest (key="  + key + ")");
                 ex.printStackTrace();
             }
         }

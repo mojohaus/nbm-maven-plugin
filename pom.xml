@@ -47,6 +47,15 @@
                             <goal>xsd</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>site</id>
+                        <phase>site-generate</phase>
+                        <goals>
+                            <goal>xdoc</goal>
+                            <goal>xsd</goal>
+                        </goals>
+                    </execution>
+                    
                 </executions>
                 <configuration>
                     <model>src/main/mdo/descriptor.mdo</model>

@@ -46,6 +46,7 @@ public class ExamineManifest  {
     private String module;
     private String moduleDeps;
     private String locBundle;
+    private String classpath;
     private boolean publicPackages;
     private boolean populateDependencies = false;
     private List dependencyTokens = Collections.EMPTY_LIST;
@@ -105,6 +106,7 @@ public class ExamineManifest  {
         setModuleDeps(null);
         setLocBundle(null);
         setPublicPackages(false);
+        setClasspath("");
     }
     
     void processManifest(Manifest mf) {
@@ -117,6 +119,7 @@ public class ExamineManifest  {
             setSpecVersion(attrs.getValue("OpenIDE-Module-Specification-Version"));
             setImplVersion(attrs.getValue("OpenIDE-Module-Implementation-Version"));
             setModuleDeps(attrs.getValue("OpenIDE-Module-Module-Dependencies"));
+            setClasspath(attrs.getValue("Class-Path") == null ? "" : attrs.getValue("Class-Path"));
             String value = attrs.getValue("OpenIDE-Module-Public-Packages");
             if (attrs.getValue("OpenIDE-Module-Friends") != null || value == null || value.trim().equals("-")) {
                 setPublicPackages(false);
@@ -153,6 +156,7 @@ public class ExamineManifest  {
             setImplVersion(attrs.getValue("Implementation-Version"));
             setModule(attrs.getValue("Package"));
             setPublicPackages(false);
+            setClasspath("");
         /*    if (module != null) {
                 // now we have the package to make it a module definition, add the version there..
                 module = module + "/1"; 
@@ -197,6 +201,14 @@ public class ExamineManifest  {
     public void setManifestFile(File manifestFileLoc)
     {
         manifestFile = manifestFileLoc;
+    }
+    
+    public void setClasspath(String path) {
+        classpath = path;
+    }
+    
+    public String getClasspath() {
+        return classpath;
     }
 
     public boolean isNetbeansModule() {
