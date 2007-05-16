@@ -1,5 +1,5 @@
 /* ==========================================================================
- * Copyright 2003-2004 Mevenide Team
+ * Copyright 2003-2007 Mevenide Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.mojo.nbm.model.Dependency;

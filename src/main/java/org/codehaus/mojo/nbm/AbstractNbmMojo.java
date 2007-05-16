@@ -103,7 +103,12 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
         while (it.hasNext()) {
             Dependency dep = (Dependency)it.next();
             if (id.equals(dep.getId())) {
-                return dep;
+                if (manifest.isNetbeansModule()) {
+                    return dep;
+                } else {
+                    getLog().warn(id + " declared as module dependency in descriptor, but not a NetBeans module");
+                    return null;
+                }
             }
         }
         //TODO this kind of thing works when building but the current
