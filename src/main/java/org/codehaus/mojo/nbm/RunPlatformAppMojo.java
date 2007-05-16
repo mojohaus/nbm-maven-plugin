@@ -151,6 +151,10 @@ public class RunPlatformAppMojo extends AbstractMojo {
         File platform = null;
         // check installation..
         File[] fls = new File(netbeansInstallation).listFiles();
+        if (fls == null) {
+            //null means not existing folder
+            throw new MojoExecutionException("Non-existing NetBeans installation at " + netbeansInstallation);
+        }
         for (int i = 0; i < fls.length; i++) {
             if (fls[i].isDirectory()) {
                 String folderName = fls[i].getName();
