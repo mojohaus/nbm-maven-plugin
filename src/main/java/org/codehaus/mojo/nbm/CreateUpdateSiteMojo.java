@@ -100,7 +100,7 @@ public class CreateUpdateSiteMojo
                     copyTask.setTodir(nbmBuildDirFile);
                     FileSet fs = new FileSet();
                     fs.setDir(moduleDir);
-                    fs.createInclude().setName("**/*.nbm");
+                    fs.createInclude().setName("target/**/*.nbm");
                     copyTask.addFileset(fs);
                     copyTask.setOverwrite(true);
                     copyTask.setFlatten(true);
