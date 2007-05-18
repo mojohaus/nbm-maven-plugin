@@ -16,8 +16,12 @@
  */
 package org.codehaus.mojo.nbm;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,6 +50,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Input;
 import org.apache.tools.ant.taskdefs.PathConvert;
 import org.apache.tools.ant.types.FileSet;
+import org.codehaus.plexus.util.IOUtil;
 
 
 /**
@@ -327,8 +332,8 @@ public class PopulateRepositoryMojo
         mavenModel.setPackaging("jar");
         mavenModel.setModelVersion("4.0.0");
         ExamineManifest man = wrapper.getModuleManifest();
+        List deps = new ArrayList();
         if (!man.getDependencyTokens().isEmpty()) {
-            List deps = new ArrayList();
             Iterator it = man.getDependencyTokens().iterator();
             while (it.hasNext()) {
                 String elem = (String) it.next();
@@ -352,15 +357,48 @@ public class PopulateRepositoryMojo
                     getLog().warn("No module found for dependency '" + elem + "'");
                 }
             }
-            //need some generic way to handle Classpath: items.
-            if ("org.netbeans.api".equals(wrapper.getGroup()) && "org-jdesktop-layout".equals(wrapper.getArtifact())) {
-                //how to figure the right version?
-            }
-            if ("org.netbeans.api".equals(wrapper.getGroup()) && "org-netbeans-libs-javacapi".equals(wrapper.getArtifact())) {
-                //how to figure the right version?
-            }
-            mavenModel.setDependencies(deps);
         }
+        //need some generic way to handle Classpath: items.
+        if ("org.netbeans.api".equals(wrapper.getGroup()) && "org-jdesktop-layout".equals(wrapper.getArtifact())) {
+            //how to figure the right version?
+            String cp = wrapper.getModuleManifest().getClasspath();
+            if (cp != null) {
+                StringTokenizer tok = new StringTokenizer(cp);
+                while (tok.hasMoreTokens()) {
+                    String path = tok.nextToken();
+                    File f = new File(wrapper.getFile().getParentFile(), path);
+                    if (f.exists()) {
+                        FileInputStream fis = null;
+                        DigestOutputStream os = null;
+                        try {
+                            fis = new FileInputStream(f);
+                            MessageDigest md5Dig = MessageDigest.getInstance( "MD5" );
+                            os = new DigestOutputStream(new NullOutputStream(), md5Dig);
+                            IOUtil.copy(fis, os);
+                            IOUtil.close(fis);
+                            IOUtil.close(os);
+                            String md5 = encode(md5Dig.digest());
+                            if ("5deb85c331c5a75d2ea6182e22a7f191".equals(md5)) {
+                                Dependency dep = new Dependency();
+                                dep.setArtifactId("swing-layout");
+                                dep.setGroupId("net.java.dev.swing-layout");
+                                dep.setVersion("1.0.1");
+                                dep.setType("jar");
+                                dep.setScope("provided");
+                                deps.add(dep);
+                            }
+                        } catch (Exception x) {
+                            x.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        if ("org.netbeans.api".equals(wrapper.getGroup()) && "org-netbeans-libs-javacapi".equals(wrapper.getArtifact())) {
+            //how to figure the right version?
+        }
+        
+        mavenModel.setDependencies(deps);
         FileWriter writer = null;
         File fil = null;
         try {
@@ -487,4 +525,45 @@ public class PopulateRepositoryMojo
             return file;
         }
     }
+    
+    private static class NullOutputStream extends OutputStream {
+        public void write(int b) throws IOException {
+            
+        }
+        
+    }
+    
+    /**
+     * Encodes a 128 bit or 160-bit byte array into a String.
+     *
+     * @param binaryData Array containing the digest
+     * @return Encoded hex string, or null if encoding failed
+     */
+    private static String encode( byte[] binaryData )
+    {
+        if ( binaryData.length != 16 && binaryData.length != 20 )
+        {
+            int bitLength = binaryData.length * 8;
+            throw new IllegalArgumentException( "Unrecognised length for binary data: " + bitLength + " bits" );
+        }
+
+        String retValue = "";
+
+        for ( int i = 0; i < binaryData.length; i++ )
+        {
+            String t = Integer.toHexString( binaryData[i] & 0xff );
+
+            if ( t.length() == 1 )
+            {
+                retValue += ( "0" + t );
+            }
+            else
+            {
+                retValue += t;
+            }
+        }
+
+        return retValue.trim();
+    }
+    
 }
