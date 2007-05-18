@@ -32,11 +32,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.mojo.nbm.model.Dependency;
 import org.codehaus.mojo.nbm.model.NetbeansModule;
 import org.codehaus.mojo.nbm.model.io.xpp3.NetbeansModuleXpp3Reader;
+import org.codehaus.plexus.util.IOUtil;
 
 public abstract class AbstractNbmMojo extends AbstractMojo {
 
 
-    protected Project registerNbmAntTasks() {
+    protected final Project registerNbmAntTasks() {
         Project antProject = new Project();
         antProject.init();
 
@@ -63,7 +64,7 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
         return antProject;
     }
     
-    protected boolean matchesLibrary(Artifact artifact, List libraries) {
+    protected final boolean matchesLibrary(Artifact artifact, List libraries) {
 // when we have classifier like jar-assembly this condition is not true..
 // just take everything that is a dependecy, no matter of what type..        
 //        if (!"jar".equals(artifact.getType())) {
@@ -95,7 +96,7 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
         return true;
     }
     
-    protected Dependency resolveNetbeansDependency(Artifact artifact, List deps, ExamineManifest manifest) {
+    protected final Dependency resolveNetbeansDependency(Artifact artifact, List deps, ExamineManifest manifest) {
         String artId = artifact.getArtifactId();
         String grId = artifact.getGroupId();
         String id = grId + ":" + artId;
@@ -136,9 +137,12 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
         return null;
     }
     
-    protected NetbeansModule readModuleDescriptor(File descriptor) throws MojoExecutionException {
-        if (descriptor == null ||  !descriptor.exists()) {
-            return null;
+    protected final NetbeansModule readModuleDescriptor(File descriptor) throws MojoExecutionException {
+        if (descriptor == null) {
+            throw new MojoExecutionException( "The module descriptor has to be configured.");
+         }
+        if (!descriptor.exists()) {
+            throw new MojoExecutionException( "The module descriptor is missing: '" + descriptor + "'.");
         }
         Reader r = null;
         try {
@@ -147,22 +151,15 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
             NetbeansModule module = reader.read(r);
             return module;
         } catch (IOException exc) {
-            getLog().error(exc);
+            throw new MojoExecutionException( "Error while reading module descriptor '" + descriptor + "'.", exc);
         } catch (XmlPullParserException xml) {
-            getLog().error(xml);
+            throw new MojoExecutionException( "Error while reading module descriptor '" + descriptor + "'.", xml);
         } finally {
-            if (r != null) {
-                try {
-                    r.close();
-                } catch (IOException e) {
-                    getLog().error(e);
-                }
-            }
+            IOUtil.close(r);
         }
-        return null;
     }
     
-    protected NetbeansModule createDefaultDescriptor(MavenProject project, boolean log) {
+    protected final NetbeansModule createDefaultDescriptor(MavenProject project, boolean log) {
         
         if (log) getLog().info("No Module Descriptor defined, trying to fallback to generated values:");
         NetbeansModule module = new NetbeansModule();
