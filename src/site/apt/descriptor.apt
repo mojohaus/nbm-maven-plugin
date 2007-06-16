@@ -4,13 +4,13 @@
  Milos Kleint
  <mkleint@codehaus.org>
  ------
- October 10, 2005
+ Jun 15, 2007
 
 Example nbm descriptors
 
  These descriptors are referenced from the {{{nbm-mojo.html}nbm:nbm}} and {{{jar-mojo.html}nbm:jar}} mojos.
  
-*common.xml
+*Usual case
 
  A rather common module descriptor. Basic properties filled in, defines some libraries that ship with the module and
  declared dependencies on other netbeans modules.
@@ -31,46 +31,42 @@ Example nbm descriptors
    <libraries>
        <!-- these dependencies get copied to modules/ext directory in the mevenide cluster and
             get referenced from the module's jar usign the Class-Path manifest entry. 
+            Not necessary since 2.5 version of nbm-maven-plugin
          -->
        <library>org.netbeans.api:org-netbeans-graph</library>
        <library>org.netbeans.api:org-netbeans-graph-vmd</library>
    </libraries>
    <dependencies>
-      <!-- all of these dependencies get referrenced as module dependencies of this project's artifact.
+      <!-- all of these dependencies get referrenced as module dependencies of this project's artifact. 
+        Not necessary since 2.5 version of nbm-maven-plugin
+        -->
       <dependency>
           <id>org.codehaus.mevenide:run-jar-bridge</id>
-	  <type>spec</type>
       </dependency>
       <dependency>
           <id>org.codehaus.mevenide:debugger-bridge</id>
-	  <type>spec</type>
       </dependency>
       <dependency>
           <id>org.netbeans.api:org-netbeans-api-debugger-jpda</id>
-	  <type>spec</type>
       </dependency>
       <dependency>
           <id>org.netbeans.api:org-netbeans-api-debugger</id>
-	  <type>spec</type>
       </dependency>
       <dependency>
           <id>org.netbeans.api:org-netbeans-modules-options-api</id>
-	  <type>spec</type>
       </dependency>
       <dependency>
           <id>org.netbeans.api:org-openide-io</id>
-	  <type>spec</type>
       </dependency>
       <dependency>
           <id>org.netbeans.api:org-openide-modules</id>
-	  <type>spec</type>
       </dependency>
    </dependencies> 
 </nbm>
 
 ------
 
-*resources.xml
+*Additional custom files in module
 
  Apart from the usual properties, this one declares additional files that ought to be packed into the module.
 

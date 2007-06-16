@@ -46,7 +46,7 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
 import org.codehaus.mojo.nbm.model.NetbeansModule;
 
 /**
- * Create the Netbeans module artifact (nbm file)
+ * Create the Netbeans module artifact (nbm file), part of "nbm" lifecycle/packaging.
  * <p/>
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>

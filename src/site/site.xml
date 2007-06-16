@@ -28,7 +28,7 @@
       <item name="Introduction" href="introduction.html"/>
       <item name="Descriptor Format" href="nbm.html"/>
       <item name="Example Descriptor" href="descriptor.html"/>
-      <item name="2.4 -> 2.5 upgrade" href="2425update.html"/>
+      <item name="2.4 -> 2.5 upgrade" href="2425upgrade.html"/>
       <item name="Javadoc" href="apidocs/index.html"/>
     </menu>
     ${reports}

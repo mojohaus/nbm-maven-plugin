@@ -41,7 +41,7 @@ import org.apache.tools.ant.taskdefs.ManifestException;
 import org.apache.tools.ant.util.FileUtils;
 
 /**
- * goal for updating the artifact jar with netbeans specific entries.
+ * Goal for updating the artifact jar with netbeans specific entries, part of "nbm" lifecycle/packaging.
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal jar
