@@ -1,0 +1,153 @@
+ ------
+ Maven 2 NBM Plugin 
+ ------
+ Milos Kleint
+ <mkleint@codehaus.org>
+ ------
+ June 16, 2007
+
+Netbeans Module plugin
+
+ This m2 plugin is able to create Netbeans module(plugin) artifacts. It registers a new packaging type "nbm". Any project with
+this packaging will be automatically turned into a netbeans module project. Additionally it allows to create clusters of modules, generate
+an autoupdate site content or build application on top of NetBeans platform.
+
+ To get access to Netbeans.org API artifacts, add http://208.44.201.216:18080/maven/ to the list of remote repositories for your project.
+
+ The plugin is also capable of populating the local maven repository with module jars from a given Netbeans installation. Useful for 
+module development, modules with public APIs are separated from those without a public API.
+
+ Sample pom.xml excerpts for creation of a NetBeans module:
+
+------
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>example-netbeans-module</artifactId>
+  <groupId>org.mycompany.yproject</groupId>
+  <!--here is the packaging and lifecycle defined>
+  <packaging>nbm</packaging>
+
+....
+  <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <version>RELEASE</version>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
+  </build>
+
+ ....
+    <!-- this section is important only to access the binaries of netbeans that you use as dependencies -->
+    <repositories>
+        <repository>
+            <id>netbeans</id>
+            <name>repository hosting netbeans.org api artifacts</name>
+            <url>http://208.44.201.216:18080/maven</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+------
+
+ To build the project then, just type
+
++-------------------------------------------------------------------------------+
+mvn install
++-------------------------------------------------------------------------------+
+
+
+Maven Dependency vs NetBeans runtime dependency
+
+ There are important differences between Maven's dependency mechanism and NetBeans runtime dependencies.
+Maven's dependencies are transitive, so at compile time you get not only direct dependencies you declared, but also
+dependencies of dependencies etc. In Netbeans, the module dependencies are non-transitive by nature, you have to explicitly declare all at runtime.
+Additionally next to module dependencies there are also library jars attached and shipped with the module's main artifact.
+In the Netbeans terminology there is a special sort of modules called "Library Wrappers". These library wrappers
+add the libraries on the module's classpath and allow other modules to depend on the libraries within the IDE's runtime.
+
+ The ways in which the nbm-maven-plugin tries to adress these issues has changed over time.
+ 
+ In nbm-maven-plugin version 2.4 and older, you have to declare the dependencies in maven for compilation and then
+use the special module descriptor file to define the runtime dependencies and libraries.
+ 
+ In nbm-maven-plugin version 2.5 and later, we tried to simplify setting the dependencies and remove redundancies. A few rules had
+to be introduced in terms of declaring maven dependencies though.
+
+  A maven dependency is turned into a netbeans runtime dependency when:
+
+    * for netbeans module dependencies (dependency jars that have the netbeans specific entries in META-INF/MANIFEST.MF)
+
+        * It's defined in existing (though optional) module.xml file in <dependencies> section.
+
+        * It's a direct dependency (non-transitive) and is a netbeans module itself.
+
+        * When the dependency is of type "nbm". Such dependencies don't include their transitive deps on compilation classpath. 
+That should allow one to simulate the rumtime dependencies at compilation time in maven, however there's one major drawback. Not only are the nbm's module dependencies hidden, but the libraries associated with the
+given nbm module are also hidden. So you can end up with less stuff on classpath  as opposed to more stuff with "jar typed dependencies.
+
+    * for module libraries (jars that are packed together with the module and appear on it's classpath directly, not by a dependency relationship.)
+
+        * It's defined in existing (though optional) module.xml file in <libraries> section
+
+        * It's a direct dependency (non-transitive) and is not of "provided" scope.
+
+ The complete {{{nbm.html}nbm descriptor format}} documentation, and {{{descriptor.html}example descriptors}} are also available.
+
+
+Multi module setup
+
+ If you have a set of NetBeans modules, or are building on top of NetBeans platform,
+you will make use of the additional goals provided by the plugin.
+
++-------------------------------------------------------------------------------+
+mvn nbm:cluster
++-------------------------------------------------------------------------------+
+
+ This goal aggregates output of multiple netbeans module projects and creates one 
+or more clusters in the current project. So usually one runs this goal on parent pom project,
+and aggregates the content of all it's modules. 
+The resulting cluster structure can later be used for running the application, creating an installer or similar.
+
++-------------------------------------------------------------------------------+
+mvn nbm:branding
++-------------------------------------------------------------------------------+
+
+ Branding is to used when one builds an application based on NetBenans platform (as opposed to creating set of modules for the IDE)
+Branding contains all the resources that are to be changed in the platform binaries (resource bundles, images, html files etc) 
+to give the application it's unique touch. 
+
+ This goal can be attached either to one of the nbm module projects or directly to the parent pom project that 
+is the root of your platform based application project tree.
+
++-------------------------------------------------------------------------------+
+mvn nbm:run-ide nbm:run-platform
++-------------------------------------------------------------------------------+
+ 
+ These two goals do almost the same, they allow you to execute your projects content within
+the IDE or NetBeans platform. Usually one wants to prepent the nbm:cluster goal to any execution of these goals. (in case it's not part of your regular build cycle).
+run-platform allows to include/exclude clusters from the executed application and runs with the branded resources, while
+run-ide runs only adds your modules to an instance of the IDE.
+
+ For more information on plugin configuration and customization, see {{{plugin-info.html}goal documentation}}. 
+
+
+Archetypes anyone?
+ 
+ There are currently no ready-to-use archetypes available.  A simple Netbeans module and a module suite
+archetypes are being worked on at {{{https://svn.codehaus.org/mojo/trunk/mojo-archetypes}Mojo project}}. However
+these require archetypeng plugin from mojo, rather than the default maven-archetype-plugin.
+
+IDE support
+
+ The NetBeans 6.0 M9+ builds have Maven support available on the default update center. Among other features, it
+contains additional support for working with Netbeans module projects. The support includes file templates,
+important nodes in projects view, running module(s) in IDE or platform.

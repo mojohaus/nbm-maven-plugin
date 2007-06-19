@@ -1,0 +1,100 @@
+ ------
+ Maven 2 NBM Plugin 
+ ------
+ Milos Kleint
+ <mkleint@codehaus.org>
+ ------
+ Jun 15, 2007
+
+Example nbm descriptors
+
+ These descriptors are referenced from the {{{nbm-mojo.html}nbm:nbm}} and {{{jar-mojo.html}nbm:jar}} mojos.
+ 
+*Usual case
+
+ A rather common module descriptor. Basic properties filled in, defines some libraries that ship with the module and
+ declared dependencies on other netbeans modules.
+
+------
+
+<nbm>
+   <moduleType>normal</moduleType>
+   <codeNameBase>org.codehaus.mevenide.netbeans/2</codeNameBase>
+   <cluster>mevenide</cluster>
+   <manifest>src/main/nbm/manifest.mf</manifest>
+   <!-- distributionUrl important when creating an autoupdate center. The expected download URL for the module is:
+            ${distributionUrl}/${finalName}.nbm
+     -->
+   <distributionUrl>http://mevenide.codehaus.org/nbm_release2</distributionUrl>
+   <licenseName>Apache License, Version 2.0</licenseName>
+   <licenseFile>license.txt</licenseFile>
+   <libraries>
+       <!-- these dependencies get copied to modules/ext directory in the mevenide cluster and
+            get referenced from the module's jar usign the Class-Path manifest entry. 
+            Not necessary since 2.5 version of nbm-maven-plugin
+         -->
+       <library>org.netbeans.api:org-netbeans-graph</library>
+       <library>org.netbeans.api:org-netbeans-graph-vmd</library>
+   </libraries>
+   <dependencies>
+      <!-- all of these dependencies get referrenced as module dependencies of this project's artifact. 
+        Not necessary since 2.5 version of nbm-maven-plugin
+        -->
+      <dependency>
+          <id>org.codehaus.mevenide:run-jar-bridge</id>
+      </dependency>
+      <dependency>
+          <id>org.codehaus.mevenide:debugger-bridge</id>
+      </dependency>
+      <dependency>
+          <id>org.netbeans.api:org-netbeans-api-debugger-jpda</id>
+      </dependency>
+      <dependency>
+          <id>org.netbeans.api:org-netbeans-api-debugger</id>
+      </dependency>
+      <dependency>
+          <id>org.netbeans.api:org-netbeans-modules-options-api</id>
+      </dependency>
+      <dependency>
+          <id>org.netbeans.api:org-openide-io</id>
+      </dependency>
+      <dependency>
+          <id>org.netbeans.api:org-openide-modules</id>
+      </dependency>
+   </dependencies> 
+</nbm>
+
+------
+
+*Additional custom files in module
+
+ Apart from the usual properties, this one declares additional files that ought to be packed into the module.
+
+------
+
+<nbm>
+   <moduleType>eager</moduleType>
+   <codeNameBase>org.codehaus.mevenide.netbeans.nbrepo/2</codeNameBase>
+   <cluster>mevenide</cluster>
+   <manifest>src/main/nbm/manifest.mf</manifest>
+   <distributionUrl>http://mevenide.codehaus.org/nbm_release2</distributionUrl>
+   <licenseName>Apache License, Version 2.0</licenseName>
+   <licenseFile>license.txt</licenseFile>
+   <dependencies>
+       <dependency>
+           <id>org.codehaus.mevenide:nb-project</id>
+       </dependency>
+   </dependencies> 
+   <nbmResources>
+       <nbmResource>
+           <baseDirectory>../ide-mojos/target</baseDirectory>
+           <includes>
+               <include>m2-repository/**</include>
+           </includes>
+       </nbmResource>
+   </nbmResources>
+</nbm>
+
+------
+
+
