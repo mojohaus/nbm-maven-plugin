@@ -138,3 +138,16 @@ run-platform allows to include/exclude clusters from the executed application an
 run-ide runs only adds your modules to an instance of the IDE.
 
  For more information on plugin configuration and customization, see {{{plugin-info.html}goal documentation}}. 
+
+
+Archetypes anyone?
+ 
+ There are currently no ready-to-use archetypes available.  A simple Netbeans module and a module suite
+archetypes are being worked on at {{{https://svn.codehaus.org/mojo/trunk/mojo-archetypes}Mojo project}}. However
+these require archetypeng plugin from mojo, rather than the default maven-archetype-plugin.
+
+IDE support
+
+ The NetBeans 6.0 M9+ builds have Maven support available on the default update center. Among other features, it
+contains additional support for working with Netbeans module projects. The support includes file templates,
+important nodes in projects view, running module(s) in IDE or platform.
