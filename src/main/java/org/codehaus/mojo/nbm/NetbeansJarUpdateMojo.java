@@ -171,7 +171,7 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
         conditionallyAddAttribute(mainSection, "OpenIDE-Module", moduleName);
 
         //See http://www.netbeans.org/download/dev/javadoc/org-openide-modules/apichanges.html#split-of-openide-jar
-//        conditionallyAddAttribute(mainSection, "OpenIDE-Module-Requires", "org.openide.modules.ModuleFormat1");
+        conditionallyAddAttribute(mainSection, "OpenIDE-Module-Requires", "org.openide.modules.ModuleFormat1");
 //        conditionallyAddAttribute(mainSection, "OpenIDE-Module-IDE-Dependencies", "IDE/1 > 3.40");
         // localization items
         if (!examinator.isLocalized()) {
