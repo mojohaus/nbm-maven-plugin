@@ -169,6 +169,9 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
         String timestamp = new SimpleDateFormat("yyyyMMddhhmm").format(new Date());
         conditionallyAddAttribute(mainSection, "OpenIDE-Module-Build-Version", timestamp);
         conditionallyAddAttribute(mainSection, "OpenIDE-Module", moduleName);
+
+        //See http://www.netbeans.org/download/dev/javadoc/org-openide-modules/apichanges.html#split-of-openide-jar
+//        conditionallyAddAttribute(mainSection, "OpenIDE-Module-Requires", "org.openide.modules.ModuleFormat1");
 //        conditionallyAddAttribute(mainSection, "OpenIDE-Module-IDE-Dependencies", "IDE/1 > 3.40");
         // localization items
         if (!examinator.isLocalized()) {
@@ -193,9 +196,14 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
                 ExamineManifest depExaminator = new ExamineManifest();
                 depExaminator.setJarFile(artifact.getFile());
                 depExaminator.checkFile();
-                if (!depExaminator.isNetbeansModule() && matchesLibrary(artifact, librList)) {
+                if (/** MNBMODULE-15 !depExaminator.isNetbeansModule() && **/ 
+                     matchesLibrary(artifact, librList)) {
+                    if (depExaminator.isNetbeansModule()) {
+                        getLog().warn("You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId());
+                    }
                     classPath = classPath + " ext/" + artifact.getFile().getName();
-                }
+                    continue;
+                } 
                 Dependency dep = resolveNetbeansDependency(artifact, deps, depExaminator);
                 if (dep != null) {
                     String type = dep.getType();
