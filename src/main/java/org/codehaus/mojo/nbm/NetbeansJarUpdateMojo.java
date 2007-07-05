@@ -196,8 +196,14 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
                 ExamineManifest depExaminator = new ExamineManifest();
                 depExaminator.setJarFile(artifact.getFile());
                 depExaminator.checkFile();
+                String artId = artifact.getArtifactId();
+                String grId = artifact.getGroupId();
+                String id = grId + ":" + artId;
+                boolean explicit = librList.contains(id);
+                
                 if (/** MNBMODULE-15 !depExaminator.isNetbeansModule() && **/ 
-                     matchesLibrary(artifact, librList)) {
+                     matchesLibrary(artifact, librList) && 
+                     (!depExaminator.isNetbeansModule() || explicit)) {
                     if (depExaminator.isNetbeansModule()) {
                         getLog().warn("You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId());
                     }
