@@ -97,7 +97,7 @@
                         <multiplicity>*</multiplicity>
                     </association>
                 </field>
-                <field>
+                 <field>
                     <name>dependencies</name>
                     <description>List of module dependencies. The plugin will use it to Generate the OpenIDE-Module-Module-Dependencies manifest entry.</description>
                     <version>1.0.0+</version>

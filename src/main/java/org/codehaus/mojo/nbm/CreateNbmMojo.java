@@ -179,7 +179,7 @@ public class CreateNbmMojo
         modExaminator.setJarFile(jarFile);
         modExaminator.checkFile();
         String classpathValue = modExaminator.getClasspath();
-        
+
         if(module != null) {
             // copy libraries to the designated place..            
             List librList = new ArrayList();
@@ -190,7 +190,7 @@ public class CreateNbmMojo
             for ( Iterator iter = artifacts.iterator(); iter.hasNext();) {
                 Artifact artifact = (Artifact) iter.next();
                 File source = artifact.getFile();
-                if (classpathValue.contains("ext/" + source.getName()) && matchesLibrary(artifact, librList)) {
+                if (classpathValue.contains("ext/" + source.getName())) {
                     File targetDir = new File(moduleJarLocation, "ext");
                     targetDir.mkdirs();
                     File target = new File(targetDir, source.getName());

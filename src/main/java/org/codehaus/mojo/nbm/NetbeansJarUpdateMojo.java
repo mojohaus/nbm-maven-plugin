@@ -85,8 +85,8 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
      * @readonly
      */
     private MavenProject project;
-    
-    
+
+
     public void execute()
     throws MojoExecutionException {
         Project antProject = registerNbmAntTasks();
@@ -191,19 +191,12 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
             };
             List deps = module.getDependencies();
             List artifacts = project.getCompileArtifacts();
-            for ( Iterator iter = artifacts.iterator(); iter.hasNext();) {
-                Artifact artifact = (Artifact) iter.next();
+                for ( Iterator iter = artifacts.iterator(); iter.hasNext();) {
+                    Artifact artifact = (Artifact) iter.next();
                 ExamineManifest depExaminator = new ExamineManifest();
                 depExaminator.setJarFile(artifact.getFile());
                 depExaminator.checkFile();
-                String artId = artifact.getArtifactId();
-                String grId = artifact.getGroupId();
-                String id = grId + ":" + artId;
-                boolean explicit = librList.contains(id);
-                
-                if (/** MNBMODULE-15 !depExaminator.isNetbeansModule() && **/ 
-                     matchesLibrary(artifact, librList) && 
-                     (!depExaminator.isNetbeansModule() || explicit)) {
+                if (matchesLibrary(artifact, librList, depExaminator)) {
                     if (depExaminator.isNetbeansModule()) {
                         getLog().warn("You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId());
                     }
@@ -289,5 +282,4 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
             }
         }
     }
-
 }

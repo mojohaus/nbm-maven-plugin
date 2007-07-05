@@ -64,7 +64,7 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
         return antProject;
     }
     
-    protected final boolean matchesLibrary(Artifact artifact, List libraries) {
+    protected final boolean matchesLibrary(Artifact artifact, List libraries, ExamineManifest depExaminator) {
 // when we have classifier like jar-assembly this condition is not true..
 // just take everything that is a dependecy, no matter of what type..        
 //        if (!"jar".equals(artifact.getType())) {
@@ -84,6 +84,9 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
             return false;
         }
         if ("nbm".equals(artifact.getType())) {
+            return false;
+        }
+        if (depExaminator.isNetbeansModule()) {
             return false;
         }
         //only direct deps matter to us..
@@ -175,5 +178,5 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
         module.setRequiresRestart(false);
         return module;
     }
-
+    
 }
