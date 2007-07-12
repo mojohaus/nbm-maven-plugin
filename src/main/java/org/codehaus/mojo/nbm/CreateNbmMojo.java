@@ -338,7 +338,7 @@ public class CreateNbmMojo
         String licenseFile = module.getLicenseFile();
         if (licenseName != null && licenseFile != null) {
             File lf = new File(project.getBasedir(), licenseFile);
-            if (!lf.exists()) {
+            if (!lf.exists() || !lf.isFile()) {
                 getLog().warn("Cannot find license file at " + lf.getAbsolutePath());
             } else {
                 Blurb lb = nbmTask.createLicense();
