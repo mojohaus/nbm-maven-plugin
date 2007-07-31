@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archetype-descriptor id="netbeans-platform-app-archetype">
+<archetype-descriptor id="netbeans-platform-app-archetype" partial="false">
     <requiredProperties>
         <requiredProperty key="cluster" defaultValue="mavencluster"/>
         <requiredProperty key="brandingtoken" defaultValue="mavenbranding"/>
@@ -64,34 +64,4 @@
         </fileSet>
         
     </fileSets>
-    <!--modules>
-        <module id="module1">
-            <fileSets>
-                <fileSet filtered="true" packaged="true">
-                    <directory>src/main/resources</directory>
-                    <includes>
-                        <include>**/*.*</include>
-                    </includes>
-                </fileSet>
-                <fileSet filtered="true">
-                    <directory>src/main/nbm</directory>
-                    <includes>
-                        <include>**/*.*</include>
-                    </includes>
-                </fileSet>
-                <fileSet filtered="true" packaged="true">
-                    <directory>src/main/java</directory>
-                    <includes>
-                        <include>**/deleteme.txt</include>
-                    </includes>
-                </fileSet>
-                <fileSet filtered="true" packaged="true">
-                    <directory>src/test/java</directory>
-                    <includes>
-                        <include>**/deleteme.txt</include>
-                    </includes>
-                </fileSet>
-            </fileSets>
-        </module>
-    </modules-->
 </archetype-descriptor>
