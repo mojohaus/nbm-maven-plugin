@@ -10,7 +10,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
   <name>Maven Netbeans Platform Application ArchetypeNG template</name>
-  <description>Next Generation Archetype for application based on NetBeans platform</description>
+  <description>Archetype for sample application based on NetBeans platform. Creates parent pom, branding module project and empty NBM project.</description>
   <build>
       <plugins>
           <plugin>
