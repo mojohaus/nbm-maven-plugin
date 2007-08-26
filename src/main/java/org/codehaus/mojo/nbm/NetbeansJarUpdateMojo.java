@@ -51,7 +51,9 @@ import org.apache.tools.ant.util.FileUtils;
  */
 public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
     /**
-     * @parameter expression="${project.build.directory}/nbm"
+     * Netbeans module assembly build directory.
+     * directory where the the netbeans jar and nbm file get constructed.
+     * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      * @required
      */
     protected String nbmBuildDir;

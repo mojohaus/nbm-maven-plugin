@@ -59,8 +59,9 @@ import org.codehaus.mojo.nbm.model.NetbeansModule;
 public class CreateNbmMojo
         extends AbstractNbmMojo {
     /**
-     * directory where the the netbeans jar and nbm file will be constructed
-     * @parameter expression="${project.build.directory}/nbm"
+     * Netbeans module assembly build directory.
+     * directory where the the netbeans jar and nbm file get constructed.
+     * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      * @required
      */
     protected String nbmBuildDir;
