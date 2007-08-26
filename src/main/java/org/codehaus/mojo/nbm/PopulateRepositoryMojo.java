@@ -351,6 +351,8 @@ public class PopulateRepositoryMojo
                         dep.setGroupId(wr.getGroup());
                         dep.setVersion(wr.getVersion());
                         dep.setType("jar");
+//TODO possible solution to transitivity? 
+//                      dep.setOptional(true);
                         deps.add(dep);
                     }
                 } else {
@@ -383,6 +385,14 @@ public class PopulateRepositoryMojo
                                 dep.setArtifactId("swing-layout");
                                 dep.setGroupId("net.java.dev.swing-layout");
                                 dep.setVersion("1.0.1");
+                                dep.setType("jar");
+                                dep.setScope("provided");
+                                deps.add(dep);
+                            } else if ("a7a21e91ecaffdda3fb4f4ff0ae338b1".equals(md5)) {
+                                Dependency dep = new Dependency();
+                                dep.setArtifactId("swing-layout");
+                                dep.setGroupId("net.java.dev.swing-layout");
+                                dep.setVersion("1.0.2");
                                 dep.setType("jar");
                                 dep.setScope("provided");
                                 deps.add(dep);
