@@ -68,6 +68,7 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
     private String buildDir;
     
     /**
+     * Name of the final jar produced by the default jar:jar goal.
      * @parameter expression="${project.build.finalName}"
      * @required
      */

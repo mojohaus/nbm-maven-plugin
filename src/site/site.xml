@@ -19,12 +19,13 @@
       <item name="Maven" href="http://maven.apache.org/"/>
     </links>
     <menu name="Overview">
-      <item name="Introduction" href="index.html"/>
+      <item name="Usage" href="index.html"/>
       <item name="Plugin Goals" href="plugin-info.html"/>
       <item name="Descriptor Format" href="nbm.html"/>
       <item name="Example Descriptor" href="descriptor.html"/>
       <item name="2.4 -> 2.5 upgrade" href="2425upgrade.html"/>
       <item name="Javadoc" href="apidocs/index.html"/>
+      <item name="FAQ" href="faq.html"/>
     </menu>
     ${reports}
   </body>
