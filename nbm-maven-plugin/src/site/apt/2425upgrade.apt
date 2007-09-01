@@ -1,0 +1,41 @@
+ ------
+ Maven 2 NBM Plugin 
+ ------
+ Milos Kleint
+ <mkleint@codehaus.org>
+ ------
+ Jun 15, 2007
+
+Upgrading from 2.4 version to 2.5
+
+ There are  significant changes in how netbeans module system dependencies are mapped to maven's own 
+dependencies model. Th 2.4 and older version all module system deps had to be explicitly defined in the module descriptor at src/main/nbm/module.xml.
+That is no longer a requirement in 2.5 for most cases. The plugin will try to decide based on the declaration
+in maven POM file. 
+ 
+ These are the rules:
+
+    * for netbeans module dependencies (jars that have the netbeans specific entries in META-INF/MANIFEST.MF)
+
+        * It's defined in existing (though optional) module.xml file in <dependencies> section.
+
+        * It's a direct dependency (non-transitive) and is a netbeans module.
+
+        * When the dependency is of type "nbm". Such dependencies don't include their transitive deps on compilation classpath.
+
+    * for module libraries (jars that are packed together with the module and appear on it's classpath directly, not by a dependency relationship.)
+
+        * It's defined in existing (though optional) module.xml file in <libraries> section
+
+        * It's a direct dependency (non-transitive) and is not of "provided" scope.
+
+ So if you have used 2.4 and older before, you need to check your dependencies when upgrading to 2.5.
+
+    * The new plugin can pick up and declare more module dependencies than the previous version. Module dependencies are safe. 
+You either declared them in your module.xml file. Some additional ones can appear if you have them as direct dependencies in your pom.
+Use the dependency:analyze goal to check for used/unused direct dependencies.
+
+    * The new plugin can also pick up and declare more module libraries. That's something to watch out for! That happens again only when you declared the jars as direct dependencies.
+You could end up with a single jar being added to multiple modules and get runtime classpath issues and of course your download size 
+will get higher than necessary. Again the dependency:analyze goal shall help. If you know the jar is required but is provided by a module you depend on, use the "provided" scope to prevent inclusion.
+
