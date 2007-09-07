@@ -223,7 +223,7 @@ public class RunPlatformAppMojo extends AbstractMojo {
         try {
             String[] args = new String[] {
                 //TODO --jdkhome
-                "-userdir",
+                "--userdir",
                 Commandline.quoteArgument(userDir.getAbsolutePath()),
                 "-J-Dnetbeans.logger.console=true",
                 "-J-ea",
