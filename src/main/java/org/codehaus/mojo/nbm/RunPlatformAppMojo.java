@@ -209,7 +209,7 @@ public class RunPlatformAppMojo extends AbstractMojo {
         it = realEnabledClusters.iterator();
         String clustersString = "";
         while (it.hasNext()) {
-            clustersString = clustersString + ":" + ((File)it.next()).getAbsolutePath();
+            clustersString = clustersString + File.pathSeparator + ((File)it.next()).getAbsolutePath();
         }
         clustersString = clustersString.substring(1);
         
