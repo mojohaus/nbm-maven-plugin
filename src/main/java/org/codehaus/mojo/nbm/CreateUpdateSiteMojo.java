@@ -19,6 +19,7 @@
 package org.codehaus.mojo.nbm;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -113,7 +114,15 @@ public class CreateUpdateSiteMojo
                 }
             }
             MakeUpdateDesc descTask = (MakeUpdateDesc)antProject.createTask("updatedist");
-            descTask.setDesc(new File(nbmBuildDirFile, fileName).toString());
+            try {
+                //when including 6.0 beta1 ant tasks, the method signature has changed.
+                Method meth60 = descTask.getClass().getDeclaredMethod("setDesc", new Class[] {File.class});
+                meth60.invoke(descTask, new Object[] {new File(nbmBuildDirFile, fileName)});
+            } catch (NoSuchMethodException ex) {
+                descTask.setDesc(new File(nbmBuildDirFile, fileName).toString());
+            } catch (Exception ex) {
+                getLog().error(ex);
+            }
             if (distBase !=null) {
                 descTask.setDistBase(distBase);
             }
