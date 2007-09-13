@@ -42,15 +42,13 @@ public class CreateUpdateSiteMojo
         extends AbstractNbmMojo {
     /**
      * directory where the the netbeans autoupdate site will be created.
-     * @parameter expression="${project.build.directory}/netbeans_site"
-     * @required
+     * @parameter default-value="${project.build.directory}/netbeans_site"
      */
     protected String nbmBuildDir;
     
     /**
      * autoupdate site xml file name.
      * @parameter expression="${maven.nbm.updatesitexml}" default-value="Autoupdate_Site.xml"
-     * @required
      */
     protected String fileName;
     
