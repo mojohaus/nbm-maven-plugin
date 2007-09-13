@@ -29,13 +29,16 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.mojo.nbm.model.NbmResource;
 import org.apache.maven.project.MavenProject;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Copy;
+import org.apache.tools.ant.taskdefs.Jar;
 import org.apache.tools.ant.taskdefs.LoadProperties;
 import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PatternSet;
 import org.apache.tools.ant.util.FileUtils;
 import org.netbeans.nbbuild.CreateModuleXML;
@@ -44,6 +47,7 @@ import org.netbeans.nbbuild.MakeNBM;
 import org.netbeans.nbbuild.MakeNBM.Blurb;
 import org.netbeans.nbbuild.MakeNBM.Signature;
 import org.codehaus.mojo.nbm.model.NetbeansModule;
+import org.netbeans.nbbuild.JHIndexer;
 
 /**
  * Create the Netbeans module artifact (nbm file), part of "nbm" lifecycle/packaging.
@@ -62,7 +66,6 @@ public class CreateNbmMojo
      * Netbeans module assembly build directory.
      * directory where the the netbeans jar and nbm file get constructed.
      * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
-     * @required
      */
     protected String nbmBuildDir;
     
@@ -78,7 +81,6 @@ public class CreateNbmMojo
     /**
      * Name of the jar packaged by the jar:jar plugin
      * @parameter alias="jarName" expression="${project.build.finalName}"
-     * @required
      */
     private String finalName;
     
@@ -101,11 +103,43 @@ public class CreateNbmMojo
     private String keystorealias;
     
     /**
-     * a netbeans module descriptor containing dependency information and more
+     * a netbeans module descriptor containing dependency information and more..
      *
      * @parameter default-value="${basedir}/src/main/nbm/module.xml"
      */
     protected File descriptor;
+
+    /**
+     * The location of JavaHelp sources for the project. The documentation
+     * itself is expected to be in the directory structure based on codenamebase of the module.
+     * eg. if your codenamebase is "org.netbeans.modules.apisupport", the the actual docs
+     * files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs
+     * <br/>
+
+     * Additionally if you provide docs, you will need to place the JavaHelp jar on the classpath 
+     * of the nbm-plugin for the project. The jar is to be found in the netbeans/harness directory 
+     * of any NetBeans installation. <br/>
+<code>
+&lt;plugin&gt;<br/>
+  &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;<br/>
+  &lt;artifactId&gt;nbm-maven-plugin&lt;/artifactId&gt;<br/>
+  &lt;extensions&gt;true&lt;/extensions&gt;<br/>
+  &lt;dependencies&gt;<br/>
+    &lt;dependency&gt;<br/>
+      &lt;groupId&gt;javax.help&lt;/groupId&gt;<br/>
+      &lt;artifactId&gt;search&lt;/artifactId&gt;<br/>
+      &lt;version&gt;2.0&lt;/version&gt;<br/>
+      &lt;!--scope&gt;system&lt;/scope&gt;<br/>
+      &lt;systemPath&gt;/home/mkleint/netbeans/harness/jsearch-2.0_04.jar&lt;/systemPath--&gt;<br/>
+    &lt;/dependency&gt;<br/>
+  &lt;/dependencies&gt;<br/>
+&lt;/plugin&gt;<br/>
+<br/>
+</code>
+     *
+     * @parameter default-value="${basedir}/src/main/javahelp"
+     */
+    protected File nbmJavahelpSource;
     
     /**
      * @parameter expression="${project}"
@@ -264,6 +298,64 @@ public class CreateNbmMojo
                     throw new MojoExecutionException( e.getMessage(), e );
                 }
             }
+        }
+        
+        //javahelp stuff.
+        if (nbmJavahelpSource.exists()) {
+            if (!hasJavaHelp) {
+                getLog().error("jsearch.jar required on plugin classpath to generate JavaHelp.Please add this section to your nbm-maven-plugin configuration in pom.xml:" +
+                        "\n\n<plugin>" +
+                        "\n  <groupId>org.codehaus.mojo</groupId>" +
+                        "\n  <artifactId>nbm-maven-plugin</artifactId>" +
+                        "\n  <extensions>true</extensions>" +
+                        "\n  <dependencies>" +
+                        "\n    <dependency>" +
+                        "\n      <groupId>javax.help</groupId>" +
+                        "\n      <artifactId>search</artifactId>" +
+                        "\n      <version>2.0</version>" +
+                        "\n      <!--scope>system</scope>" +
+                        "\n      <systemPath>/home/mkleint/netbeans/harness/jsearch-2.0_04.jar</systemPath-->" +
+                        "\n    </dependency>" +
+                        "\n  </dependencies>" +
+                        "\n</plugin>"
+                        );
+                throw new MojoExecutionException("Required JavaHelp jar not found on nbm-maven-plugin's classpath.");
+            }
+            File javahelp_target = new File(buildDir, "javahelp");
+            String javahelpbase = moduleJarName.replace('-', File.separatorChar) + File.separator + "docs";
+            String javahelpSearch = "JavaHelpSearch";
+            File b = new File(javahelp_target, javahelpbase);
+            File p = new File(b, javahelpSearch);
+            p.mkdirs();
+            Copy cp = (Copy)antProject.createTask("copy");
+            cp.setTodir(javahelp_target);
+            FileSet set = new FileSet();
+            set.setDir(nbmJavahelpSource);
+            cp.addFileset(set);
+            cp.execute();
+            getLog().info("Generating JavaHelp Index...");
+            
+            JHIndexer jhTask = (JHIndexer)antProject.createTask("jhindexer");
+            jhTask.setBasedir(b);
+            jhTask.setDb(p);
+            jhTask.setIncludes("**/*.html");
+            jhTask.setExcludes(javahelpSearch);
+            Path path = new Path(antProject);
+            jhTask.setClassPath(path);
+            try {
+                jhTask.execute();
+            } catch (BuildException e) {
+                getLog().error( "Cannot generate JavaHelp index." );
+                throw new MojoExecutionException( e.getMessage(), e );
+            }
+            File helpJarLocation = new File(clusterDir, "modules/docs");
+            helpJarLocation.mkdirs();
+            Jar jar = (Jar)antProject.createTask("jar");
+            jar.setDestFile(new File(helpJarLocation, moduleJarName + ".jar"));
+            set = new FileSet();
+            set.setDir(javahelp_target);
+            jar.addFileset(set);
+            jar.execute();
         }
         
         File configDir = new File(clusterDir, "config" + File.separator + "Modules");
