@@ -54,7 +54,6 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
      * Netbeans module assembly build directory.
      * directory where the the netbeans jar and nbm file get constructed.
      * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
-     * @required
      */
     protected String nbmBuildDir;
     
@@ -70,7 +69,6 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
     /**
      * Name of the final jar produced by the default jar:jar goal.
      * @parameter expression="${project.build.finalName}"
-     * @required
      */
     private String finalName;
     
