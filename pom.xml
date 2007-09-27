@@ -72,6 +72,23 @@
                     <version>1.0.0</version>
                 </configuration>
             </plugin>
+          <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>ganalytics-maven-plugin</artifactId>
+              <version>1.0-SNAPSHOT</version>
+              <executions>
+                  <execution>
+                      <id>analytics</id>
+                      <phase>site</phase>
+                      <goals>
+                          <goal>inject</goal>
+                      </goals>
+                      <configuration>
+                          <id>UA-128621-2</id>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
         </plugins>
     </build>
     <dependencies>
