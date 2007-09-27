@@ -138,6 +138,7 @@ public class CreateNbmMojo
 </code>
      *
      * @parameter default-value="${basedir}/src/main/javahelp"
+     * @since 2.7
      */
     protected File nbmJavahelpSource;
     

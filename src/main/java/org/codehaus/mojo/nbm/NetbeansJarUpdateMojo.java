@@ -116,6 +116,7 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
 </code>
      *
      * @parameter default-value="${basedir}/src/main/javahelp"
+     * @since 2.7
      */
     protected File nbmJavahelpSource;
     
