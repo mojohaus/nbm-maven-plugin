@@ -54,12 +54,12 @@ import org.codehaus.plexus.util.IOUtil;
 
 
 /**
- * a goal for identifying netbeans modules from the installation and populationg the local
+ * A goal for identifying netbeans modules from the installation and populationg the local
  * repository with them. Optionally you can also deploy to a remote repository.
    <p/>
  * If you are looking for an existing remote repository for netbeans artifacts, check out
- * http://208.44.201.216:18080/maven/ it contains API artifacts for 4.1, 5.0 and 5.5 releases. 
- * 6.0 Milestone 4 and 6 also included.
+ * http://deadlock.netbeans.org/maven2/ it contains API artifacts for 4.1, 5.0 and 5.5 releases. 
+ * 6.0 Milestones and Betas also included.
  
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal populate-repository

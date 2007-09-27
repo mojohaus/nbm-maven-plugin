@@ -12,7 +12,7 @@ Netbeans Module plugin
 this packaging will be automatically turned into a netbeans module project. Additionally it allows to create clusters of modules, generate
 an autoupdate site content or build application on top of NetBeans platform.
 
- To get access to Netbeans.org API artifacts, add http://208.44.201.216:18080/maven/ to the list of remote repositories for your project.
+ To get access to Netbeans.org API artifacts, add http://deadlock.netbeans.org/maven2/ to the list of remote repositories for your project.
 
  The plugin is also capable of populating the local maven repository with module jars from a given Netbeans installation. Useful for 
 module development, modules with public APIs are separated from those without a public API.
@@ -46,7 +46,7 @@ module development, modules with public APIs are separated from those without a 
         <repository>
             <id>netbeans</id>
             <name>repository hosting netbeans.org api artifacts</name>
-            <url>http://208.44.201.216:18080/maven</url>
+            <url>http://deadlock.netbeans.org/maven2/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
