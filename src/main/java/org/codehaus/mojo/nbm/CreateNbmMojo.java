@@ -246,6 +246,7 @@ public class CreateNbmMojo
                 cp.setTodir(clusterDir);
                 HashMap customPaths = new HashMap();
                 Iterator it = nbmResources.iterator();
+                boolean hasStandard = false;
                 while (it.hasNext()) {
                     NbmResource res = (NbmResource)it.next();
                     if (res.getBaseDirectory() != null) {
@@ -271,14 +272,17 @@ public class CreateNbmMojo
                                 col = new ArrayList();
                                 customPaths.put(path, col);
                             }
-                            col.add(path);
+                            col.add(set);
                         } else {
                             cp.addFileset(set);
+                            hasStandard = true;
                         }
                     }
                 }
-                try {
-                    cp.execute();
+               try {
+                    if (hasStandard) {
+                        cp.execute();
+                    }
                     if (customPaths.size() > 0) {
                         Iterator itx = customPaths.entrySet().iterator();
                         while (itx.hasNext()) {
