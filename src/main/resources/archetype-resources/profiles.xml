@@ -8,12 +8,12 @@
        <profile>
            <id>netbeans-location</id>
            <properties>
-               <netbeans.installation.directory>fill in your netbeans platform path</netbeans.installation.directory>
+               <netbeans.installation.directory>${netbeans-install}</netbeans.installation.directory>
            </properties>
        </profile>
    </profiles>
    
-   <!--activeProfiles>
+   <activeProfiles>
        <activeProfile>netbeans-location</activeProfile>
-   </activeProfiles-->
+   </activeProfiles>
 </profilesXml>

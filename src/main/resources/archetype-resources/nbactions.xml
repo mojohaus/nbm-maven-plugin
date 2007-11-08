@@ -15,4 +15,12 @@
             <goal>nbm:cluster</goal>
         </goals>
     </action>
+    <action>
+        <actionName>CUSTOM-build-zip</actionName>
+        <goals>
+            <goal>install</goal>
+            <goal>nbm:cluster</goal>
+            <goal>assembly:assembly</goal>
+        </goals>
+    </action>
 </actions>

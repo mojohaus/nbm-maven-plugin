@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archetype-descriptor id="netbeans-platform-app-archetype" partial="false">
+<archetype-descriptor id="netbeans-platform-app-archetype" partial="false" name="NetBeans Platform Application Archetype">
     <requiredProperties>
         <requiredProperty key="cluster" defaultValue="mavencluster"/>
         <requiredProperty key="brandingtoken" defaultValue="mavenbranding"/>
+        <requiredProperty key="netbeans-install" defaultValue="path-to-netbeans-platform-installation"/>
     </requiredProperties>
     <fileSets>
         <fileSet filtered="true">
@@ -11,13 +12,14 @@
                 <include>**/*.properties</include>
             </includes>
         </fileSet>
-        <!--fileSet filtered="true">
-            <directory>${basedir}</directory>
+        <fileSet filtered="true">
+            <directory></directory>
             <includes>
                 <include>profiles.xml</include>
                 <include>nbactions.xml</include>
+                <include>src/**/*.*</include>
             </includes>
-        </fileSet-->
+        </fileSet>
         <fileSet filtered="false">
             <directory>branding/src/main/nbm-branding</directory>
             <includes>
