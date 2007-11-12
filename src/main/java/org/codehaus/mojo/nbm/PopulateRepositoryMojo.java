@@ -212,7 +212,7 @@ public class PopulateRepositoryMojo
             File module = new File(token);
             String clust = module.getAbsolutePath().substring(rootDir.getAbsolutePath().length() + 1);
             clust = clust.substring(0, clust.indexOf(File.separator));
-            ExamineManifest examinator = new ExamineManifest();
+            ExamineManifest examinator = new ExamineManifest(getLog());
             examinator.setPopulateDependencies(true);
             examinator.setJarFile(module);
             examinator.checkFile();

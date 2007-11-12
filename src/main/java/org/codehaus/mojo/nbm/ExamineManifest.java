@@ -28,6 +28,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 
 /**
  * Tag examines the manifest of a jar file and retrieves netbeans specific information.
@@ -35,6 +36,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  *
  */
 public class ExamineManifest  {
+    private Log logger;
     
     private File jarFile;
     private File manifestFile;
@@ -50,7 +52,10 @@ public class ExamineManifest  {
     private boolean publicPackages;
     private boolean populateDependencies = false;
     private List dependencyTokens = Collections.EMPTY_LIST;
-   
+
+    ExamineManifest(Log logger) {
+        this.logger = logger;
+    }
     
     public void checkFile() throws MojoExecutionException {
         
@@ -93,7 +98,12 @@ public class ExamineManifest  {
         if (mf != null) {
             processManifest(mf);
         } else {
-            throw new MojoExecutionException("Cannot read jar file or manifest file");
+            //MNBMODULE-22
+            File source = manifestFile;
+            if (source == null) {
+                source = jarFile;
+            }
+            logger.info("Cannot find manifest entries in " + source.getAbsolutePath());
         }
     }
     

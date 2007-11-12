@@ -159,7 +159,7 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
         if (nbmManifest != null && nbmManifest.exists()) {
             specialManifest = nbmManifest;
         }
-        ExamineManifest examinator = new ExamineManifest();
+        ExamineManifest examinator = new ExamineManifest(getLog());
         if (specialManifest != null) {
             examinator.setManifestFile(specialManifest);
         } else {
@@ -228,7 +228,7 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
             List artifacts = project.getCompileArtifacts();
                 for ( Iterator iter = artifacts.iterator(); iter.hasNext();) {
                     Artifact artifact = (Artifact) iter.next();
-                ExamineManifest depExaminator = new ExamineManifest();
+                ExamineManifest depExaminator = new ExamineManifest(getLog());
                 depExaminator.setJarFile(artifact.getFile());
                 depExaminator.checkFile();
                 if (matchesLibrary(artifact, librList, depExaminator)) {

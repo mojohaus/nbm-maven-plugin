@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.maven.artifact.Artifact;
+//import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.mojo.nbm.model.NbmResource;
 import org.apache.maven.project.MavenProject;
@@ -147,6 +148,13 @@ public class CreateNbmMojo
      */
     private MavenProject project;
     
+//    /**
+//     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
+//     * @required
+//     * @readonly
+//     */
+//    private ArtifactFactory artifactFactory;
+    
     /**
      * custom distribution URL, overriding the value in the nbm descriptor
      * 
@@ -209,7 +217,7 @@ public class CreateNbmMojo
             throw new MojoExecutionException("Cannot copy module jar", ex);
         }
         
-        ExamineManifest modExaminator = new ExamineManifest();
+        ExamineManifest modExaminator = new ExamineManifest(getLog());
         modExaminator.setJarFile(jarFile);
         modExaminator.checkFile();
         String classpathValue = modExaminator.getClasspath();
@@ -469,7 +477,11 @@ public class CreateNbmMojo
             throw new MojoExecutionException( e.getMessage(), e );
         }
         try {
-            FileUtils.newFileUtils().copyFile(nbmFile, new File(buildDir, nbmFile.getName()));
+            File nbmfile = new File(buildDir, nbmFile.getName());
+            FileUtils.newFileUtils().copyFile(nbmFile, nbmfile);
+//            Artifact atr = artifactFactory.createBuildArtifact(project.getGroupId(), project.getArtifactId(), project.getVersion(), "nbm-file");
+//            atr.setFile(nbmfile);
+//            project.addAttachedArtifact(atr);
         } catch (IOException ex) {
             getLog().error("Cannot copy nbm to build directory");
             throw new MojoExecutionException("Cannot copy nbm to build directory", ex);
