@@ -103,7 +103,7 @@ public class ExamineManifest  {
             if (source == null) {
                 source = jarFile;
             }
-            logger.info("Cannot find manifest entries in " + source.getAbsolutePath());
+            logger.debug("Cannot find manifest entries in " + source.getAbsolutePath());
         }
     }
     
