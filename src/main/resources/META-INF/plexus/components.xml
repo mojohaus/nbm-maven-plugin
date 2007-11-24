@@ -23,6 +23,19 @@
       </configuration>
     </component>
     <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>nbm-file</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>nbm-file</type>
+        <extension>nbm</extension>
+        <packaging>nbm-file</packaging>
+        <addedToClasspath>false</addedToClasspath>
+        <language>java</language>
+        <includesDependencies>false</includesDependencies>
+      </configuration>
+    </component>
+    <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>nbm</role-hint>
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
@@ -34,13 +47,18 @@
           <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
           <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
           <package>org.apache.maven.plugins:maven-jar-plugin:jar, 
-                   org.codehaus.mojo:nbm-maven-plugin:jar,
-                   org.codehaus.mojo:nbm-maven-plugin:nbm
+                   org.codehaus.mojo:nbm-maven-plugin:jar
           </package>
           <install>org.apache.maven.plugins:maven-install-plugin:install</install>
           <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
         </phases>
       </configuration>
     </component>
+    <!--component>
+      <role>org.apache.maven.toolchain.ToolchainFactory</role>
+      <role-hint>netbeans</role-hint>
+      <implementation>org.codehaus.mojo.nbm.toolchain.NetbeansToolchainFactory</implementation>
+    </component-->
+    
   </components>
 </component-set>

@@ -1,0 +1,21 @@
+ ------
+ Maven 2 NBM Plugin 
+ ------
+ Milos Kleint
+ <mkleint@codehaus.org>
+ ------
+ Nov 24, 2007
+
+Upgrading from 2.6 version to 2.7
+
+ There are a few significant incompatible changes introduced in 2.7's version of
+NBM packaging lifecycle. The result should be faster builds and more freedom in customizing the builds.
+
+
+   * The NBM file is currently not built by default. You need to explicitly invoke nbm:nbm goal to create the NBM file.
+
+   * Before creating the cluster(s) of modules via the nbm:cluster goal, you need to invoke nbm:directory to
+ create the actual NetBeans specific directory setup in the project's target/nbm folder. The nbm:cluster goal then merges these
+directories into a single directory.
+
+   * TBD

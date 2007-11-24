@@ -308,6 +308,7 @@ public class NetbeansJarUpdateMojo extends AbstractNbmMojo {
         try {
             original.delete();
             FileUtils.newFileUtils().copyFile(jarFile, original);
+            jarFile.delete();
         } catch (IOException ex) {
             getLog().error("Cannot copy module jar to original location");
             throw new MojoExecutionException("Cannot copy module jar to original location", ex);

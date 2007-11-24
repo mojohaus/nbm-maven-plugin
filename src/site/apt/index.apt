@@ -116,6 +116,7 @@ mvn nbm:cluster
 or more clusters in the current project. So usually one runs this goal on parent pom project,
 and aggregates the content of all it's modules. 
 The resulting cluster structure can later be used for running the application, creating an installer or similar.
+Since 2.7, you should invoke nbm:directory on affected projects before nbm:cluster. See {{{2727upgrade.html}2.6-2.7 upgrade}} page. 
 
 +-------------------------------------------------------------------------------+
 mvn nbm:branding

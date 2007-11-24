@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -65,9 +66,9 @@ public class CreateClusterMojo
     private List reactorProjects;
     
     
-    public void execute() throws MojoExecutionException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         Project antProject = registerNbmAntTasks();
-        
+            
         File nbmBuildDirFile = new File(nbmBuildDir);
         if (!nbmBuildDirFile.exists()) {
             nbmBuildDirFile.mkdirs();
@@ -87,12 +88,18 @@ public class CreateClusterMojo
                     set.setDir(nbmDir);
                     set.createInclude().setName("**");
                     copyTask.addFileset(set);
-
+                
                     try {
                         copyTask.execute();
                     } catch (BuildException ex) {
                         getLog().error("Cannot merge modules into cluster");
                         throw new MojoExecutionException("Cannot merge modules into cluster", ex);
+                    }
+                } else {
+                    if ("nbm".equals(proj.getPackaging())) {
+                        String error = "Since 2.7, the nbm:nbm goal is not part of the lifecycle. \nTherefore the NetBeans binary directory structure for " + proj.getId() + " is not created yet." +
+                                "\n Please execute 'mvn install nbm:directory nbm:cluster' to get the same results as in earlier versions.";
+                        throw new MojoFailureException(error);
                     }
                 }
             }
