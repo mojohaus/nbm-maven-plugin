@@ -13,9 +13,28 @@ NBM packaging lifecycle. The result should be faster builds and more freedom in 
 
 
    * The NBM file is currently not built by default. You need to explicitly invoke nbm:nbm goal to create the NBM file.
+Alternatively you can attach the nbm:nbm goal to the packaging phase.
+
+------
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>nbm-maven-plugin</artifactId>
+                    <version>2.7</version>
+                    <executions>
+                        <execution>
+                            <id>nbm</id>                                
+                            <phase>package</phase>
+                            <goals>
+                                <goal>nbm</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+------
 
    * Before creating the cluster(s) of modules via the nbm:cluster goal, you need to invoke nbm:directory to
  create the actual NetBeans specific directory setup in the project's target/nbm folder. The nbm:cluster goal then merges these
-directories into a single directory.
+directories into a single directory. The nbm:directory goal can be attached to the 
+packaging phase (see above for example)
 
    * TBD
