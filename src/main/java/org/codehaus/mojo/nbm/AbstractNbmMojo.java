@@ -122,6 +122,9 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
                 if (manifest.isNetbeansModule()) {
                     return dep;
                 } else {
+                    if (dep.getExplicitValue() != null) {
+                        return dep;
+                    }
                     getLog().warn(id + " declared as module dependency in descriptor, but not a NetBeans module");
                     return null;
                 }
