@@ -24,6 +24,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.util.FileUtils;
 import org.netbeans.nbbuild.MakeNBM;
@@ -64,11 +65,12 @@ public class CreateNbmMojo
     
     
     /**
-     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
-     * @required
-     * @readonly
+     * Used for attaching the artifact in the project
+     *
+     * @component
      */
-    private ArtifactFactory artifactFactory;
+    private MavenProjectHelper projectHelper;
+    
     
     
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -145,9 +147,8 @@ public class CreateNbmMojo
         try {
             File nbmfile = new File(buildDir, nbmFile.getName());
             FileUtils.newFileUtils().copyFile(nbmFile, nbmfile);
-            Artifact atr = artifactFactory.createBuildArtifact(project.getGroupId(), project.getArtifactId(), project.getVersion(), "nbm-file");
-            atr.setFile(nbmfile);
-            project.addAttachedArtifact(atr);
+            projectHelper.attachArtifact( project, "nbm-file", null, nbmfile);
+            
         } catch (IOException ex) {
             getLog().error("Cannot copy nbm to build directory");
             throw new MojoExecutionException("Cannot copy nbm to build directory", ex);
