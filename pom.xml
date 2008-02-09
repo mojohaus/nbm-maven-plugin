@@ -11,7 +11,4 @@
   <packaging>jar</packaging>
   <name>Maven Netbeans Platform Application ArchetypeNG template</name>
   <description>Archetype for sample application based on NetBeans platform. Creates parent pom, branding module project and empty NBM project.</description>
-  <properties>
-        <netbeans.hint.useExternalMaven>true</netbeans.hint.useExternalMaven>
-    </properties>
 </project>

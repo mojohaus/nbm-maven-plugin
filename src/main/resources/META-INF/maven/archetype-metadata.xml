@@ -7,33 +7,20 @@
     </requiredProperties>
     <fileSets>
         <fileSet filtered="true">
-            <directory>branding/src/main/nbm-branding</directory>
-            <includes>
-                <include>**/*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet filtered="true">
             <directory></directory>
             <includes>
                 <include>profiles.xml</include>
                 <include>nbactions.xml</include>
-                <include>src/**/*.*</include>
+                <include>src/main/assembly/*.*</include>
+                <include>src/main/nbm-branding/**/*.properties</include>
             </includes>
         </fileSet>
         <fileSet filtered="false">
-            <directory>branding/src/main/nbm-branding</directory>
+            <directory>src/main/nbm-branding</directory>
             <includes>
                 <include>**/*.gif</include>
             </includes>
         </fileSet>
-        <fileSet filtered="true">
-            <directory>branding</directory>
-            <includes>
-                <include>pom.xml</include>
-            </includes>
-        </fileSet>
-        
-        
         <fileSet filtered="true" packaged="true">
             <directory>module1/src/main/resources</directory>
             <includes>

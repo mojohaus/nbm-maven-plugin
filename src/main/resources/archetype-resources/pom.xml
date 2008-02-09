@@ -38,7 +38,22 @@
                     <finalName>${pom.artifactId}</finalName>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>branding</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>branding</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
+        
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -64,6 +79,5 @@
     
     <modules>
         <module>module1</module>
-        <module>branding</module>
     </modules>    
 </project>
