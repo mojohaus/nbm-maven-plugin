@@ -12,9 +12,4 @@
    <!--libraries>
       <library>jdom:jdom</library>
    </libraries--> 
-    <dependencies>
-       <dependency>
-          <id>org.netbeans.api:org-openide-util</id>
-       </dependency>
-    </dependencies> 
 </nbm>
