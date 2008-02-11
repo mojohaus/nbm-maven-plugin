@@ -6,7 +6,7 @@
  ------
  Nov 24, 2007
 
-Upgrading from 2.6 version to 2.7
+Upgrading from 2.6 version to 2.7 (not yet released)
 
  There are a few significant incompatible changes introduced in 2.7's version of
 NBM packaging lifecycle. The result should be faster builds and more freedom in customizing the builds.
