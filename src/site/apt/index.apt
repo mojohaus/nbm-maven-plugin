@@ -147,10 +147,26 @@ run-ide runs only adds your modules to an instance of the IDE.
 
 Archetypes anyone?
  
- There are currently no ready-to-use archetypes available.  A simple Netbeans module and a module suite
-archetypes are being worked on at {{{https://svn.codehaus.org/mojo/trunk/mojo-archetypes}Mojo project}}. However
-these require archetypeng plugin from mojo, rather than the default maven-archetype-plugin.
+ There are 2 basic archetypes:
 
+ The first once creates a single project preconfigured to be a NetBeans module. Use this
+one if you are developing a NetBeans IDE module or a module for NetBeans platform based application module.
+
++-------------------------------------------------------------------------------+
+mvn -B -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=nbm-archetype -DarchetypeVersion=1.0 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 -Dpackage=org.kleint.milos org.apache.maven.plugins:maven-archetype-plugin:2.0-alpha-1:create
++-------------------------------------------------------------------------------+
+
+ The second one creates a parent pom project containing configuration and application branding for your NetBeans platform based application.
+Additionally it contains a sample empty module.
+
++-------------------------------------------------------------------------------+
+mvn -B -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=netbeans-platform-app-archetype -DarchetypeVersion=1.0 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 -Dpackage=org.kleint.milos -Dcluster=milos -Dnetbeans-install=/home/mkleint/netbeans-6.0 -Dbrandingtoken=milos org.apache.maven.plugins:maven-archetype-plugin:2.0-alpha-1:create
++-------------------------------------------------------------------------------+
+
+ PLEASE NOTE: Due to a bug in 2.0-alpha-1, the command needs to run in batch mode (-B) and all archetype properties need to be specified.
+Alternatively one can use the latest binaries of mevenide from {{{http://deadlock.netbeans.org/hudson/job/mevenide/}NetBeans CI Hudson server}} which
+have these archetypes listed in the basic set of archetypes.
+ 
 IDE support
 
  The NetBeans 6.0 M9+ builds have Maven support available on the default update center. Among other features, it
