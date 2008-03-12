@@ -54,11 +54,6 @@
         </phases>
       </configuration>
     </component>
-    <!--component>
-      <role>org.apache.maven.toolchain.ToolchainFactory</role>
-      <role-hint>netbeans</role-hint>
-      <implementation>org.codehaus.mojo.nbm.toolchain.NetbeansToolchainFactory</implementation>
-    </component-->
     
   </components>
 </component-set>

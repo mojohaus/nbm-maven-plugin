@@ -116,9 +116,9 @@ public class RunPlatformAppMojo extends AbstractMojo {
      * @readonly
      */
     private MavenProject project;
-
+    
     /**
-     * 
+     *
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
      */
@@ -245,5 +245,5 @@ public class RunPlatformAppMojo extends AbstractMojo {
             throw new MojoExecutionException("Failed executing NetBeans", e);
         }
     }
-
-}
+    
+                }
