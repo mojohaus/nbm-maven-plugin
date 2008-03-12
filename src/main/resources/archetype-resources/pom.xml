@@ -37,6 +37,17 @@
                     <descriptor>src/main/nbm/module.xml</descriptor>
                 </configuration>
             </plugin>
+            
+            <!-- netbeans modules in 5.5+ are 1.5 compatible -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
