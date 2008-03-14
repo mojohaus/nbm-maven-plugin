@@ -200,8 +200,10 @@ public class CreateNetbeansFileStructureMojo
         
         //2. create nbm resources
         File moduleFile = new File(moduleJarLocation, moduleJarName + ".jar");
+        
+        getLog().info("Copying module jar to " + moduleJarLocation);
         try {
-            FileUtils.newFileUtils().copyFile(jarFile, moduleFile);
+            FileUtils.newFileUtils().copyFile(jarFile, moduleFile, null, true, false);
         } catch (IOException ex) {
             getLog().error("Cannot copy module jar");
             throw new MojoExecutionException("Cannot copy module jar", ex);
@@ -228,7 +230,7 @@ public class CreateNetbeansFileStructureMojo
                     File target = new File(targetDir, source.getName());
                     
                     try {
-                        FileUtils.newFileUtils().copyFile(source, target);
+                        FileUtils.newFileUtils().copyFile(source, target, null, true, false);
                     } catch (IOException ex) {
                         getLog().error("Cannot copy library jar");
                         throw new MojoExecutionException("Cannot copy library jar", ex);
