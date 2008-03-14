@@ -19,6 +19,8 @@
 package org.codehaus.mojo.nbm;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -101,6 +103,21 @@ public class CreateClusterMojo
                                 "\n Please execute 'mvn install nbm:directory nbm:cluster' to get the same results as in earlier versions.";
                         throw new MojoFailureException(error);
                     }
+                }
+            }
+            //in 6.1 the rebuilt modules will be cached if the timestamp is not touched.
+            File[] files = nbmBuildDirFile.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    File stamp = new File(files[i], ".lastModified");
+                    if (!stamp.exists()) {
+                        try {
+                            stamp.createNewFile();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    stamp.setLastModified(new Date().getTime());
                 }
             }
             getLog().info("Created NetBeans module cluster(s) at " + nbmBuildDir);
