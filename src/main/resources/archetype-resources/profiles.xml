@@ -8,7 +8,7 @@
        <profile>
            <id>netbeans-location</id>
            <properties>
-               <netbeans.installation.directory>${netbeans-install}</netbeans.installation.directory>
+               <netbeans.installation>${netbeans-install}</netbeans.installation>
            </properties>
        </profile>
    </profiles>
