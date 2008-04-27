@@ -41,6 +41,16 @@
             </roles>
         </developer>
     </developers>
+    <contributors>
+        <contributor>
+            <name>Johan Andrén</name>
+            <email>protected</email>
+            <roles>
+                <role>Patch Contributor</role>
+                <role>Goal Contributor</role>
+            </roles>
+        </contributor>
+    </contributors>
     <build>
         <plugins>
             <plugin>

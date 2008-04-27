@@ -21,10 +21,9 @@ package org.codehaus.mojo.nbm;
 import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Taskdef;
-import org.netbeans.nbbuild.Branding;
+import org.codehaus.plexus.archiver.jar.JarArchiver;
+import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Package branding resources for NetBeans platform/IDE based application.
@@ -53,14 +52,14 @@ import org.netbeans.nbbuild.Branding;
  */
 public class BrandingMojo
         extends AbstractNbmMojo {
-    
+
     /**
      * directory where the the binary content is created.
      * @parameter expression="${project.build.directory}/nbm"
      * @required
      */
     protected String nbmBuildDir;
-    
+
     /**
      * Location of the branded resources.
      * @parameter expression="${basedir}/src/main/nbm-branding"
@@ -74,7 +73,7 @@ public class BrandingMojo
      * @required
      */
     private String brandingToken;
-    
+
     /**
      * cluster of the branding.
      *
@@ -82,42 +81,84 @@ public class BrandingMojo
      * @required
      */
     protected String cluster;
-    
+
     /**
      * @parameter expression="${project}"
      * @required
      * @readonly
      */
     private MavenProject project;
-    
-    
+
     public void execute() throws MojoExecutionException {
-        Project antProject = registerNbmAntTasks();
-
-        //load task..
-        Taskdef taskdef = (Taskdef) antProject.createTask( "taskdef" );
-        taskdef.setClassname("org.netbeans.nbbuild.Branding" );
-        taskdef.setName("branding");
-        taskdef.execute();
-
-        Branding brandingTask = (Branding)antProject.createTask("branding");
-        brandingTask.setToken(brandingToken);
         
-        File clusterDir = new File(nbmBuildDir, "netbeans" + File.separator + cluster);
-        clusterDir.mkdirs();
-        brandingTask.setCluster(clusterDir);
-        
-        File brandSourcesDir = new File(brandingSources);
-        if (!brandSourcesDir.exists()) {
-            throw new MojoExecutionException("brandingSources have to exist at " + brandingSources);
-        }
-        brandingTask.setOverrides(brandSourcesDir);
         try {
-            brandingTask.execute();
-        } catch (BuildException e) {
-            getLog().error( "Cannot brand application" );
-            throw new MojoExecutionException( e.getMessage(), e );
+
+            DirectoryScanner scanner = new DirectoryScanner();
+            scanner.setIncludes(new String[]{"**/*.*"});
+            scanner.addDefaultExcludes();
+            scanner.setBasedir(brandingSources);
+            scanner.scan();
+
+            File clusterDir = new File(nbmBuildDir, "netbeans" + File.separator + cluster);
+            clusterDir.mkdirs();
+
+            // copy all files and see to it that they get the correct names
+            for (String brandingFilePath : scanner.getIncludedFiles()) {
+                File brandingFile = new File(brandingSources, brandingFilePath);
+                String destinationFilePath = destinationFileName(brandingFilePath);
+                File brandingDestination = new File(clusterDir, destinationFilePath);
+                if (!brandingDestination.getParentFile().exists()) {
+                    brandingDestination.getParentFile().mkdirs();
+                }
+                FileUtils.copyFile(brandingFile, brandingDestination);
+            }
+            
+            // create jar-files from each toplevel .jar directory
+            scanner.setIncludes(new String[] {"*/*.jar"});
+            scanner.setBasedir(clusterDir);
+            scanner.scan();
+            
+            for (String jarDirectoryPath: scanner.getIncludedDirectories()) {
+                
+                // move nnn.jar directory to nnn.jar.tmp
+                File jarDirectory = new File(clusterDir, jarDirectoryPath);
+                
+                // jars should be placed in locales/ under the same directory the jar-directories are
+                File destinationJar = 
+                        new File(jarDirectory.getParentFile().getAbsolutePath() + 
+                        File.separator + "locale" + 
+                        File.separator + destinationFileName(jarDirectory.getName()));
+                
+                // create nnn.jar archive of contents
+                JarArchiver archiver = new JarArchiver();
+                archiver.setDestFile(destinationJar);
+                archiver.addDirectory(jarDirectory);
+                archiver.createArchive();
+                
+                FileUtils.deleteDirectory(jarDirectory);
+            }
+
+        } catch (Exception ex) {
+            throw new MojoExecutionException("Error creating branding", ex);
         }
+
         getLog().info("Created branded jars for branding '" + brandingToken + "'.");
+    }
+
+    private String destinationFileName(String brandingFilePath) {
+        // use first underscore in filename 
+        int lastSeparator = brandingFilePath.indexOf(File.separator);
+        int firstUnderscore = brandingFilePath.indexOf("_", lastSeparator);
+
+        if (firstUnderscore != -1) {
+            return brandingFilePath.substring(0, firstUnderscore) + "_" +
+                    brandingToken + "_" +
+                    brandingFilePath.substring(firstUnderscore + 1);
+        }
+        
+        // no underscores, use dot
+        int lastDot = brandingFilePath.lastIndexOf(".");
+        return brandingFilePath.substring(0, lastDot) +
+                "_" + brandingToken + brandingFilePath.substring(lastDot);
     }
 }
