@@ -38,8 +38,9 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 
 /**
- * @author <a href="mailto:johan.andren@databyran.se">Johan AndrÃ©n</a>
- * @goal create-webstart
+ * @author <a href="mailto:johan.andren@databyran.se">Johan Andren</a>
+ * @goal webstart
+ * @aggregator
  */
 public class CreateWebstartMojo extends AbstractDistributionMojo {
 
@@ -98,8 +99,13 @@ public class CreateWebstartMojo extends AbstractDistributionMojo {
             // setup filter properties for the jnlp-templates
             Properties filterProperties = new Properties();
             filterProperties.setProperty("app.title", project.getName());
-            filterProperties.setProperty("app.vendor", project.getOrganization().getName());
-            filterProperties.setProperty("app.description", project.getDescription());
+            if (project.getOrganization() != null) {
+                filterProperties.setProperty("app.vendor", project.getOrganization().getName());
+            } else {
+                filterProperties.setProperty("app.vendor", "Nobody");
+            }
+            String description = project.getDescription() != null ? project.getDescription() : "No Project Description";
+            filterProperties.setProperty("app.description", description);
             filterProperties.setProperty("branding.token", brandingToken);
 
             // split default options into <argument> blocks

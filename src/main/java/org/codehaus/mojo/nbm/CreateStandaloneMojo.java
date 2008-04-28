@@ -30,8 +30,9 @@ import org.codehaus.plexus.util.FileUtils;
  * Create a standalone application out of the available clusters and netbeans
  * installation.
  *
- * @author <a href="mailto:johan.andren@databyran.se">Johan AndrÃ©n</a>
- * @goal create-standalone
+ * @author <a href="mailto:johan.andren@databyran.se">Johan Andren</a>
+ * @goal standalone-zip
+ * @aggregator
  */
 public class CreateStandaloneMojo extends AbstractDistributionMojo {
 
