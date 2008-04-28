@@ -21,7 +21,7 @@
         <url>http://jira.codehaus.org/browse/MNBMODULE</url>
     </issueManagement>
     <prerequisites>
-        <maven>2.0.4</maven>
+        <maven>2.0.6</maven>
     </prerequisites>
     <licenses>
         <license>
@@ -179,9 +179,9 @@
             <version>5.5</version>
         </dependency>
         <dependency>
-            <groupId>plexus</groupId>
+            <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>1.0.3</version>
+            <version>1.5.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -193,6 +193,12 @@
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
             <version>1.0-alpha-10</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>plexus-component-api</artifactId>
+                    <groupId>org.codehaus.plexus</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <reporting>
