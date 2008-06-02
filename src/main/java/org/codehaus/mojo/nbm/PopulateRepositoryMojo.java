@@ -40,8 +40,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
@@ -107,6 +109,14 @@ public class PopulateRepositoryMojo
      */
     
     protected String netbeansSourcesDirectory;
+    
+    /**
+     * Assumes a folder with &lt;code-name-base&gt;.nbm files containing nbm files for modules.
+     * @parameter expression="${netbeansNbmDirectory}"
+     */
+    
+    protected String nbmDirectory;
+    
     /**
      * Optional parameter, when specified, will force all modules to have the designated version.
      * Good when depending on releases. Then you would for example specify RELEASE50 in this parameter and
@@ -219,6 +229,12 @@ public class PopulateRepositoryMojo
             if (examinator.isNetbeansModule()) {
                 //TODO get artifact id from the module's manifest?
                 String artifact = module.getName().substring(0, module.getName().indexOf(".jar"));
+                if ("boot".equals(artifact)) {
+                    artifact = "org-netbeans-bootstrap";
+                }
+                if ("core".equals(artifact)) {
+                    artifact = "org-netbeans-core-startup";
+                }
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
                 String group = "org.netbeans." + (examinator.hasPublicPackages() ? "api" : "modules");
                 String m = examinator.getModule();
@@ -230,6 +246,7 @@ public class PopulateRepositoryMojo
                 examinator.setModule(m);
                 Artifact art = createArtifact(artifact, version, group);
                 ModuleWrapper wr = new ModuleWrapper(artifact, version, group, examinator, module);
+                wr.setCluster(clust);
                 moduleDefinitions.put(wr, art);
                 Collection col = (Collection)clusters.get(clust);
                 if (col == null) {
@@ -259,6 +276,16 @@ public class PopulateRepositoryMojo
                 throw new MojoExecutionException("The netbeansSourceDirectory parameter doesn't point to an existing folder");
             }
         }
+        
+        File nbmRoot = null;
+        if (nbmDirectory != null) {
+            nbmRoot = new File(nbmDirectory);
+            if (!nbmRoot.exists()) {
+                nbmRoot = null;
+                throw new MojoExecutionException("The nbmDirectory parameter doesn't point to an existing folder");
+            }
+        }
+        
         while (it.hasNext()) {
             Map.Entry elem = (Map.Entry) it.next();
             ModuleWrapper man = (ModuleWrapper)elem.getKey();
@@ -292,6 +319,22 @@ public class PopulateRepositoryMojo
                                                                               "jar", "sources");
                 }
             }
+            File nbm = null;
+            Artifact nbmArt = null;
+            if (nbmRoot != null) {
+                File zip = new File(nbmRoot, art.getArtifactId() + ".nbm");
+                
+                if (!zip.exists()) {
+                    zip = new File(nbmRoot, man.getCluster() + File.separator + art.getArtifactId() + ".nbm");
+                }
+                if (zip.exists()) {
+                    nbm = zip;
+                    nbmArt = artifactFactory.createArtifact(art.getGroupId(), 
+                                                            art.getArtifactId(),
+                                                            art.getVersion(),
+                                                            "compile", "nbm");
+                }
+            }
             
             try {
                 if (javadoc != null) {
@@ -299,6 +342,9 @@ public class PopulateRepositoryMojo
                 }
                 if (source != null) {
                     artifactInstaller.install(source, sourceArt, localRepository);
+                }
+                if (nbm != null) {
+                    artifactInstaller.install(nbm, nbmArt, localRepository);
                 }
                 artifactInstaller.install(man.getFile(), art, localRepository );
             } catch ( ArtifactInstallationException e ) {
@@ -313,10 +359,42 @@ public class PopulateRepositoryMojo
                     if (source != null) {
                         artifactDeployer.deploy(source, sourceArt, deploymentRepository, localRepository);
                     }
+                    if (nbm != null) {
+                        artifactDeployer.deploy(nbm, nbmArt, deploymentRepository, localRepository);
+                    }
                     artifactDeployer.deploy(man.getFile(), art, deploymentRepository, localRepository);
                 }
             } catch (ArtifactDeploymentException ex) {
                 throw new MojoExecutionException( "Error Deploying artifact", ex );
+            }
+            
+        }
+        if (forcedVersion == null) {
+            getLog().warn("Version not specified, cannot create cluster POMs.");
+        } else {
+            it = clusters.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry elem = (Map.Entry) it.next();
+                String cluster = (String)elem.getKey();
+                Collection modules = (Collection)elem.getValue();
+                getLog().info("Processing cluster " + cluster);
+                Artifact art = createClusterArtifact(cluster, forcedVersion);
+                File pom = createClusterProject(art, modules);
+                ProjectArtifactMetadata metadata = new ProjectArtifactMetadata(art, pom);
+                art.addMetadata( metadata );
+                try {
+                    artifactInstaller.install(pom, art, localRepository );
+                } catch ( ArtifactInstallationException e ) {
+                    // TODO: install exception that does not give a trace
+                    throw new MojoExecutionException( "Error installing artifact", e );
+                }
+                try {
+                    if (deploymentRepository != null) {
+                        artifactDeployer.deploy(pom, art, deploymentRepository, localRepository);
+                    }
+                } catch (ArtifactDeploymentException ex) {
+                    throw new MojoExecutionException( "Error Deploying artifact", ex );
+                }
             }
             
         }
@@ -437,6 +515,7 @@ public class PopulateRepositoryMojo
         mavenModel.setGroupId(cluster.getGroupId());
         mavenModel.setArtifactId(cluster.getArtifactId());
         mavenModel.setVersion(cluster.getVersion());
+//        mavenModel.setPackaging("nbm-application");
         mavenModel.setPackaging("pom");
         mavenModel.setModelVersion("4.0.0");
         List deps = new ArrayList();
@@ -447,10 +526,21 @@ public class PopulateRepositoryMojo
             dep.setArtifactId(wr.getArtifact());
             dep.setGroupId(wr.getGroup());
             dep.setVersion(wr.getVersion());
-            dep.setType("jar");
+            dep.setType("nbm-file");
             deps.add(dep);
         }
         mavenModel.setDependencies(deps);
+//        
+//        
+//        Build build = new Build();
+//        Plugin plg = new Plugin();
+//        plg.setGroupId("org.codehaus.mojo");
+//        plg.setArtifactId("nbm-maven-plugin");
+//        plg.setVersion("2.7-SNAPSHOT");
+//        plg.setExtensions(true);
+//        build.addPlugin(plg);
+//        mavenModel.setBuild(build);
+                
         FileWriter writer = null;
         File fil = null;
         try {
@@ -488,6 +578,7 @@ public class PopulateRepositoryMojo
         private String version;
         private String group;
         private File file;
+        private String cluster;
 
         String module;
         
@@ -533,6 +624,14 @@ public class PopulateRepositoryMojo
 
         private File getFile() {
             return file;
+        }
+
+        void setCluster(String clust) {
+            cluster = clust;
+        }
+        
+        String getCluster() {
+            return cluster;
         }
     }
     
