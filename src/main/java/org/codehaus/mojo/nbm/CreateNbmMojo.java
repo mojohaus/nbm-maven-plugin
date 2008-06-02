@@ -20,8 +20,6 @@ package org.codehaus.mojo.nbm;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProjectHelper;
@@ -138,6 +136,7 @@ public class CreateNbmMojo
             nbmTask.setDistribution(project.getUrl() + (project.getUrl() != null && project.getUrl().endsWith("/") ? "" :"/") + nbmFile.getName());
             getLog().warn("  Using default value for distribution URL: " + nbmTask.getDescription());
         }
+        nbmTask.setTargetcluster(cluster);
         try {
             nbmTask.execute();
         } catch (BuildException e) {
