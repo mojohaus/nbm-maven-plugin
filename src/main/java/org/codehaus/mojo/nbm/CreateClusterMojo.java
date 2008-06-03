@@ -14,8 +14,6 @@
  *  limitations under the License.
  * =========================================================================
  */
-
-
 package org.codehaus.mojo.nbm;
 
 import java.io.File;
@@ -70,12 +68,12 @@ public class CreateClusterMojo
     
     public void execute() throws MojoExecutionException, MojoFailureException {
         Project antProject = registerNbmAntTasks();
-            
+
         File nbmBuildDirFile = new File(nbmBuildDir);
         if (!nbmBuildDirFile.exists()) {
             nbmBuildDirFile.mkdirs();
         }
-        
+
         if (reactorProjects != null && reactorProjects.size() > 0) {
             Iterator it = reactorProjects.iterator();
             while (it.hasNext()) {
@@ -96,30 +94,30 @@ public class CreateClusterMojo
                     } catch (BuildException ex) {
                         getLog().error("Cannot merge modules into cluster");
                         throw new MojoExecutionException("Cannot merge modules into cluster", ex);
-                    }
-                } else {
+                            }
+                                    } else {
                     if ("nbm".equals(proj.getPackaging())) {
                         String error = "Since 2.7, the nbm:nbm goal is not part of the lifecycle. \nTherefore the NetBeans binary directory structure for " + proj.getId() + " is not created yet." +
                                 "\n Please execute 'mvn install nbm:directory nbm:cluster' to get the same results as in earlier versions.";
                         throw new MojoFailureException(error);
+                                        }
+                                    }
+                                }
+        //in 6.1 the rebuilt modules will be cached if the timestamp is not touched.
+        File[] files = nbmBuildDirFile.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isDirectory()) {
+                File stamp = new File(files[i], ".lastModified");
+                if (!stamp.exists()) {
+                    try {
+                        stamp.createNewFile();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
                     }
                 }
+                stamp.setLastModified(new Date().getTime());
             }
-            //in 6.1 the rebuilt modules will be cached if the timestamp is not touched.
-            File[] files = nbmBuildDirFile.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    File stamp = new File(files[i], ".lastModified");
-                    if (!stamp.exists()) {
-                        try {
-                            stamp.createNewFile();
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                    stamp.setLastModified(new Date().getTime());
-                }
-            }
+        }
             getLog().info("Created NetBeans module cluster(s) at " + nbmBuildDir);
         } else {
             throw new MojoExecutionException("This goal only makes sense on reactor projects.");

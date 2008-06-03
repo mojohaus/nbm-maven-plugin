@@ -67,13 +67,12 @@ public class CreateNetbeansFileStructureMojo
     protected String nbmBuildDir;
     
     /**
-     * @todo Change type to File
      * Build directory
      * @parameter expression="${project.build.directory}"
      * @required
      * @readonly
      */
-    protected String buildDir;
+    protected File buildDir;
     
     /**
      * Name of the jar packaged by the jar:jar plugin
@@ -88,6 +87,14 @@ public class CreateNetbeansFileStructureMojo
      * @parameter default-value="${basedir}/src/main/nbm/module.xml"
      */
     protected File descriptor;
+    
+    /**
+     * Netbeans module's cluster. Shall replace the cluster element in module descriptor.
+     *
+     * @parameter default-value="extra"
+     * @required
+     */
+    protected String cluster;
 
     /**
      * The location of JavaHelp sources for the project. The documentation
@@ -179,7 +186,10 @@ public class CreateNetbeansFileStructureMojo
             moduleName = moduleName.replaceAll("-", ".");
         }
         moduleJarName = moduleName.replace('.', '-');
-        String cluster = module.getCluster();
+        if (cluster == null) {
+            getLog().warn("Parameter cluster in module descriptor is deprecated, use the plugin configuration element.");
+            cluster = module.getCluster();
+        }
         // it can happen the moduleName is in format org.milos/1
         int index = moduleJarName.indexOf('/');
         if (index > -1) {
