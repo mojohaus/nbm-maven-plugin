@@ -77,7 +77,7 @@ public class BrandingMojo
     /**
      * cluster of the branding.
      *
-     * @parameter default-value="maven1"
+     * @parameter default-value="extra"
      * @required
      */
     protected String cluster;
