@@ -17,32 +17,51 @@
 package org.codehaus.mojo.nbm;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
-import org.codehaus.plexus.util.FileUtils;
 
 /**
- * Create a standalone application out of the available clusters and netbeans
- * installation.
+ * Create a standalone application out of the composed clusters of nbm-application
  *
  * @author <a href="mailto:johan.andren@databyran.se">Johan Andren</a>
+ * @author Milos Kleint
  * @goal standalone-zip
- * @aggregator
+ * @requiresProject
  */
-public class CreateStandaloneMojo extends AbstractDistributionMojo {
+public class CreateStandaloneMojo extends AbstractMojo {
 
     /**
-     * Distributable zip file of NetBeans platform application
-     * 
-     * @parameter default-value="${project.build.directory}/${project.artifactId}-standalone-${project.version}.zip"
+     * The branding token for the application based on NetBeans platform.
+     * @parameter expression="${netbeans.branding.token}"
      * @required
      */
-    protected File destinationFile;
+    protected String brandingToken;
+
+    /**
+     * additional command line arguments that the application should always
+     * be run with. Will be placed in the etc/{brandingToken}.conf file
+     * Eg. 
+     * -J-Dnetbeans.winsys.no_toolbars=true -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
+     * @parameter expression="${netbeans.default.options}"
+     */
+    private String defaultOptions;
+
+    /**
+     * output directory where the the netbeans application will be created.
+     * @parameter default-value="${project.build.directory}"
+     * @required
+     */
+    private File buildDirectory;
+    
+    /**
+     * Name of the jar packaged by the jar:jar plugin
+     * @parameter expression="${project.build.finalName}"
+     */
+    private File finalName;
+    
 
     /**
      * The Maven project.
@@ -54,11 +73,6 @@ public class CreateStandaloneMojo extends AbstractDistributionMojo {
     private MavenProject project;
 
     /**
-     * @component
-     */
-    protected MavenProjectHelper projectHelper;
-
-    /**
      * 
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
@@ -66,60 +80,19 @@ public class CreateStandaloneMojo extends AbstractDistributionMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         try {
-            File harnessDir = new File(netbeansInstallation + File.separator + "harness");
-            File standaloneBuildDir = new File(projectBuildDir + File.separator + "standalone" + File.separator + brandingToken);
-            if (standaloneBuildDir.exists()) {
-                FileUtils.deleteDirectory(standaloneBuildDir);
-            }
-            standaloneBuildDir.mkdirs();
-
-            List<File> enabledClusterDirectories = findClusterDirectories();
-            File platformClusterDirectory = findPlatformClusterDirectory(enabledClusterDirectories);
-            if (platformClusterDirectory == null) {
-                throw new MojoExecutionException("Cannot find platform* cluster within NetBeans installation at " + netbeansInstallation);
-            }
-
-            if (enabledClusterDirectories.size() != enabledClusters.size()) {
-                getLog().error("Cannot find cluster directories for all enabled clusters:");
-                getLog().error("enabled clusters: " + enabledClusters);
-                getLog().error("found directories: " + enabledClusterDirectories);
-                throw new MojoFailureException("Not all clusters found");
-            }
-
-            // create etc/ with cluster and startup config
-            createBundleEtcDir(standaloneBuildDir, harnessDir, enabledClusters, defaultOptions, brandingToken);
-            createLauncherDir(standaloneBuildDir, harnessDir);
-            copyClusters(standaloneBuildDir, enabledClusterDirectories);
-
-            // create zip archive
-            if (destinationFile.exists()) {
-                destinationFile.delete();
-            }
+            File nbmBuildDirFile = new File(buildDirectory, brandingToken);
+            
             ZipArchiver archiver = new ZipArchiver();
-            archiver.addDirectory(standaloneBuildDir);
-            archiver.setDestFile(destinationFile);
+            archiver.addDirectory(nbmBuildDirFile);
+            File zipFile = new File( buildDirectory, finalName + ".zip");
+            //TODO - somehow check for last modified content to see if we shall be
+            //recreating the zip file.
+            archiver.setDestFile(zipFile);
             archiver.createArchive();
-
-            // attach standalone so that it gets installed/deployed
-            projectHelper.attachArtifact(project, "zip", "standalone", destinationFile);
+            project.getArtifact().setFile( zipFile );
 
         } catch (Exception ex) {
             throw new MojoExecutionException("", ex);
-        }
-
-    }
-
-    private void createLauncherDir(File standaloneBuildDir, File harnessDir) throws IOException {
-        // copy application startup files to bin/ and rename to branding token
-        File binDir = new File(standaloneBuildDir + File.separator + "bin");
-        binDir.mkdir();
-        File harnessBinDir = new File(harnessDir.getAbsolutePath() + File.separator + "launchers");
-
-        for (File launcher : harnessBinDir.listFiles()) {
-            // brand executable and remove .sh from sh-launcher
-            File newLauncher = new File(binDir.getAbsolutePath() + File.separator +
-                    launcher.getName().replace("app", brandingToken).replace(".sh", ""));
-            FileUtils.copyFile(launcher, newLauncher);
         }
 
     }

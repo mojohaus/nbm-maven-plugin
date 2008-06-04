@@ -32,9 +32,23 @@
         <packaging>nbm-file</packaging>
         <addedToClasspath>false</addedToClasspath>
         <language>java</language>
+        <includesDependencies>true</includesDependencies>
+      </configuration>
+    </component>
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>nbm-application</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>nbm-application</type>
+        <extension>zip</extension>
+        <packaging>nbm-application</packaging>
+        <addedToClasspath>false</addedToClasspath>
+        <language>java</language>
         <includesDependencies>false</includesDependencies>
       </configuration>
     </component>
+    
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>nbm</role-hint>
@@ -54,6 +68,21 @@
         </phases>
       </configuration>
     </component>
+
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>nbm-application</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <phases>
+          <process-resources>org.codehaus.mojo:nbm-maven-plugin:cluster-app</process-resources>
+          <package>org.codehaus.mojo:nbm-maven-plugin:standalone-zip</package>
+          <install>org.apache.maven.plugins:maven-install-plugin:install</install>
+          <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+        </phases>
+      </configuration>
+    </component>
+    
     
   </components>
 </component-set>
