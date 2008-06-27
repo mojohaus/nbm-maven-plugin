@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>RELEASE60</version>
+            <version>RELEASE61</version>
         </dependency>
     </dependencies>
     <build>
