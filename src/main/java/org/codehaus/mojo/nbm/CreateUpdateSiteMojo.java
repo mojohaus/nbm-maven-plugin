@@ -128,7 +128,10 @@ public class CreateUpdateSiteMojo
             }
         }
 
-        if ( reactorProjects != null && reactorProjects.size() > 0 )
+        if ( "nbm-application".equals( project.getPackaging() ) )
+        {
+            
+        } else if ( reactorProjects != null && reactorProjects.size() > 0 )
         {
 
             Iterator it = reactorProjects.iterator();
@@ -217,13 +220,9 @@ public class CreateUpdateSiteMojo
                     "Generated autoupdate site content at " + nbmBuildDirFile.getAbsolutePath() );
         } else
         {
-            if ( "nbm-application".equals( project.getPackaging() ) )
-            {
-            } else
-            {
-                throw new MojoExecutionException(
-                        "This goal only makes sense on reactor projects or project with 'nbm-application' packaging." );
-            }
+            throw new MojoExecutionException(
+                    "This goal only makes sense on reactor projects or project with 'nbm-application' packaging." );
+
         }
     }
     private static final Pattern ALT_REPO_SYNTAX_PATTERN = Pattern.compile(
