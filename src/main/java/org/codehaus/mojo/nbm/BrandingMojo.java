@@ -14,8 +14,6 @@
  *  limitations under the License.
  * =========================================================================
  */
-
-
 package org.codehaus.mojo.nbm;
 
 import java.io.File;
@@ -51,7 +49,8 @@ import org.codehaus.plexus.util.FileUtils;
  *
  */
 public class BrandingMojo
-        extends AbstractNbmMojo {
+        extends AbstractNbmMojo
+{
 
     /**
      * directory where the the binary content is created.
@@ -59,21 +58,18 @@ public class BrandingMojo
      * @required
      */
     protected String nbmBuildDir;
-
     /**
      * Location of the branded resources.
      * @parameter expression="${basedir}/src/main/nbm-branding"
      * @required
      */
     private String brandingSources;
-
     /**
      * The branding token used by the application.
      * @parameter expression="${netbeans.branding.token}"
      * @required
      */
     private String brandingToken;
-
     /**
      * cluster of the branding.
      *
@@ -81,7 +77,6 @@ public class BrandingMojo
      * @required
      */
     protected String cluster;
-
     /**
      * @parameter expression="${project}"
      * @required
@@ -89,76 +84,95 @@ public class BrandingMojo
      */
     private MavenProject project;
 
-    public void execute() throws MojoExecutionException {
-        
-        try {
+    public void execute() throws MojoExecutionException
+    {
+
+        try
+        {
 
             DirectoryScanner scanner = new DirectoryScanner();
-            scanner.setIncludes(new String[]{"**/*.*"});
+            scanner.setIncludes( new String[]
+                    {
+                        "**/*.*"
+                    } );
             scanner.addDefaultExcludes();
-            scanner.setBasedir(brandingSources);
+            scanner.setBasedir( brandingSources );
             scanner.scan();
 
-            File clusterDir = new File(nbmBuildDir, "netbeans" + File.separator + cluster);
+            File clusterDir = new File( nbmBuildDir,
+                    "netbeans" + File.separator + cluster );
             clusterDir.mkdirs();
 
             // copy all files and see to it that they get the correct names
-            for (String brandingFilePath : scanner.getIncludedFiles()) {
-                File brandingFile = new File(brandingSources, brandingFilePath);
-                String destinationFilePath = destinationFileName(brandingFilePath);
-                File brandingDestination = new File(clusterDir, destinationFilePath);
-                if (!brandingDestination.getParentFile().exists()) {
+            for ( String brandingFilePath : scanner.getIncludedFiles() )
+            {
+                File brandingFile = new File( brandingSources, brandingFilePath );
+                String destinationFilePath = destinationFileName(
+                        brandingFilePath );
+                File brandingDestination = new File( clusterDir,
+                        destinationFilePath );
+                if ( !brandingDestination.getParentFile().exists() )
+                {
                     brandingDestination.getParentFile().mkdirs();
                 }
-                FileUtils.copyFile(brandingFile, brandingDestination);
+                FileUtils.copyFile( brandingFile, brandingDestination );
             }
-            
+
             // create jar-files from each toplevel .jar directory
-            scanner.setIncludes(new String[] {"*/*.jar"});
-            scanner.setBasedir(clusterDir);
+            scanner.setIncludes( new String[]
+                    {
+                        "*/*.jar"
+                    } );
+            scanner.setBasedir( clusterDir );
             scanner.scan();
-            
-            for (String jarDirectoryPath: scanner.getIncludedDirectories()) {
-                
+
+            for ( String jarDirectoryPath : scanner.getIncludedDirectories() )
+            {
+
                 // move nnn.jar directory to nnn.jar.tmp
-                File jarDirectory = new File(clusterDir, jarDirectoryPath);
-                
+                File jarDirectory = new File( clusterDir, jarDirectoryPath );
+
                 // jars should be placed in locales/ under the same directory the jar-directories are
-                File destinationJar = 
-                        new File(jarDirectory.getParentFile().getAbsolutePath() + 
-                        File.separator + "locale" + 
-                        File.separator + destinationFileName(jarDirectory.getName()));
-                
+                File destinationJar =
+                        new File( jarDirectory.getParentFile().getAbsolutePath() +
+                        File.separator + "locale" +
+                        File.separator + destinationFileName(
+                        jarDirectory.getName() ) );
+
                 // create nnn.jar archive of contents
                 JarArchiver archiver = new JarArchiver();
-                archiver.setDestFile(destinationJar);
-                archiver.addDirectory(jarDirectory);
+                archiver.setDestFile( destinationJar );
+                archiver.addDirectory( jarDirectory );
                 archiver.createArchive();
-                
-                FileUtils.deleteDirectory(jarDirectory);
+
+                FileUtils.deleteDirectory( jarDirectory );
             }
 
-        } catch (Exception ex) {
-            throw new MojoExecutionException("Error creating branding", ex);
+        } catch ( Exception ex )
+        {
+            throw new MojoExecutionException( "Error creating branding", ex );
         }
 
-        getLog().info("Created branded jars for branding '" + brandingToken + "'.");
+        getLog().info(
+                "Created branded jars for branding '" + brandingToken + "'." );
     }
 
-    private String destinationFileName(String brandingFilePath) {
+    private String destinationFileName( String brandingFilePath )
+    {
         // use first underscore in filename 
-        int lastSeparator = brandingFilePath.indexOf(File.separator);
-        int firstUnderscore = brandingFilePath.indexOf("_", lastSeparator);
+        int lastSeparator = brandingFilePath.indexOf( File.separator );
+        int firstUnderscore = brandingFilePath.indexOf( "_", lastSeparator );
 
-        if (firstUnderscore != -1) {
-            return brandingFilePath.substring(0, firstUnderscore) + "_" +
+        if ( firstUnderscore != -1 )
+        {
+            return brandingFilePath.substring( 0, firstUnderscore ) + "_" +
                     brandingToken + "_" +
-                    brandingFilePath.substring(firstUnderscore + 1);
+                    brandingFilePath.substring( firstUnderscore + 1 );
         }
-        
+
         // no underscores, use dot
-        int lastDot = brandingFilePath.lastIndexOf(".");
-        return brandingFilePath.substring(0, lastDot) +
-                "_" + brandingToken + brandingFilePath.substring(lastDot);
+        int lastDot = brandingFilePath.lastIndexOf( "." );
+        return brandingFilePath.substring( 0, lastDot ) +
+                "_" + brandingToken + brandingFilePath.substring( lastDot );
     }
 }

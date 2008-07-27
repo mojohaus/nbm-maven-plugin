@@ -14,7 +14,6 @@
  *  limitations under the License.
  * =========================================================================
  */
-
 package org.codehaus.mojo.nbm;
 
 import java.io.File;
@@ -42,7 +41,10 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  * @requiresDependencyResolution runtime
  *
  */
-public class RunPlatformAppMojo extends AbstractMojo {
+public class RunPlatformAppMojo
+        extends AbstractMojo
+{
+
     /**
      * directory where the module(s)' netbeans cluster(s) are located.
      * is related to nbm:cluster goal.
@@ -50,7 +52,6 @@ public class RunPlatformAppMojo extends AbstractMojo {
      * @required
      */
     protected String clusterBuildDir;
-
     /**
      * directory where the the NetBeans platform/IDE installation is,
      * denotes the root directory of netbeans installation.
@@ -58,21 +59,18 @@ public class RunPlatformAppMojo extends AbstractMojo {
      * @required
      */
     protected String netbeansInstallation;
-    
     /**
      * The branding token for the application based on NetBeans platform.
      * @parameter expression="${netbeans.branding.token}"
      * @required
      */
     protected String brandingToken;
-    
     /**
      * netbeans user directory for the executed instance.
      * @parameter default-value="${project.build.directory}/userdir" expression="${netbeans.userdir}"
      * @required
      */
     protected String netbeansUserdir;
-    
     /**
      * additional command line arguments. Eg. 
      * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
@@ -80,7 +78,6 @@ public class RunPlatformAppMojo extends AbstractMojo {
      * @parameter expression="${netbeans.run.params}"
      */
     protected String additionalArguments;
-    
     /**
      * List of enabled clusters. At least platform cluster needs to be
      * included.
@@ -88,7 +85,6 @@ public class RunPlatformAppMojo extends AbstractMojo {
      * @required
      */
     protected List/*<String>*/ enabledClusters;
-    
 //    /**
 //     * List of disabled modules in the enabled clusters. 
 //     * Allows for fine-tuned configuration of the application.
@@ -107,7 +103,6 @@ public class RunPlatformAppMojo extends AbstractMojo {
 //                </custom>
 //            </hidden>
 //        </createmodulexml>
-    
     /**
      * The Maven Project.
      *
@@ -116,134 +111,162 @@ public class RunPlatformAppMojo extends AbstractMojo {
      * @readonly
      */
     private MavenProject project;
-    
+
     /**
      *
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
      */
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        File userDir = new File(netbeansUserdir);
+    public void execute() throws MojoExecutionException, MojoFailureException
+    {
+        File userDir = new File( netbeansUserdir );
         userDir.mkdirs();
-        
-        File clusterRoot = new File(clusterBuildDir);
-        if (!clusterRoot.exists()) {
-            throw new MojoExecutionException("There are no additional clusters in " + clusterBuildDir);
+
+        File clusterRoot = new File( clusterBuildDir );
+        if ( !clusterRoot.exists() )
+        {
+            throw new MojoExecutionException(
+                    "There are no additional clusters in " + clusterBuildDir );
         }
-        
+
         // make sure the final cluster list is numbered.
         Map matchers = new HashMap();
-        if (enabledClusters == null) {
+        if ( enabledClusters == null )
+        {
             // fallback default.
             enabledClusters = new ArrayList();
         }
         Iterator it = enabledClusters.iterator();
-        while (it.hasNext()) {
-            String clus = (String)it.next();
+        while ( it.hasNext() )
+        {
+            String clus = (String) it.next();
             // we don't want the plaform in the list of clusters..
-            if (!clus.startsWith("platform")) {
-                matchers.put(clus, Pattern.compile(clus + "(\\d)*"));
+            if ( !clus.startsWith( "platform" ) )
+            {
+                matchers.put( clus, Pattern.compile( clus + "(\\d)*" ) );
             }
         }
-        
+
         /** list of files **/
         List realEnabledClusters = new ArrayList();
         File platform = null;
         // check installation..
-        File[] fls = new File(netbeansInstallation).listFiles();
-        if (fls == null) {
+        File[] fls = new File( netbeansInstallation ).listFiles();
+        if ( fls == null )
+        {
             //null means not existing folder
-            throw new MojoExecutionException("Non-existing NetBeans installation at " + netbeansInstallation);
+            throw new MojoExecutionException(
+                    "Non-existing NetBeans installation at " + netbeansInstallation );
         }
-        for (int i = 0; i < fls.length; i++) {
-            if (fls[i].isDirectory()) {
+        for ( int i = 0; i < fls.length; i++ )
+        {
+            if ( fls[i].isDirectory() )
+            {
                 String folderName = fls[i].getName();
-                if (folderName.startsWith("platform")) {
+                if ( folderName.startsWith( "platform" ) )
+                {
                     platform = fls[i];
                 }
                 Iterator it2 = matchers.entrySet().iterator();
-                while (it2.hasNext()) {
-                    Map.Entry en = (Map.Entry)it2.next();
+                while ( it2.hasNext() )
+                {
+                    Map.Entry en = (Map.Entry) it2.next();
                     Pattern match = (Pattern) en.getValue();
-                    if (match.matcher(folderName).matches()) {
-                        realEnabledClusters.add(fls[i]);
+                    if ( match.matcher( folderName ).matches() )
+                    {
+                        realEnabledClusters.add( fls[i] );
                         it2.remove();
                         break;
                     }
                 }
             }
         }
-        
+
         // check our module clusters.
         fls = clusterRoot.listFiles();
-        for (int i = 0; i < fls.length; i++) {
-            if (fls[i].isDirectory()) {
+        for ( int i = 0; i < fls.length; i++ )
+        {
+            if ( fls[i].isDirectory() )
+            {
                 String folderName = fls[i].getName();
                 Iterator it2 = matchers.entrySet().iterator();
-                while (it2.hasNext()) {
-                    Map.Entry en = (Map.Entry)it2.next();
+                while ( it2.hasNext() )
+                {
+                    Map.Entry en = (Map.Entry) it2.next();
                     Pattern match = (Pattern) en.getValue();
-                    if (match.matcher(folderName).matches()) {
+                    if ( match.matcher( folderName ).matches() )
+                    {
                         // add our clusters at the start..
-                        realEnabledClusters.add(0, fls[i]);
+                        realEnabledClusters.add( 0, fls[i] );
                         it2.remove();
                         break;
                     }
                 }
             }
         }
-        
-        if (platform == null) {
-            throw new MojoExecutionException("Cannot find platform* cluster within NetBeans installation at " + netbeansInstallation);
+
+        if ( platform == null )
+        {
+            throw new MojoExecutionException(
+                    "Cannot find platform* cluster within NetBeans installation at " + netbeansInstallation );
         }
         // add all we could not match in platform and cross fingers.
-        if (matchers.size() > 0) {
-            getLog().error("Cannot find following clusters, ignoring:");
+        if ( matchers.size() > 0 )
+        {
+            getLog().error( "Cannot find following clusters, ignoring:" );
             it = matchers.keySet().iterator();
-            while (it.hasNext()) {
-                getLog().error("      " + it.next());
+            while ( it.hasNext() )
+            {
+                getLog().error( "      " + it.next() );
             }
         }
-        
+
         // create cluster list;
         it = realEnabledClusters.iterator();
         String clustersString = "";
-        while (it.hasNext()) {
-            clustersString = clustersString + File.pathSeparator + ((File)it.next()).getAbsolutePath();
+        while ( it.hasNext() )
+        {
+            clustersString = clustersString + File.pathSeparator + ((File) it.next()).getAbsolutePath();
         }
-        clustersString = clustersString.substring(1);
-        
-        boolean windows = Os.isFamily("windows");
-        
+        clustersString = clustersString.substring( 1 );
+
+        boolean windows = Os.isFamily( "windows" );
+
         Commandline cmdLine = new Commandline();
-        File exec = windows ? new File(platform, "lib\\nbexec.exe") : 
-                              new File(platform, "lib/nbexec");
-        cmdLine.setExecutable(exec.getAbsolutePath());
-        
-        try {
-            String[] args = new String[] {
+        File exec = windows ? new File( platform, "lib\\nbexec.exe" ) : new File(
+                platform, "lib/nbexec" );
+        cmdLine.setExecutable( exec.getAbsolutePath() );
+
+        try
+        {
+            String[] args = new String[]
+            {
                 //TODO --jdkhome
                 "--userdir",
-                Commandline.quoteArgument(userDir.getAbsolutePath()),
+                Commandline.quoteArgument( userDir.getAbsolutePath() ),
                 "-J-Dnetbeans.logger.console=true",
                 "-J-ea",
                 "--branding",
                 brandingToken,
                 "--clusters",
-                Commandline.quoteArgument(clustersString)
+                Commandline.quoteArgument( clustersString )
             };
-            cmdLine.addArguments(args);
-            cmdLine.addArguments(cmdLine.translateCommandline(additionalArguments));
-            getLog().info("Executing: " + cmdLine.toString());
-            StreamConsumer out = new StreamConsumer() {
-                public void consumeLine(String line) {
-                    getLog().info(line);
+            cmdLine.addArguments( args );
+            cmdLine.addArguments( cmdLine.translateCommandline(
+                    additionalArguments ) );
+            getLog().info( "Executing: " + cmdLine.toString() );
+            StreamConsumer out = new StreamConsumer()
+            {
+
+                public void consumeLine( String line )
+                {
+                    getLog().info( line );
                 }
             };
-            CommandLineUtils.executeCommandLine(cmdLine, out, out);
-        } catch (Exception e) {
-            throw new MojoExecutionException("Failed executing NetBeans", e);
+            CommandLineUtils.executeCommandLine( cmdLine, out, out );
+        } catch ( Exception e )
+        {
+            throw new MojoExecutionException( "Failed executing NetBeans", e );
         }
     }
-    
-                }
+}

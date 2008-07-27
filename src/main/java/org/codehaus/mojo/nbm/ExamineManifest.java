@@ -35,9 +35,10 @@ import org.apache.maven.plugin.logging.Log;
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  *
  */
-public class ExamineManifest  {
+public class ExamineManifest
+{
+
     private Log logger;
-    
     private File jarFile;
     private File manifestFile;
     // package private to simplify testing
@@ -53,149 +54,189 @@ public class ExamineManifest  {
     private boolean populateDependencies = false;
     private List dependencyTokens = Collections.EMPTY_LIST;
 
-    ExamineManifest(Log logger) {
+    ExamineManifest( Log logger )
+    {
         this.logger = logger;
     }
-    
-    public void checkFile() throws MojoExecutionException {
-        
+
+    public void checkFile() throws MojoExecutionException
+    {
+
         resetExamination();
-        
+
         Manifest mf = null;
-        if (jarFile != null) {
+        if ( jarFile != null )
+        {
             JarFile jar = null;
-            try {
-                jar = new JarFile(jarFile);
+            try
+            {
+                jar = new JarFile( jarFile );
                 mf = jar.getManifest();
-            } catch (Exception exc) {
+            } catch ( Exception exc )
+            {
                 throw new MojoExecutionException( exc.getMessage(), exc );
-            } finally {
-                if (jar != null) {
-                    try {
+            } finally
+            {
+                if ( jar != null )
+                {
+                    try
+                    {
                         jar.close();
-                    } catch (IOException io) {
+                    } catch ( IOException io )
+                    {
                         throw new MojoExecutionException( io.getMessage(), io );
                     }
                 }
             }
-        } else if (manifestFile != null) {
+        } else if ( manifestFile != null )
+        {
             InputStream stream = null;
-            try {
-                stream = new FileInputStream(manifestFile);
-                mf = new Manifest(stream);
-            } catch (Exception exc) {
+            try
+            {
+                stream = new FileInputStream( manifestFile );
+                mf = new Manifest( stream );
+            } catch ( Exception exc )
+            {
                 throw new MojoExecutionException( exc.getMessage(), exc );
-            } finally {
-                if (stream != null) {
-                    try {
+            } finally
+            {
+                if ( stream != null )
+                {
+                    try
+                    {
                         stream.close();
-                    } catch (IOException io) {
+                    } catch ( IOException io )
+                    {
                         throw new MojoExecutionException( io.getMessage(), io );
                     }
                 }
             }
         }
-        if (mf != null) {
-            processManifest(mf);
-        } else {
+        if ( mf != null )
+        {
+            processManifest( mf );
+        } else
+        {
             //MNBMODULE-22
             File source = manifestFile;
-            if (source == null) {
+            if ( source == null )
+            {
                 source = jarFile;
             }
-            logger.debug("Cannot find manifest entries in " + source.getAbsolutePath());
+            logger.debug(
+                    "Cannot find manifest entries in " + source.getAbsolutePath() );
         }
     }
-    
-    void resetExamination() {
-        setNetbeansModule(false);
-        setLocalized(false);
-        setSpecVersion(null);
-        setImplVersion(null);
-        setModule(null);
-        setModuleDeps(null);
-        setLocBundle(null);
-        setPublicPackages(false);
-        setClasspath("");
+
+    void resetExamination()
+    {
+        setNetbeansModule( false );
+        setLocalized( false );
+        setSpecVersion( null );
+        setImplVersion( null );
+        setModule( null );
+        setModuleDeps( null );
+        setLocBundle( null );
+        setPublicPackages( false );
+        setClasspath( "" );
     }
-    
-    void processManifest(Manifest mf) {
+
+    void processManifest( Manifest mf )
+    {
         Attributes attrs = mf.getMainAttributes();
-        setModule(attrs.getValue("OpenIDE-Module"));
-        setNetbeansModule(getModule() != null);
-        if (isNetbeansModule()) {
-            setLocBundle(attrs.getValue("OpenIDE-Module-Localizing-Bundle"));
-            setLocalized((getLocBundle() == null ? false : true));
-            setSpecVersion(attrs.getValue("OpenIDE-Module-Specification-Version"));
-            setImplVersion(attrs.getValue("OpenIDE-Module-Implementation-Version"));
-            setModuleDeps(attrs.getValue("OpenIDE-Module-Module-Dependencies"));
-            setClasspath(attrs.getValue("Class-Path") == null ? "" : attrs.getValue("Class-Path"));
-            String value = attrs.getValue("OpenIDE-Module-Public-Packages");
-            if (attrs.getValue("OpenIDE-Module-Friends") != null || value == null || value.trim().equals("-")) {
-                setPublicPackages(false);
-            } else {
-                setPublicPackages(true);
+        setModule( attrs.getValue( "OpenIDE-Module" ) );
+        setNetbeansModule( getModule() != null );
+        if ( isNetbeansModule() )
+        {
+            setLocBundle( attrs.getValue( "OpenIDE-Module-Localizing-Bundle" ) );
+            setLocalized( (getLocBundle() == null ? false : true) );
+            setSpecVersion( attrs.getValue(
+                    "OpenIDE-Module-Specification-Version" ) );
+            setImplVersion( attrs.getValue(
+                    "OpenIDE-Module-Implementation-Version" ) );
+            setModuleDeps(
+                    attrs.getValue( "OpenIDE-Module-Module-Dependencies" ) );
+            setClasspath( attrs.getValue( "Class-Path" ) == null ? "" : attrs.getValue(
+                    "Class-Path" ) );
+            String value = attrs.getValue( "OpenIDE-Module-Public-Packages" );
+            if ( attrs.getValue( "OpenIDE-Module-Friends" ) != null || value == null || value.trim().equals(
+                    "-" ) )
+            {
+                setPublicPackages( false );
+            } else
+            {
+                setPublicPackages( true );
             }
-            if (isPopulateDependencies()) {
-                String deps = attrs.getValue("OpenIDE-Module-Module-Dependencies");
-                if (deps != null) {
-                    StringTokenizer tokens = new StringTokenizer(deps, ",");
+            if ( isPopulateDependencies() )
+            {
+                String deps = attrs.getValue(
+                        "OpenIDE-Module-Module-Dependencies" );
+                if ( deps != null )
+                {
+                    StringTokenizer tokens = new StringTokenizer( deps, "," );
                     List depList = new ArrayList();
-                    while (tokens.hasMoreTokens()) {
+                    while ( tokens.hasMoreTokens() )
+                    {
                         String tok = tokens.nextToken();
                         //we are just interested in specification and loose dependencies.
-                        int spec = tok.indexOf(">");
-                        if (spec > 0 || (tok.indexOf("=") == -1 && spec == -1)) {
-                            if (spec > 0) {
-                                tok = tok.substring(0, spec - 1);
+                        int spec = tok.indexOf( ">" );
+                        if ( spec > 0 || (tok.indexOf( "=" ) == -1 && spec == -1) )
+                        {
+                            if ( spec > 0 )
+                            {
+                                tok = tok.substring( 0, spec - 1 );
                             }
-                            int slash = tok.indexOf("/");
-                            if (slash > 0) {
-                                tok = tok.substring(0, slash - 1);
+                            int slash = tok.indexOf( "/" );
+                            if ( slash > 0 )
+                            {
+                                tok = tok.substring( 0, slash - 1 );
                             }
-                            depList.add(tok.trim());
+                            depList.add( tok.trim() );
                         }
                     }
-                    setDependencyTokens(depList);
+                    setDependencyTokens( depList );
                 }
             }
-            
-        } else {
+
+        } else
+        {
             // for non-netbeans jars.
-            setSpecVersion(attrs.getValue("Specification-Version"));
-            setImplVersion(attrs.getValue("Implementation-Version"));
-            setModule(attrs.getValue("Package"));
-            setPublicPackages(false);
-            setClasspath("");
-        /*    if (module != null) {
-                // now we have the package to make it a module definition, add the version there..
-                module = module + "/1"; 
+            setSpecVersion( attrs.getValue( "Specification-Version" ) );
+            setImplVersion( attrs.getValue( "Implementation-Version" ) );
+            setModule( attrs.getValue( "Package" ) );
+            setPublicPackages( false );
+            setClasspath( "" );
+            /*    if (module != null) {
+            // now we have the package to make it a module definition, add the version there..
+            module = module + "/1";
             }
-         */
-            if (getModule() == null) {
+             */
+            if ( getModule() == null )
+            {
                 // do we want to do that?
-                setModule(attrs.getValue("Extension-Name"));
+                setModule( attrs.getValue( "Extension-Name" ) );
             }
         }
-        
+
     }
-    
+
     /**
      * Getter for property jarFile.
      * @return Value of property jarFile.
      */
-    public java.io.File getJarFile() {
+    public java.io.File getJarFile()
+    {
         return jarFile;
     }
 
     /**
      * The jar file to examine. It is exclusive with manifestFile.
      */
-    public void setJarFile(java.io.File jarFileLoc) {
+    public void setJarFile( java.io.File jarFileLoc )
+    {
         jarFile = jarFileLoc;
     }
 
-    
     /** Getter for property manifestFile.
      * @return Value of property manifestFile.
      *
@@ -203,102 +244,123 @@ public class ExamineManifest  {
     public File getManifestFile()
     {
         return manifestFile;
-    }    
-    
+    }
+
     /** 
      * Manifest file to be examined. It is exclusing with jarFile.
      */
-    public void setManifestFile(File manifestFileLoc)
+    public void setManifestFile( File manifestFileLoc )
     {
         manifestFile = manifestFileLoc;
     }
-    
-    public void setClasspath(String path) {
+
+    public void setClasspath( String path )
+    {
         classpath = path;
     }
-    
-    public String getClasspath() {
+
+    public String getClasspath()
+    {
         return classpath;
     }
 
-    public boolean isNetbeansModule() {
+    public boolean isNetbeansModule()
+    {
         return netbeansModule;
     }
 
-    public void setNetbeansModule(boolean netbeansModule) {
+    public void setNetbeansModule( boolean netbeansModule )
+    {
         this.netbeansModule = netbeansModule;
     }
 
-    public boolean isLocalized() {
+    public boolean isLocalized()
+    {
         return localized;
     }
 
-    public void setLocalized(boolean localized) {
+    public void setLocalized( boolean localized )
+    {
         this.localized = localized;
     }
 
-    public String getSpecVersion() {
+    public String getSpecVersion()
+    {
         return specVersion;
     }
 
-    public void setSpecVersion(String specVersion) {
+    public void setSpecVersion( String specVersion )
+    {
         this.specVersion = specVersion;
     }
 
-    public String getImplVersion() {
+    public String getImplVersion()
+    {
         return implVersion;
     }
 
-    public void setImplVersion(String implVersion) {
+    public void setImplVersion( String implVersion )
+    {
         this.implVersion = implVersion;
     }
 
-    public String getModule() {
+    public String getModule()
+    {
         return module;
     }
 
-    public void setModule(String module) {
+    public void setModule( String module )
+    {
         this.module = module;
     }
 
-    public String getModuleDeps() {
+    public String getModuleDeps()
+    {
         return moduleDeps;
     }
 
-    public void setModuleDeps(String moduleDeps) {
+    public void setModuleDeps( String moduleDeps )
+    {
         this.moduleDeps = moduleDeps;
     }
 
-    public String getLocBundle() {
+    public String getLocBundle()
+    {
         return locBundle;
     }
 
-    public void setLocBundle(String locBundle) {
+    public void setLocBundle( String locBundle )
+    {
         this.locBundle = locBundle;
     }
 
-    public boolean hasPublicPackages() {
+    public boolean hasPublicPackages()
+    {
         return publicPackages;
     }
 
-    public void setPublicPackages(boolean publicPackages) {
+    public void setPublicPackages( boolean publicPackages )
+    {
         this.publicPackages = publicPackages;
     }
 
-    public boolean isPopulateDependencies() {
+    public boolean isPopulateDependencies()
+    {
         return populateDependencies;
     }
 
-    public void setPopulateDependencies(boolean populateDependencies) {
+    public void setPopulateDependencies( boolean populateDependencies )
+    {
         this.populateDependencies = populateDependencies;
     }
 
-    public List getDependencyTokens() {
+    public List getDependencyTokens()
+    {
         return dependencyTokens;
     }
 
-    public void setDependencyTokens(List dependencyTokens) {
+    public void setDependencyTokens( List dependencyTokens )
+    {
         this.dependencyTokens = dependencyTokens;
     }
-    
 }

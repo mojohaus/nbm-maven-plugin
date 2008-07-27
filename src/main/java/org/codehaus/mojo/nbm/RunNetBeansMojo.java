@@ -14,7 +14,6 @@
  *  limitations under the License.
  * =========================================================================
  */
-
 package org.codehaus.mojo.nbm;
 
 import java.io.File;
@@ -43,7 +42,10 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  * @requiresDependencyResolution runtime
  *
  */
-public class RunNetBeansMojo extends AbstractMojo {
+public class RunNetBeansMojo
+        extends AbstractMojo
+{
+
     /**
      * directory where the module(s)' netbeans cluster(s) are located.
      * is related to nbm:cluster goal.
@@ -51,7 +53,6 @@ public class RunNetBeansMojo extends AbstractMojo {
      * @required
      */
     protected String clusterBuildDir;
-
     /**
      * directory where the the netbeans platform/IDE installation is,
      * denotes the root directory of netbeans installation.
@@ -59,15 +60,12 @@ public class RunNetBeansMojo extends AbstractMojo {
      * @required
      */
     protected String netbeansInstallation;
-    
-    
     /**
      * netbeans user directory for the executed instance.
      * @parameter default-value="${project.build.directory}/userdir" expression="${netbeans.userdir}"
      * @required
      */
     protected String netbeansUserdir;
-    
     /**
      * additional command line arguments. Eg. 
      * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
@@ -75,7 +73,6 @@ public class RunNetBeansMojo extends AbstractMojo {
      * @parameter expression="${netbeans.run.params}"
      */
     protected String additionalArguments;
-    
     /**
      * The Maven Project.
      *
@@ -90,76 +87,89 @@ public class RunNetBeansMojo extends AbstractMojo {
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
      */
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        File userDir = new File(netbeansUserdir);
+    public void execute() throws MojoExecutionException, MojoFailureException
+    {
+        File userDir = new File( netbeansUserdir );
         userDir.mkdirs();
-        
-        File clusterRoot = new File(clusterBuildDir);
+
+        File clusterRoot = new File( clusterBuildDir );
         List clusters = new ArrayList();
         File[] fls = clusterRoot.listFiles();
-        for (int i = 0; i < fls.length; i++) {
-            if (fls[i].isDirectory()) {
-                clusters.add(fls[i]);
+        for ( int i = 0; i < fls.length; i++ )
+        {
+            if ( fls[i].isDirectory() )
+            {
+                clusters.add( fls[i] );
             }
         }
-        
+
         // write netbeans.conf file with cluster information...
-        File etc = new File(userDir, "etc");
+        File etc = new File( userDir, "etc" );
         etc.mkdirs();
         StringBuffer buff = new StringBuffer();
-        buff.append("netbeans_extraclusters=\"");
+        buff.append( "netbeans_extraclusters=\"" );
         Iterator it = clusters.iterator();
-        while (it.hasNext()) {
-            File cluster = (File)it.next();
-            buff.append(cluster.getAbsolutePath());
-            buff.append(":");
+        while ( it.hasNext() )
+        {
+            File cluster = (File) it.next();
+            buff.append( cluster.getAbsolutePath() );
+            buff.append( ":" );
         }
-        buff.deleteCharAt(buff.lastIndexOf(":"));
-        buff.append("\"");
-        StringReader sr = new StringReader(buff.toString());
-        File confFile  = new File(etc, "netbeans.conf");
+        buff.deleteCharAt( buff.lastIndexOf( ":" ) );
+        buff.append( "\"" );
+        StringReader sr = new StringReader( buff.toString() );
+        File confFile = new File( etc, "netbeans.conf" );
         FileOutputStream conf = null;
-        try {
-            conf = new FileOutputStream(confFile);
-            IOUtil.copy(sr, conf);
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Error writing " + confFile, ex);
+        try
+        {
+            conf = new FileOutputStream( confFile );
+            IOUtil.copy( sr, conf );
+        } catch ( IOException ex )
+        {
+            throw new MojoExecutionException( "Error writing " + confFile, ex );
+        } finally
+        {
+            IOUtil.close( conf );
         }
-        finally {
-            IOUtil.close(conf);
-        }
-        
-        boolean windows = Os.isFamily("windows");
+
+        boolean windows = Os.isFamily( "windows" );
         Commandline cmdLine = new Commandline();
-        File exec = windows ? new File(netbeansInstallation, "bin\\nb.exe") : 
-                              new File(netbeansInstallation, "bin/netbeans");
-        cmdLine.setExecutable(exec.getAbsolutePath());
-        
-        try {
-            String[] args = new String[] {
+        File exec = windows ? new File( netbeansInstallation, "bin\\nb.exe" ) : new File(
+                netbeansInstallation, "bin/netbeans" );
+        cmdLine.setExecutable( exec.getAbsolutePath() );
+
+        try
+        {
+            String[] args = new String[]
+            {
                 //TODO --jdkhome
                 "--userdir",
-                Commandline.quoteArgument(userDir.getAbsolutePath()),
+                Commandline.quoteArgument( userDir.getAbsolutePath() ),
                 "-J-Dnetbeans.logger.console=true",
                 "-J-ea",
             };
-            cmdLine.addArguments(args);
-            getLog().info("Additional arguments=" + additionalArguments);
-            cmdLine.addArguments(cmdLine.translateCommandline(additionalArguments));
-            for (int i = 0; i < cmdLine.getArguments().length; i++) {
-                getLog().info("      " + cmdLine.getArguments()[i]);
+            cmdLine.addArguments( args );
+            getLog().info( "Additional arguments=" + additionalArguments );
+            cmdLine.addArguments( cmdLine.translateCommandline(
+                    additionalArguments ) );
+            for ( int i = 0; i < cmdLine.getArguments().length; i++ )
+            {
+                getLog().info( "      " + cmdLine.getArguments()[i] );
             }
-            getLog().info("Executing: " + cmdLine.toString());
-            StreamConsumer out = new StreamConsumer() {
-                public void consumeLine(String line) {
-                    getLog().info(line);
+            getLog().info( "Executing: " + cmdLine.toString() );
+            StreamConsumer out = new StreamConsumer()
+            {
+
+                public void consumeLine( String line )
+                {
+                    getLog().info( line );
                 }
             };
-            CommandLineUtils.executeCommandLine(cmdLine, out, out);
-            
-        } catch (Exception e) {
-            throw new MojoExecutionException("Failed executing NetBeans", e);
+            CommandLineUtils.executeCommandLine( cmdLine, out, out );
+
+        } catch ( Exception e )
+        {
+            throw new MojoExecutionException( "Failed executing NetBeans", e );
         }
     }
-
 }

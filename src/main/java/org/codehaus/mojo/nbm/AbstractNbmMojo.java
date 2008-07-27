@@ -34,49 +34,56 @@ import org.codehaus.mojo.nbm.model.NetbeansModule;
 import org.codehaus.mojo.nbm.model.io.xpp3.NetbeansModuleXpp3Reader;
 import org.codehaus.plexus.util.IOUtil;
 
-public abstract class AbstractNbmMojo extends AbstractMojo {
+public abstract class AbstractNbmMojo
+        extends AbstractMojo
+{
 
     protected boolean hasJavaHelp = false;
 
-    protected final Project registerNbmAntTasks() {
+    protected final Project registerNbmAntTasks()
+    {
         Project antProject = new Project();
         antProject.init();
 
         Taskdef taskdef = (Taskdef) antProject.createTask( "taskdef" );
-        taskdef.setClassname("org.netbeans.nbbuild.MakeListOfNBM");
-        taskdef.setName("genlist");
+        taskdef.setClassname( "org.netbeans.nbbuild.MakeListOfNBM" );
+        taskdef.setName( "genlist" );
         taskdef.execute();
 
         taskdef = (Taskdef) antProject.createTask( "taskdef" );
-        taskdef.setClassname("org.netbeans.nbbuild.MakeNBM");
-        taskdef.setName("makenbm");
+        taskdef.setClassname( "org.netbeans.nbbuild.MakeNBM" );
+        taskdef.setName( "makenbm" );
         taskdef.execute();
 
         taskdef = (Taskdef) antProject.createTask( "taskdef" );
-        taskdef.setClassname("org.netbeans.nbbuild.MakeUpdateDesc");
-        taskdef.setName("updatedist");
+        taskdef.setClassname( "org.netbeans.nbbuild.MakeUpdateDesc" );
+        taskdef.setName( "updatedist" );
         taskdef.execute();
 
         taskdef = (Taskdef) antProject.createTask( "taskdef" );
-        taskdef.setClassname("org.netbeans.nbbuild.CreateModuleXML");
-        taskdef.setName("createmodulexml");
+        taskdef.setClassname( "org.netbeans.nbbuild.CreateModuleXML" );
+        taskdef.setName( "createmodulexml" );
         taskdef.execute();
 
-        try {
-            getClass().getClassLoader().loadClass("javax.help.search.SearchEngine");
+        try
+        {
+            getClass().getClassLoader().loadClass(
+                    "javax.help.search.SearchEngine" );
             hasJavaHelp = true;
             taskdef = (Taskdef) antProject.createTask( "taskdef" );
-            taskdef.setClassname("org.netbeans.nbbuild.JHIndexer");
-            taskdef.setName("jhindexer");
+            taskdef.setClassname( "org.netbeans.nbbuild.JHIndexer" );
+            taskdef.setName( "jhindexer" );
             taskdef.execute();
-        } catch (ClassNotFoundException ex) {
+        } catch ( ClassNotFoundException ex )
+        {
             hasJavaHelp = false;
         }
 
         return antProject;
     }
 
-    protected final boolean matchesLibrary(Artifact artifact, List libraries, ExamineManifest depExaminator) {
+    protected final boolean matchesLibrary( Artifact artifact, List libraries, ExamineManifest depExaminator )
+    {
 // when we have classifier like jar-assembly this condition is not true..
 // just take everything that is a dependecy, no matter of what type..
 //        if (!"jar".equals(artifact.getType())) {
@@ -86,46 +93,63 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
         String artId = artifact.getArtifactId();
         String grId = artifact.getGroupId();
         String id = grId + ":" + artId;
-        boolean explicit = libraries.remove(id);
-        if (explicit) {
-            getLog().debug(id + " included as module library, explicitly declared in module descriptor.");
+        boolean explicit = libraries.remove( id );
+        if ( explicit )
+        {
+            getLog().debug(
+                    id + " included as module library, explicitly declared in module descriptor." );
             return explicit;
         }
-        if (Artifact.SCOPE_PROVIDED.equals(artifact.getScope()) || Artifact.SCOPE_SYSTEM.equals(artifact.getScope())) {
-            getLog().debug(id + " omitted as module library, has scope 'provided/system'");
+        if ( Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) || Artifact.SCOPE_SYSTEM.equals(
+                artifact.getScope() ) )
+        {
+            getLog().debug(
+                    id + " omitted as module library, has scope 'provided/system'" );
             return false;
         }
-        if ("nbm".equals(artifact.getType())) {
+        if ( "nbm".equals( artifact.getType() ) )
+        {
             return false;
         }
-        if (depExaminator.isNetbeansModule()) {
+        if ( depExaminator.isNetbeansModule() )
+        {
             return false;
         }
         //only direct deps matter to us..
-        if (artifact.getDependencyTrail().size() > 2) {
-            getLog().debug(id + " omitted as module library, not direct dependency.");
+        if ( artifact.getDependencyTrail().size() > 2 )
+        {
+            getLog().debug(
+                    id + " omitted as module library, not direct dependency." );
             return false;
         }
-        getLog().debug(id + " included as module library, squeezed through all the filters.");
-        getLog().info("Adding as module's library:" + id);
+        getLog().debug(
+                id + " included as module library, squeezed through all the filters." );
+        getLog().info( "Adding as module's library:" + id );
         return true;
     }
 
-    protected final Dependency resolveNetbeansDependency(Artifact artifact, List deps, ExamineManifest manifest) {
+    protected final Dependency resolveNetbeansDependency( Artifact artifact, List deps, ExamineManifest manifest )
+    {
         String artId = artifact.getArtifactId();
         String grId = artifact.getGroupId();
         String id = grId + ":" + artId;
         Iterator it = deps.iterator();
-        while (it.hasNext()) {
+        while ( it.hasNext() )
+        {
             Dependency dep = (Dependency) it.next();
-            if (id.equals(dep.getId())) {
-                if (manifest.isNetbeansModule()) {
+            if ( id.equals( dep.getId() ) )
+            {
+                if ( manifest.isNetbeansModule() )
+                {
                     return dep;
-                } else {
-                    if (dep.getExplicitValue() != null) {
+                } else
+                {
+                    if ( dep.getExplicitValue() != null )
+                    {
                         return dep;
                     }
-                    getLog().warn(id + " declared as module dependency in descriptor, but not a NetBeans module");
+                    getLog().warn(
+                            id + " declared as module dependency in descriptor, but not a NetBeans module" );
                     return null;
                 }
             }
@@ -133,72 +157,96 @@ public abstract class AbstractNbmMojo extends AbstractMojo {
         //TODO this kind of thing works when building but the current
         // embedder in netbeans is not capable of figuring out the ArtifactHandlers in extensions
         // thus the compilation classpath in netbeans doens't have them in (which is not acceptable)
-        if ("nbm".equals(artifact.getType())) {
+        if ( "nbm".equals( artifact.getType() ) )
+        {
             Dependency dep = new Dependency();
-            dep.setId(id);
-            dep.setType("spec");
-            getLog().debug("Adding nbm module dependency - " + id);
+            dep.setId( id );
+            dep.setType( "spec" );
+            getLog().debug( "Adding nbm module dependency - " + id );
             return dep;
         }
         //only direct deps matter to us..
-        if (manifest.isNetbeansModule() && artifact.getDependencyTrail().size() > 2) {
-            getLog().debug(id + " omitted as NetBeans module dependency, not a direct one. Declare it in the pom for inclusion.");
+        if ( manifest.isNetbeansModule() && artifact.getDependencyTrail().size() > 2 )
+        {
+            getLog().debug(
+                    id + " omitted as NetBeans module dependency, not a direct one. Declare it in the pom for inclusion." );
             return null;
         }
-        if (manifest.isNetbeansModule()) {
+        if ( manifest.isNetbeansModule() )
+        {
             Dependency dep = new Dependency();
-            dep.setId(id);
-            dep.setType("spec");
-            getLog().debug("Adding direct NetBeans module dependency - " + id);
+            dep.setId( id );
+            dep.setType( "spec" );
+            getLog().debug( "Adding direct NetBeans module dependency - " + id );
             return dep;
         }
         return null;
     }
 
-    protected final NetbeansModule readModuleDescriptor(File descriptor) throws MojoExecutionException {
-        if (descriptor == null) {
-            throw new MojoExecutionException("The module descriptor has to be configured.");
+    protected final NetbeansModule readModuleDescriptor( File descriptor )
+            throws MojoExecutionException
+    {
+        if ( descriptor == null )
+        {
+            throw new MojoExecutionException(
+                    "The module descriptor has to be configured." );
         }
-        if (!descriptor.exists()) {
-            throw new MojoExecutionException("The module descriptor is missing: '" + descriptor + "'.");
+        if ( !descriptor.exists() )
+        {
+            throw new MojoExecutionException(
+                    "The module descriptor is missing: '" + descriptor + "'." );
         }
         Reader r = null;
-        try {
-            r = new FileReader(descriptor);
+        try
+        {
+            r = new FileReader( descriptor );
             NetbeansModuleXpp3Reader reader = new NetbeansModuleXpp3Reader();
-            NetbeansModule module = reader.read(r);
+            NetbeansModule module = reader.read( r );
             return module;
-        } catch (IOException exc) {
-            throw new MojoExecutionException("Error while reading module descriptor '" + descriptor + "'.", exc);
-        } catch (XmlPullParserException xml) {
-            throw new MojoExecutionException("Error while reading module descriptor '" + descriptor + "'.", xml);
-        } finally {
-            IOUtil.close(r);
+        } catch ( IOException exc )
+        {
+            throw new MojoExecutionException(
+                    "Error while reading module descriptor '" + descriptor + "'.",
+                    exc );
+        } catch ( XmlPullParserException xml )
+        {
+            throw new MojoExecutionException(
+                    "Error while reading module descriptor '" + descriptor + "'.",
+                    xml );
+        } finally
+        {
+            IOUtil.close( r );
         }
     }
 
-    protected final NetbeansModule createDefaultDescriptor(MavenProject project, boolean log) {
+    protected final NetbeansModule createDefaultDescriptor( MavenProject project, boolean log )
+    {
 
-        if (log) {
-            getLog().info("No Module Descriptor defined, trying to fallback to generated values:");
+        if ( log )
+        {
+            getLog().info(
+                    "No Module Descriptor defined, trying to fallback to generated values:" );
         }
         NetbeansModule module = new NetbeansModule();
-        module.setAuthor("Nobody");
-        module.setCluster("maven");
-        if (log) {
-            getLog().info("   Cluster:" + module.getCluster());
+        module.setAuthor( "Nobody" );
+        module.setCluster( "maven" );
+        if ( log )
+        {
+            getLog().info( "   Cluster:" + module.getCluster() );
         }
         String codename = project.getGroupId() + "." + project.getArtifactId();
-        codename = codename.replaceAll("-", ".");
-        module.setCodeNameBase(codename);
-        if (log) {
-            getLog().info("   Codenamebase:" + module.getCodeNameBase());
+        codename = codename.replaceAll( "-", "." );
+        module.setCodeNameBase( codename );
+        if ( log )
+        {
+            getLog().info( "   Codenamebase:" + module.getCodeNameBase() );
         }
-        module.setModuleType("normal");
-        if (log) {
-            getLog().info("   Type:" + module.getModuleType());
+        module.setModuleType( "normal" );
+        if ( log )
+        {
+            getLog().info( "   Type:" + module.getModuleType() );
         }
-        module.setRequiresRestart(false);
+        module.setRequiresRestart( false );
         return module;
     }
 }

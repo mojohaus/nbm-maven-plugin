@@ -31,7 +31,9 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @goal standalone-zip
  * @requiresProject
  */
-public class CreateStandaloneMojo extends AbstractMojo {
+public class CreateStandaloneMojo
+        extends AbstractMojo
+{
 
     /**
      * The branding token for the application based on NetBeans platform.
@@ -39,22 +41,17 @@ public class CreateStandaloneMojo extends AbstractMojo {
      * @required
      */
     protected String brandingToken;
-
-
     /**
      * output directory where the the netbeans application will be created.
      * @parameter default-value="${project.build.directory}"
      * @required
      */
     private File buildDirectory;
-    
     /**
      * Name of the jar packaged by the jar:jar plugin
      * @parameter expression="${project.build.finalName}"
      */
     private String finalName;
-    
-
     /**
      * The Maven project.
      *
@@ -69,23 +66,26 @@ public class CreateStandaloneMojo extends AbstractMojo {
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
      */
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException
+    {
 
-        try {
-            File nbmBuildDirFile = new File(buildDirectory, brandingToken);
-            
+        try
+        {
+            File nbmBuildDirFile = new File( buildDirectory, brandingToken );
+
             ZipArchiver archiver = new ZipArchiver();
-            archiver.addDirectory(nbmBuildDirFile);
-            File zipFile = new File( buildDirectory, finalName + ".zip");
+            archiver.addDirectory( nbmBuildDirFile );
+            File zipFile = new File( buildDirectory, finalName + ".zip" );
             //TODO - somehow check for last modified content to see if we shall be
             //recreating the zip file.
-            archiver.setDestFile(zipFile);
-            archiver.setForced(false);
+            archiver.setDestFile( zipFile );
+            archiver.setForced( false );
             archiver.createArchive();
             project.getArtifact().setFile( zipFile );
 
-        } catch (Exception ex) {
-            throw new MojoExecutionException("", ex);
+        } catch ( Exception ex )
+        {
+            throw new MojoExecutionException( "", ex );
         }
 
     }

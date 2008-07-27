@@ -32,7 +32,9 @@ import org.codehaus.plexus.util.FileUtils;
  * 
  * @author <a href="mailto:johan.andren@databyran.se">Johan AndrÃ©n</a>
  */
-public abstract class AbstractDistributionMojo extends AbstractMojo {
+public abstract class AbstractDistributionMojo
+        extends AbstractMojo
+{
 
     /**
      * directory where the module(s)' netbeans cluster(s) are located.
@@ -41,7 +43,6 @@ public abstract class AbstractDistributionMojo extends AbstractMojo {
      * @required
      */
     protected File projectBuildDir;
-
     /**
      * directory where the module(s)' netbeans cluster(s) are located.
      * is related to nbm:cluster goal.
@@ -49,7 +50,6 @@ public abstract class AbstractDistributionMojo extends AbstractMojo {
      * @required
      */
     protected File clusterBuildDir;
-
     /**
      * directory where the the NetBeans platform/IDE installation is,
      * denotes the root directory of netbeans installation.
@@ -57,14 +57,12 @@ public abstract class AbstractDistributionMojo extends AbstractMojo {
      * @required
      */
     protected File netbeansInstallation;
-
     /**
      * The branding token for the application based on NetBeans platform.
      * @parameter expression="${netbeans.branding.token}"
      * @required
      */
     protected String brandingToken;
-
     /**
      * additional command line arguments that the application should always
      * be run with. Will be placed in the etc/{brandingToken}.conf file
@@ -73,7 +71,6 @@ public abstract class AbstractDistributionMojo extends AbstractMojo {
      * @parameter expression="${netbeans.default.options}"
      */
     protected String defaultOptions;
-
     /**
      * List of enabled clusters. At least platform cluster needs to be
      * included.
@@ -82,23 +79,29 @@ public abstract class AbstractDistributionMojo extends AbstractMojo {
      */
     protected List<String> enabledClusters;
 
-    protected List<File> findClusterDirectories() throws IOException {
+    protected List<File> findClusterDirectories() throws IOException
+    {
 
 
-        if (!clusterBuildDir.exists()) {
-            throw new IOException("There are no additional clusters in " + clusterBuildDir);
+        if ( !clusterBuildDir.exists() )
+        {
+            throw new IOException(
+                    "There are no additional clusters in " + clusterBuildDir );
         }
 
         // make sure the final cluster list is numbered. (???)
         Map matchers = new HashMap();
-        if (enabledClusters == null) {
+        if ( enabledClusters == null )
+        {
             // fallback default.
             enabledClusters = new ArrayList();
         }
 
         // a matcher for each cluster
-        for (String enabledCluster : enabledClusters) {
-            matchers.put(enabledCluster, Pattern.compile(enabledCluster + "(\\d)*"));
+        for ( String enabledCluster : enabledClusters )
+        {
+            matchers.put( enabledCluster, Pattern.compile(
+                    enabledCluster + "(\\d)*" ) );
         }
 
         // all enabled clusters
@@ -107,26 +110,33 @@ public abstract class AbstractDistributionMojo extends AbstractMojo {
         // add all possible cluster directories to a large list
         File[] netbeansSubDirectories = netbeansInstallation.listFiles();
         File[] clusterDirectories = clusterBuildDir.listFiles();
-        List<File> files = new ArrayList<File>(netbeansSubDirectories.length + clusterDirectories.length);
-        files.addAll(Arrays.asList(netbeansSubDirectories));
-        files.addAll(Arrays.asList(clusterDirectories));
+        List<File> files = new ArrayList<File>(
+                netbeansSubDirectories.length + clusterDirectories.length );
+        files.addAll( Arrays.asList( netbeansSubDirectories ) );
+        files.addAll( Arrays.asList( clusterDirectories ) );
 
         // safety check, null means not existing folder
-        if (netbeansSubDirectories == null) {
-            throw new IOException("Non-existing NetBeans installation at " + netbeansInstallation);
+        if ( netbeansSubDirectories == null )
+        {
+            throw new IOException(
+                    "Non-existing NetBeans installation at " + netbeansInstallation );
         }
 
         // match directories and cluster names
-        for (File current : files) {
-            if (current.isDirectory()) {
+        for ( File current : files )
+        {
+            if ( current.isDirectory() )
+            {
                 String folderName = current.getName();
 
                 // match directory name against each enabled cluster
-                for (String clusterName : enabledClusters) {
+                for ( String clusterName : enabledClusters )
+                {
 
                     // a cluster could be clustername + version
-                    if (folderName.matches(clusterName + "\\d*")) {
-                        enabledClusterDirectories.add(current);
+                    if ( folderName.matches( clusterName + "\\d*" ) )
+                    {
+                        enabledClusterDirectories.add( current );
                         continue;
                     }
                 }
@@ -142,9 +152,12 @@ public abstract class AbstractDistributionMojo extends AbstractMojo {
      * @param clusterDirectories A list for cluster directories
      * @return <code>null</code> if there is no platform directory in the list
      */
-    protected File findPlatformClusterDirectory(List<File> clusterDirectories) {
-        for (File clusterDirectory : clusterDirectories) {
-            if (clusterDirectory.getName().matches("platform\\d")) {
+    protected File findPlatformClusterDirectory( List<File> clusterDirectories )
+    {
+        for ( File clusterDirectory : clusterDirectories )
+        {
+            if ( clusterDirectory.getName().matches( "platform\\d" ) )
+            {
                 return clusterDirectory;
             }
         }
@@ -162,33 +175,39 @@ public abstract class AbstractDistributionMojo extends AbstractMojo {
      * 
      * @throws java.io.IOException
      */
-    protected void createBundleEtcDir(File buildDir, File harnessDir, List<String> enabledClusters, String defaultOptions, String brandingToken)
-            throws IOException {
-        File etcDir = new File(buildDir + File.separator + "etc");
+    protected void createBundleEtcDir( File buildDir, File harnessDir, List<String> enabledClusters, String defaultOptions, String brandingToken )
+            throws IOException
+    {
+        File etcDir = new File( buildDir + File.separator + "etc" );
         etcDir.mkdir();
 
         // create app.clusters which contains a list of clusters to include in the application
 
-        File clusterConf = new File(etcDir + File.separator + brandingToken + ".clusters");
+        File clusterConf = new File(
+                etcDir + File.separator + brandingToken + ".clusters" );
         clusterConf.createNewFile();
         StringBuffer buffer = new StringBuffer();
-        for (String clusterName : enabledClusters) {
-            buffer.append(clusterName);
-            buffer.append("\n");
+        for ( String clusterName : enabledClusters )
+        {
+            buffer.append( clusterName );
+            buffer.append( "\n" );
         }
 
-        FileUtils.fileWrite(clusterConf.getAbsolutePath(), buffer.toString());
+        FileUtils.fileWrite( clusterConf.getAbsolutePath(), buffer.toString() );
 
         // app.conf contains default options and other settings
-        File confFile = new File(harnessDir.getAbsolutePath() + File.separator + "etc" + File.separator + "app.conf");
-        File confDestFile = new File(etcDir.getAbsolutePath() + File.separator + brandingToken + ".conf");
+        File confFile = new File(
+                harnessDir.getAbsolutePath() + File.separator + "etc" + File.separator + "app.conf" );
+        File confDestFile = new File(
+                etcDir.getAbsolutePath() + File.separator + brandingToken + ".conf" );
 
-        FileUtils.copyFile(confFile, confDestFile);
+        FileUtils.copyFile( confFile, confDestFile );
 
         // add default options from pom-file to app.conf
-        String contents = FileUtils.fileRead(confDestFile);
-        contents = contents.replace("default_options=\"", "default_options=\"" + defaultOptions + " ");
-        FileUtils.fileWrite(confDestFile.getAbsolutePath(), contents);
+        String contents = FileUtils.fileRead( confDestFile );
+        contents = contents.replace( "default_options=\"",
+                "default_options=\"" + defaultOptions + " " );
+        FileUtils.fileWrite( confDestFile.getAbsolutePath(), contents );
 
 
     }
@@ -196,11 +215,15 @@ public abstract class AbstractDistributionMojo extends AbstractMojo {
     /**
      * Copy all cluster directories to destination, skipping the disabled modules.
      */
-    protected void copyClusters(File destination, List<File> clusterDirectories) throws IOException {
+    protected void copyClusters( File destination, List<File> clusterDirectories )
+            throws IOException
+    {
 
-        for (File clusterDir : clusterDirectories) {
-            File buildClusterDir = new File(destination + File.separator + clusterDir.getName());
-            FileUtils.copyDirectoryStructure(clusterDir, buildClusterDir);
+        for ( File clusterDir : clusterDirectories )
+        {
+            File buildClusterDir = new File(
+                    destination + File.separator + clusterDir.getName() );
+            FileUtils.copyDirectoryStructure( clusterDir, buildClusterDir );
         }
     }
 }
