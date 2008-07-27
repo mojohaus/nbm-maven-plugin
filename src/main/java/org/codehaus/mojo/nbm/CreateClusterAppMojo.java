@@ -18,6 +18,7 @@ package org.codehaus.mojo.nbm;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +26,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
@@ -35,11 +35,14 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.Chmod;
+import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
- * Create the Netbeans module clusters from reactor
+ * Create the Netbeans module clusters/application
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal cluster-app
  * @requiresDependencyResolution runtime
@@ -69,7 +72,23 @@ import org.codehaus.plexus.util.IOUtil;
      * @required
      */
     protected String brandingToken;
-    
+
+    /**
+     * 
+     * @parameter expression="${netbeans.conf.file}"
+     */
+    private File etcConfFile;
+
+    /**
+     * 
+     * @parameter expression="${netbeans.clusters.file}"
+     */
+    private File etcClustersFile;
+
+    /**
+     * @parameter expression="${netbeans.bin.directory}"
+     */
+    private File binDirectory;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         
@@ -142,8 +161,9 @@ import org.codehaus.plexus.util.IOUtil;
                 }
             }
             getLog().info("Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile());
+
         } else {
-            throw new MojoExecutionException("This goal only makes sense on reactor projects or project with nbm-application packaging");
+            throw new MojoExecutionException("This goal only makes sense on project with nbm-application packaging");
         }
         //in 6.1 the rebuilt modules will be cached if the timestamp is not touched.
         File[] files = nbmBuildDirFile.listFiles();
@@ -159,6 +179,11 @@ import org.codehaus.plexus.util.IOUtil;
                 }
                 stamp.setLastModified(new Date().getTime());
             }
+        }
+        try {
+            createBinEtcDir(nbmBuildDirFile, brandingToken);
+        } catch (IOException ex) {
+            throw new MojoExecutionException("Cannot process etc folder content creation.", ex);
         }
     }
     private final static Pattern patt = Pattern.compile(".*targetcluster=\"([a-zA-Z0-9_\\.\\-]+)\".*", Pattern.DOTALL);
@@ -186,34 +211,79 @@ import org.codehaus.plexus.util.IOUtil;
      * 
      * @throws java.io.IOException
      */
-    private void createBundleEtcDir(File buildDir, File harnessDir, List<String> enabledClusters, String defaultOptions, String brandingToken)
-            throws IOException {
+    private void createBinEtcDir(File buildDir, String brandingToken) throws IOException, MojoExecutionException {
         File etcDir = new File(buildDir + File.separator + "etc");
         etcDir.mkdir();
 
         // create app.clusters which contains a list of clusters to include in the application
 
         File clusterConf = new File(etcDir + File.separator + brandingToken + ".clusters");
-        clusterConf.createNewFile();
-        StringBuffer buffer = new StringBuffer();
-        for (String clusterName : enabledClusters) {
-            buffer.append(clusterName);
-            buffer.append("\n");
+        String clustersString;
+        if (etcClustersFile != null) {
+            clustersString = FileUtils.fileRead(etcClustersFile, "UTF-8");
+        } else {
+            clusterConf.createNewFile();
+            StringBuffer buffer = new StringBuffer();
+            File[] clusters = buildDir.listFiles(new FileFilter() {
+                public boolean accept(File pathname) {
+                    return new File(pathname, ".lastModified").exists();
+                }
+            });
+            for (File cluster : clusters) {
+                buffer.append(cluster.getName());
+                buffer.append("\n");
+            }
+            clustersString = buffer.toString();
         }
 
-        FileUtils.fileWrite(clusterConf.getAbsolutePath(), buffer.toString());
+        FileUtils.fileWrite(clusterConf.getAbsolutePath(), clustersString);
 
-        // app.conf contains default options and other settings
-        File confFile = new File(harnessDir.getAbsolutePath() + File.separator + "etc" + File.separator + "app.conf");
+        File confFile = etcConfFile;
+        if (confFile == null) {
+            File harnessDir = new File(buildDir, "harness");
+            if (!harnessDir.exists()) {
+                throw new MojoExecutionException("Missing the harness cluster module(s). Either define parameters etcConfFile and binDirectory or includ ethe harness modules/cluster in the application.");
+            }
+            // app.conf contains default options and other settings
+            confFile = new File(harnessDir.getAbsolutePath() + File.separator + "etc" + File.separator + "app.conf");
+        }
         File confDestFile = new File(etcDir.getAbsolutePath() + File.separator + brandingToken + ".conf");
+        
+        String str = FileUtils.fileRead(confFile, "UTF-8");
+        str = str.replace("${APPNAME}", brandingToken);
+        FileUtils.fileWrite(confDestFile.getAbsolutePath(), "UTF-8", str);
+        
+        File destBinDir = new File(buildDir + File.separator + "bin");
+        destBinDir.mkdir();
+        
+        File binDir;
+        if (binDirectory != null) {
+            binDir = binDirectory;
+            FileUtils.copyDirectoryStructureIfModified(binDir, destBinDir);
+        } else {
+            File harnessDir = new File(buildDir, "harness");
+            if (!harnessDir.exists()) {
+                throw new MojoExecutionException("Missing the harness cluster module(s). Either define parameters etcConfFile and binDirectory or includ ethe harness modules/cluster in the application.");
+            }
+            binDir = new File(harnessDir.getAbsolutePath() + File.separator + "launchers");
+            File exe = new File(binDir, "app.exe");
+            FileUtils.copyFile(exe, new File(destBinDir, brandingToken + ".exe"));
+            File exew = new File(binDir, "app_w.exe");
+            FileUtils.copyFile(exew, new File(destBinDir, brandingToken + "_w.exe"));
+            File sh = new File(binDir, "app.sh");
+            FileUtils.copyFile(sh, new File(destBinDir, brandingToken));
+        }
 
-        FileUtils.copyFile(confFile, confDestFile);
-
-        // add default options from pom-file to app.conf
-        String contents = FileUtils.fileRead(confDestFile);
-        contents = contents.replace("default_options=\"", "default_options=\"" + defaultOptions + " ");
-        FileUtils.fileWrite(confDestFile.getAbsolutePath(), contents);
-
+        Project antProject = new Project();
+        antProject.init();
+        
+        Chmod chmod = (Chmod) antProject.createTask("chmod");
+        FileSet fs = new FileSet();
+        fs.setDir(destBinDir);
+        fs.setIncludes("*");
+        chmod.addFileset(fs);
+        chmod.setPerm("755");
+        chmod.execute();
     }
     
 }
