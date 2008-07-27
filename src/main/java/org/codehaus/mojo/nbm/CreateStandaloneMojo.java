@@ -40,14 +40,6 @@ public class CreateStandaloneMojo extends AbstractMojo {
      */
     protected String brandingToken;
 
-    /**
-     * additional command line arguments that the application should always
-     * be run with. Will be placed in the etc/{brandingToken}.conf file
-     * Eg. 
-     * -J-Dnetbeans.winsys.no_toolbars=true -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
-     * @parameter expression="${netbeans.default.options}"
-     */
-    private String defaultOptions;
 
     /**
      * output directory where the the netbeans application will be created.
@@ -60,7 +52,7 @@ public class CreateStandaloneMojo extends AbstractMojo {
      * Name of the jar packaged by the jar:jar plugin
      * @parameter expression="${project.build.finalName}"
      */
-    private File finalName;
+    private String finalName;
     
 
     /**
@@ -88,6 +80,7 @@ public class CreateStandaloneMojo extends AbstractMojo {
             //TODO - somehow check for last modified content to see if we shall be
             //recreating the zip file.
             archiver.setDestFile(zipFile);
+            archiver.setForced(false);
             archiver.createArchive();
             project.getArtifact().setFile( zipFile );
 
