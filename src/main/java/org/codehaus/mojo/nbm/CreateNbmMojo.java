@@ -145,7 +145,7 @@ public class CreateNbmMojo
         }
         try {
             File nbmfile = new File(buildDir, nbmFile.getName());
-            FileUtils.newFileUtils().copyFile(nbmFile, nbmfile);
+            FileUtils.getFileUtils().copyFile(nbmFile, nbmfile);
             projectHelper.attachArtifact( project, "nbm-file", null, nbmfile);
             
         } catch (IOException ex) {
