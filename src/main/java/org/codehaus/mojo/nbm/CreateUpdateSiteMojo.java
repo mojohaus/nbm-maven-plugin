@@ -174,7 +174,6 @@ public class CreateUpdateSiteMojo
                                 proj.getGroupId(), proj.getArtifactId(),
                                 proj.getVersion(), null, "nbm-file" );
                         String path = distRepository.pathOf( art );
-                        getLog().info( "pathOf=" + path );
                         File f = new File( nbmBuildDirFile, path.replace( '/',
                                 File.separatorChar ) );
                         copyTask.setTofile( f );
@@ -184,8 +183,6 @@ public class CreateUpdateSiteMojo
                         copyTask.execute();
                     } catch ( BuildException ex )
                     {
-                        getLog().error(
-                                "Cannot merge nbm files into autoupdate site" );
                         throw new MojoExecutionException(
                                 "Cannot merge nbm files into autoupdate site",
                                 ex );
@@ -213,7 +210,6 @@ public class CreateUpdateSiteMojo
                 descTask.execute();
             } catch ( BuildException ex )
             {
-                getLog().error( "Cannot create autoupdate site xml file" );
                 throw new MojoExecutionException(
                         "Cannot create autoupdate site xml file", ex );
             }
