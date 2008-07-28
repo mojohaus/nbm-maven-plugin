@@ -68,16 +68,21 @@ public class CreateUpdateSiteMojo
     protected String fileName;
     /**
      * A custom distribution base for the nbms in the update site.
-     * Allows to create an update site based on maven repository content.
+     * If NOT defined, the update site will use the distribution URLs as
+     * defined in the nbm files.
+     * <p/>
+     * The value is either a direct http protocol based URL that points to
+     * the location under which all nbm files are located, or
+     * <p/>
+     * allows to create an update site based on maven repository content.
      * The resulting autoupdate site document can be uploaded as tar.gz to repository as well
      * as attached artifact to the 'nbm-application' project.
      * <br/>
      * Format: id::layout::url same as in maven-deploy-plugin
-     * 
-     * apart from the 'default' and 'legacy' layouts, allow also 'flat' which 
-     * assumes the location of nbm files in remote location at ${distBase}/${name of module}.nbm
-     *
-     * For backward compatibility reasons, if the value doesn't contain :: characters,
+     * <br/>
+     * with the 'default' and 'legacy' layouts. (maven2 vs maven1 layout)
+     * <br/>
+     * If the value doesn't contain :: characters,
      * it's assumed to be the flat structure and the value is just the URL.
      * 
      * @parameter expression="${maven.nbm.customDistBase}"
