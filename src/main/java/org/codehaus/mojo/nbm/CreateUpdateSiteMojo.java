@@ -19,6 +19,7 @@ package org.codehaus.mojo.nbm;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.maven.artifact.Artifact;
@@ -29,12 +30,14 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.archiver.gzip.GZipArchiver;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -104,6 +107,12 @@ public class CreateUpdateSiteMojo
      * Contextualized.
      */
     private PlexusContainer container;
+    /**
+     * Used for attaching the artifact in the project
+     *
+     * @component
+     */
+    private MavenProjectHelper projectHelper;
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -130,7 +139,43 @@ public class CreateUpdateSiteMojo
 
         if ( "nbm-application".equals( project.getPackaging() ) )
         {
-            
+            Set artifacts = project.getArtifacts();
+            Iterator it = artifacts.iterator();
+            while ( it.hasNext() )
+            {
+                Artifact art = (Artifact) it.next();
+                if ( art.getType().equals( "nbm-file" ) )
+                {
+                    Copy copyTask = (Copy) antProject.createTask( "copy" );
+                    copyTask.setOverwrite( true );
+                    copyTask.setFile( art.getFile() );
+                    if ( !isRepository )
+                    {
+                        copyTask.setFlatten( true );
+                        copyTask.setTodir( nbmBuildDirFile );
+                    } else
+                    {
+                        String path = distRepository.pathOf( art );
+                        File f = new File( nbmBuildDirFile, path.replace( '/',
+                                File.separatorChar ) );
+                        copyTask.setTofile( f );
+                    }
+                    try
+                    {
+                        copyTask.execute();
+                    } catch ( BuildException ex )
+                    {
+                        throw new MojoExecutionException(
+                                "Cannot merge nbm files into autoupdate site",
+                                ex );
+                    }
+
+                }
+            }
+            getLog().info(
+                    "Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile() );
+
+
         } else if ( reactorProjects != null && reactorProjects.size() > 0 )
         {
 
@@ -192,38 +237,59 @@ public class CreateUpdateSiteMojo
                     }
                 }
             }
-            MakeUpdateDesc descTask = (MakeUpdateDesc) antProject.createTask(
-                    "updatedist" );
-            descTask.setDesc( new File( nbmBuildDirFile, fileName ) );
-            descTask.setAutomaticgrouping( true );
-            if ( oldDistBase != null )
-            {
-                descTask.setDistBase( oldDistBase );
-            }
-            if ( distRepository != null )
-            {
-                descTask.setDistBase( distRepository.getUrl() );
-            }
-            FileSet fs = new FileSet();
-            fs.setDir( nbmBuildDirFile );
-            fs.createInclude().setName( "**/*.nbm" );
-            descTask.addFileset( fs );
-            try
-            {
-                descTask.execute();
-            } catch ( BuildException ex )
-            {
-                throw new MojoExecutionException(
-                        "Cannot create autoupdate site xml file", ex );
-            }
-            getLog().info(
-                    "Generated autoupdate site content at " + nbmBuildDirFile.getAbsolutePath() );
         } else
         {
             throw new MojoExecutionException(
                     "This goal only makes sense on reactor projects or project with 'nbm-application' packaging." );
 
         }
+        MakeUpdateDesc descTask = (MakeUpdateDesc) antProject.createTask(
+                "updatedist" );
+        File xmlFile = new File( nbmBuildDirFile, fileName );
+        descTask.setDesc( xmlFile );
+        descTask.setAutomaticgrouping( true );
+        if ( oldDistBase != null )
+        {
+            descTask.setDistBase( oldDistBase );
+        }
+        if ( distRepository != null )
+        {
+            descTask.setDistBase( distRepository.getUrl() );
+        }
+        FileSet fs = new FileSet();
+        fs.setDir( nbmBuildDirFile );
+        fs.createInclude().setName( "**/*.nbm" );
+        descTask.addFileset( fs );
+        try
+        {
+            descTask.execute();
+        } catch ( BuildException ex )
+        {
+            throw new MojoExecutionException(
+                    "Cannot create autoupdate site xml file", ex );
+        }
+        getLog().info(
+                "Generated autoupdate site content at " + nbmBuildDirFile.getAbsolutePath() );
+
+        try
+        {
+            GZipArchiver gz = new GZipArchiver();
+            gz.addFile( xmlFile, fileName );
+            File gzipped = new File( nbmBuildDirFile, fileName + ".gz");
+            gz.setDestFile( gzipped );
+            gz.createArchive();
+            if ( "nbm-application".equals( project.getPackaging() ) )
+            {
+                projectHelper.attachArtifact( project, "gz", "updatesite",
+                        gzipped );
+            }
+        } catch ( Exception ex )
+        {
+            throw new MojoExecutionException(
+                    "Cannot create gzipped version of the update site xml file.",
+                    ex );
+        }
+
     }
     private static final Pattern ALT_REPO_SYNTAX_PATTERN = Pattern.compile(
             "(.+)::(.+)::(.+)" );
