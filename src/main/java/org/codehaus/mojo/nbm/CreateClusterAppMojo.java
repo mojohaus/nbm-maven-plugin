@@ -45,6 +45,7 @@ import org.codehaus.plexus.util.IOUtil;
  * Create the Netbeans module clusters/application
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal cluster-app
+ * @phase process-resources
  * @requiresDependencyResolution runtime
  * @requiresProject
  */

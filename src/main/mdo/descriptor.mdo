@@ -64,7 +64,7 @@
                 <field>
                     <name>distributionUrl</name>
                     <version>1.0.0+</version>
-                    <description>Http URL of the location where the module can be downloaded from the internet. This value put into the NBM and used when generating the Autoupdate Site. Should point directly to the NBM download.</description>
+                    <description>DEPRECATED, use the plugin configuration instead. Http URL of the location where the module can be downloaded from the internet. This value put into the NBM and used when generating the Autoupdate Site. Should point directly to the NBM download.</description>
                     <type>String</type>
                 </field>
                 <field>

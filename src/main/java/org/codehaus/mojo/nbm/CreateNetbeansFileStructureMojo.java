@@ -128,14 +128,23 @@ public class CreateNetbeansFileStructureMojo
      * @readonly
      */
     protected MavenProject project;
-//    /**
-//     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
-//     * @required
-//     * @readonly
-//     */
-//    private ArtifactFactory artifactFactory;
     /**
-     * custom distribution URL, overriding the value in the nbm descriptor
+     * Distribution base URL for the NBM at runtime deployment time.
+     * Useful when considering distrubution via NetBeans'
+     * <p/>
+     * The value is either a direct http protocol based URL that points to
+     * the location under which nbm file will be located, or
+     * <p/>
+     * it allows to create an update site based on maven repository content.
+     * The later created autoupdate site document can use this information and
+     * compose the application from one or multiple maven repositories.
+     * <br/>
+     * Format: id::layout::url same as in maven-deploy-plugin
+     * <br/>
+     * with the 'default' and 'legacy' layouts. (maven2 vs maven1 layout)
+     * <br/>
+     * If the value doesn't contain :: characters,
+     * it's assumed to be the flat structure and the value is just the URL.
      * 
      * @parameter expression="${maven.nbm.distributionURL}"
      */

@@ -18,11 +18,19 @@ package org.codehaus.mojo.nbm;
 
 import java.io.File;
 import java.io.IOException;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.util.FileUtils;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.netbeans.nbbuild.MakeNBM;
 import org.netbeans.nbbuild.MakeNBM.Blurb;
 import org.netbeans.nbbuild.MakeNBM.Signature;
@@ -40,6 +48,7 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
  */
 public class CreateNbmMojo
         extends CreateNetbeansFileStructureMojo
+        implements Contextualizable
 {
 
     /**
@@ -63,6 +72,14 @@ public class CreateNbmMojo
      * @component
      */
     private MavenProjectHelper projectHelper;
+    /**
+     * Contextualized.
+     */
+    private PlexusContainer container;
+    /**
+     * @component
+     */
+    private ArtifactFactory artifactFactory;
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -144,12 +161,31 @@ public class CreateNbmMojo
         }
         if ( module.getDistributionUrl() != null )
         {
-            nbmTask.setDistribution( module.getDistributionUrl() + (module.getDistributionUrl().endsWith(
-                    "/" ) ? "" : "/") + nbmFile.getName() );
+            ArtifactRepository distRepository = CreateUpdateSiteMojo.getDeploymentRepository(
+                    module.getDistributionUrl(), container, getLog() );
+            String dist = null;
+            if ( distRepository == null )
+            {
+                if ( !module.getDistributionUrl().contains( "::" ) )
+                {
+                    dist = module.getDistributionUrl() + (module.getDistributionUrl().endsWith(
+                            "/" ) ? "" : "/") + nbmFile.getName();
+                }
+            } else
+            {
+                Artifact art = artifactFactory.createArtifact(
+                        project.getGroupId(), project.getArtifactId(),
+                        project.getVersion(), null, "nbm-file" );
+
+                dist = distRepository.getUrl() + (distRepository.getUrl().endsWith( 
+                        "/" ) ? "" : "/") + distRepository.pathOf( art );
+
+            }
+            nbmTask.setDistribution( dist );
         } else
         {
             getLog().warn(
-                    "You don't define distribution URL in the netbeans module descriptor. That's ok for local installation but f you want to create an autoupdate site, you have to define this property." );
+                    "You don't define distributionUrl parameter in the nbm-maven-plugin configuration. That's ok for local installation but f you want to create an autoupdate site, you have to define this property." );
             nbmTask.setDistribution( project.getUrl() + (project.getUrl() != null && project.getUrl().endsWith(
                     "/" ) ? "" : "/") + nbmFile.getName() );
             getLog().warn(
@@ -176,5 +212,12 @@ public class CreateNbmMojo
             throw new MojoExecutionException(
                     "Cannot copy nbm to build directory", ex );
         }
+    }
+
+    public void contextualize( Context context )
+            throws ContextException
+    {
+        this.container = (PlexusContainer) context.get(
+                PlexusConstants.PLEXUS_KEY );
     }
 }

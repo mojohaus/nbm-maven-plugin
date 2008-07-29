@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.BuildException;
@@ -129,7 +130,7 @@ public class CreateUpdateSiteMojo
         }
 
         boolean isRepository = false;
-        ArtifactRepository distRepository = getDeploymentRepository();
+        ArtifactRepository distRepository = getDeploymentRepository(distBase, container, getLog());
         String oldDistBase = null;
         if ( distRepository != null )
         {
@@ -299,7 +300,7 @@ public class CreateUpdateSiteMojo
     private static final Pattern ALT_REPO_SYNTAX_PATTERN = Pattern.compile(
             "(.+)::(.+)::(.+)" );
 
-    private ArtifactRepository getDeploymentRepository()
+    static ArtifactRepository getDeploymentRepository(String distBase, PlexusContainer container, Log log)
             throws MojoExecutionException, MojoFailureException
     {
 
@@ -307,8 +308,6 @@ public class CreateUpdateSiteMojo
 
         if ( distBase != null )
         {
-            getLog().info(
-                    "Using alternate update center distribution repository " + distBase );
 
             Matcher matcher = ALT_REPO_SYNTAX_PATTERN.matcher( distBase );
 
