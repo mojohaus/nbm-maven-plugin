@@ -84,7 +84,7 @@ public class CreateNetbeansFileStructureMojo
      */
     protected File descriptor;
     /**
-     * Netbeans module's cluster. Shall replace the cluster element in module descriptor.
+     * Netbeans module's cluster. Replaces the cluster element in module descriptor.
      *
      * @parameter default-value="extra"
      * @required
@@ -195,7 +195,7 @@ public class CreateNetbeansFileStructureMojo
             moduleName = moduleName.replaceAll( "-", "." );
         }
         moduleJarName = moduleName.replace( '.', '-' );
-        if ( cluster == null )
+        if ( "extra".equals( cluster ) && module.getCluster() != null )
         {
             getLog().warn(
                     "Parameter cluster in module descriptor is deprecated, use the plugin configuration element." );
