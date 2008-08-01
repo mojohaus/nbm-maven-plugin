@@ -22,6 +22,7 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -50,7 +51,7 @@ import org.codehaus.plexus.util.IOUtil;
  * @requiresProject
  */
 public class CreateClusterAppMojo
-        extends AbstractNbmMojo
+    extends AbstractNbmMojo
 {
 
     /**
@@ -59,6 +60,7 @@ public class CreateClusterAppMojo
      * @required
      */
     private File buildDirectory;
+
     /**
      * The Maven Project.
      *
@@ -67,23 +69,31 @@ public class CreateClusterAppMojo
      * @readonly
      */
     private MavenProject project;
+
     /**
      * The branding token for the application based on NetBeans platform.
      * @parameter expression="${netbeans.branding.token}"
      * @required
      */
     protected String brandingToken;
+
     /**
      * 
      * @parameter expression="${netbeans.conf.file}"
      */
     private File etcConfFile;
+
     /**
      * 
      * @parameter expression="${netbeans.clusters.file}"
      */
     private File etcClustersFile;
+
     /**
+     * Directory which contains the executables that will be copied to
+     * the final application's bin/ directory.
+     * Please note that the name of the executables shall generally
+     * match the brandingToken parameter. Otherwise the application can be wrongly branded.
      * @parameter expression="${netbeans.bin.directory}"
      */
     private File binDirectory;
@@ -115,7 +125,7 @@ public class CreateClusterAppMojo
                         if ( !knownClusters.contains( cluster ) )
                         {
                             getLog().info(
-                                    "Processing cluster '" + cluster + "'" );
+                                "Processing cluster '" + cluster + "'" );
                             knownClusters.add( cluster );
                         }
                         File clusterFile = new File( nbmBuildDirFile, cluster );
@@ -124,7 +134,8 @@ public class CreateClusterAppMojo
                         {
                             clusterFile.mkdir();
                             newer = true;
-                        } else
+                        }
+                        else
                         {
                             File stamp = new File( clusterFile, ".lastModified" );
                             if ( stamp.lastModified() < art.getFile().lastModified() )
@@ -135,7 +146,7 @@ public class CreateClusterAppMojo
                         if ( newer )
                         {
                             getLog().debug(
-                                    "Copying " + art.getId() + " to cluster " + cluster );
+                                "Copying " + art.getId() + " to cluster " + cluster );
                             Enumeration enu = jf.entries();
                             while ( enu.hasMoreElements() )
                             {
@@ -144,13 +155,14 @@ public class CreateClusterAppMojo
                                 if ( name.startsWith( "netbeans/" ) )
                                 { //ignore everything else.
                                     String path = name.replace( "netbeans/",
-                                            cluster + "/" );
+                                        cluster + "/" );
                                     File fl = new File( nbmBuildDirFile,
-                                            path.replace( "/", File.separator ) );
+                                        path.replace( "/", File.separator ) );
                                     if ( ent.isDirectory() )
                                     {
                                         fl.mkdirs();
-                                    } else
+                                    }
+                                    else
                                     {
                                         fl.getParentFile().mkdirs();
                                         fl.createNewFile();
@@ -158,11 +170,12 @@ public class CreateClusterAppMojo
                                         try
                                         {
                                             outstream = new BufferedOutputStream( new FileOutputStream(
-                                                    fl ) );
+                                                fl ) );
                                             InputStream instream = jf.getInputStream(
-                                                    ent );
+                                                ent );
                                             IOUtil.copy( instream, outstream );
-                                        } finally
+                                        }
+                                        finally
                                         {
                                             IOUtil.close( outstream );
                                         }
@@ -170,15 +183,18 @@ public class CreateClusterAppMojo
                                 }
                             }
                         }
-                    } catch ( IOException ex )
+                    }
+                    catch ( IOException ex )
                     {
                         getLog().error( ex );
-                    } finally
+                    }
+                    finally
                     {
                         try
                         {
                             jf.close();
-                        } catch ( IOException ex )
+                        }
+                        catch ( IOException ex )
                         {
                             getLog().error( ex );
                         }
@@ -186,12 +202,13 @@ public class CreateClusterAppMojo
                 }
             }
             getLog().info(
-                    "Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile() );
+                "Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile() );
 
-        } else
+        }
+        else
         {
             throw new MojoExecutionException(
-                    "This goal only makes sense on project with nbm-application packaging" );
+                "This goal only makes sense on project with nbm-application packaging" );
         }
         //in 6.1 the rebuilt modules will be cached if the timestamp is not touched.
         File[] files = nbmBuildDirFile.listFiles();
@@ -205,7 +222,8 @@ public class CreateClusterAppMojo
                     try
                     {
                         stamp.createNewFile();
-                    } catch ( IOException ex )
+                    }
+                    catch ( IOException ex )
                     {
                         ex.printStackTrace();
                     }
@@ -216,14 +234,15 @@ public class CreateClusterAppMojo
         try
         {
             createBinEtcDir( nbmBuildDirFile, brandingToken );
-        } catch ( IOException ex )
+        }
+        catch ( IOException ex )
         {
             throw new MojoExecutionException(
-                    "Cannot process etc folder content creation.", ex );
+                "Cannot process etc folder content creation.", ex );
         }
     }
     private final static Pattern patt = Pattern.compile(
-            ".*targetcluster=\"([a-zA-Z0-9_\\.\\-]+)\".*", Pattern.DOTALL );
+        ".*targetcluster=\"([a-zA-Z0-9_\\.\\-]+)\".*", Pattern.DOTALL );
 
     private String findCluster( JarFile jf ) throws MojoFailureException, IOException
     {
@@ -234,7 +253,8 @@ public class CreateClusterAppMojo
         if ( !m.matches() )
         {
             getLog().error( "Cannot find cluster for " + jf.getName() );
-        } else
+        }
+        else
         {
             return m.group( 1 );
         }
@@ -259,12 +279,13 @@ public class CreateClusterAppMojo
         // create app.clusters which contains a list of clusters to include in the application
 
         File clusterConf = new File(
-                etcDir + File.separator + brandingToken + ".clusters" );
+            etcDir + File.separator + brandingToken + ".clusters" );
         String clustersString;
         if ( etcClustersFile != null )
         {
             clustersString = FileUtils.fileRead( etcClustersFile, "UTF-8" );
-        } else
+        }
+        else
         {
             clusterConf.createNewFile();
             StringBuffer buffer = new StringBuffer();
@@ -287,22 +308,40 @@ public class CreateClusterAppMojo
         FileUtils.fileWrite( clusterConf.getAbsolutePath(), clustersString );
 
         File confFile = etcConfFile;
+        String str;
         if ( confFile == null )
         {
             File harnessDir = new File( buildDir, "harness" );
             if ( !harnessDir.exists() )
             {
-                throw new MojoExecutionException(
-                        "Missing the harness cluster module(s). Either define parameters etcConfFile and binDirectory or includ ethe harness modules/cluster in the application." );
+                getLog().debug( "Using fallback app.conf shipping with the nbm-maven-plugin." );
+                InputStream instream = null;
+                try
+                {
+                    instream = getClass().getClassLoader().getResourceAsStream(
+                        "/app.conf" );
+                    str = IOUtil.toString( instream, "UTF-8" );
+                }
+                finally
+                {
+                    IOUtil.close( instream );
+                }
             }
-            // app.conf contains default options and other settings
-            confFile = new File(
+            else
+            {
+                // app.conf contains default options and other settings
+                confFile = new File(
                     harnessDir.getAbsolutePath() + File.separator + "etc" + File.separator + "app.conf" );
+                str = FileUtils.fileRead( confFile, "UTF-8" );
+            }
+        }
+        else
+        {
+            str = FileUtils.fileRead( confFile, "UTF-8" );
         }
         File confDestFile = new File(
-                etcDir.getAbsolutePath() + File.separator + brandingToken + ".conf" );
+            etcDir.getAbsolutePath() + File.separator + brandingToken + ".conf" );
 
-        String str = FileUtils.fileRead( confFile, "UTF-8" );
         str = str.replace( "${APPNAME}", brandingToken );
         FileUtils.fileWrite( confDestFile.getAbsolutePath(), "UTF-8", str );
 
@@ -314,24 +353,31 @@ public class CreateClusterAppMojo
         {
             binDir = binDirectory;
             FileUtils.copyDirectoryStructureIfModified( binDir, destBinDir );
-        } else
+        }
+        else
         {
             File harnessDir = new File( buildDir, "harness" );
-            if ( !harnessDir.exists() )
+            File destExeW = new File( destBinDir, brandingToken + "_w.exe" );
+            File destExe = new File( destBinDir, brandingToken + ".exe" );
+            File destSh = new File( destBinDir, brandingToken );
+            if ( harnessDir.exists() )
             {
-                throw new MojoExecutionException(
-                        "Missing the harness cluster module(s). Either define parameters etcConfFile and binDirectory or includ ethe harness modules/cluster in the application." );
-            }
-            binDir = new File(
+                getLog().debug( "Using fallback executables shipping with the nbm-maven-plugin." );
+                binDir = new File(
                     harnessDir.getAbsolutePath() + File.separator + "launchers" );
-            File exe = new File( binDir, "app.exe" );
-            FileUtils.copyFile( exe, new File( destBinDir,
-                    brandingToken + ".exe" ) );
-            File exew = new File( binDir, "app_w.exe" );
-            FileUtils.copyFile( exew, new File( destBinDir,
-                    brandingToken + "_w.exe" ) );
-            File sh = new File( binDir, "app.sh" );
-            FileUtils.copyFile( sh, new File( destBinDir, brandingToken ) );
+                File exe = new File( binDir, "app.exe" );
+                FileUtils.copyFile( exe, destExe );
+                File exew = new File( binDir, "app_w.exe" );
+                FileUtils.copyFile( exew, destExeW );
+                File sh = new File( binDir, "app.sh" );
+                FileUtils.copyFile( sh, destSh );
+            }
+            else
+            {
+                writeFile( "/launchers/app.sh", destSh );
+                writeFile( "/launchers/app.exe", destExe );
+                writeFile( "/launchers/app_w.exe", destExeW );
+            }
         }
 
         Project antProject = new Project();
@@ -344,5 +390,23 @@ public class CreateClusterAppMojo
         chmod.addFileset( fs );
         chmod.setPerm( "755" );
         chmod.execute();
+    }
+
+    private void writeFile( String path, File destSh ) throws IOException
+    {
+        InputStream instream = null;
+        OutputStream output = null;
+        try
+        {
+            instream = getClass().getClassLoader().getResourceAsStream( path );
+            destSh.createNewFile();
+            output = new BufferedOutputStream( new FileOutputStream( destSh ) );
+            IOUtil.copy( instream, output );
+        }
+        finally
+        {
+            IOUtil.close( instream );
+            IOUtil.close( output );
+        }
     }
 }
