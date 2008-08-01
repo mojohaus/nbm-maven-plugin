@@ -252,7 +252,7 @@ public class RunPlatformAppMojo
                 Commandline.quoteArgument( clustersString )
             };
             cmdLine.addArguments( args );
-            cmdLine.addArguments( cmdLine.translateCommandline(
+            cmdLine.addArguments( Commandline.translateCommandline(
                     additionalArguments ) );
             getLog().info( "Executing: " + cmdLine.toString() );
             StreamConsumer out = new StreamConsumer()
