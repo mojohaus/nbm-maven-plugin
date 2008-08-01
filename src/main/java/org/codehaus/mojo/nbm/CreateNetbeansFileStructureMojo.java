@@ -130,7 +130,12 @@ public class CreateNetbeansFileStructureMojo
     protected MavenProject project;
     /**
      * Distribution base URL for the NBM at runtime deployment time.
-     * Useful when considering distrubution via NetBeans'
+     * Note: Uselfulness of the parameter is questionable, it doesn't allow for mirrors and
+     * usually when downloading the nbm, one alreayd knows the location anyway.
+     * Please note that the netbeans.org Ant scripts put a dummy url here.
+     * The actual correct value used when constructing update site is
+     * explicitly set there. The general assuption there is that all modules from one update
+     * center come from one base URL.
      * <p/>
      * The value is either a direct http protocol based URL that points to
      * the location under which nbm file will be located, or
