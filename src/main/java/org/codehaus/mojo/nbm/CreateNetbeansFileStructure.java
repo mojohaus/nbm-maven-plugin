@@ -49,13 +49,9 @@ import org.netbeans.nbbuild.JHIndexer;
  * <p/>
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal directory
- * @phase package
- * @requiresDependencyResolution runtime
- * @requiresProject
  *
  */
-public class CreateNetbeansFileStructureMojo
+public abstract class CreateNetbeansFileStructure
         extends AbstractNbmMojo
 {
 

@@ -47,7 +47,7 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
  *
  */
 public class CreateNbmMojo
-        extends CreateNetbeansFileStructureMojo
+        extends CreateNetbeansFileStructure
         implements Contextualizable
 {
 
@@ -80,6 +80,13 @@ public class CreateNbmMojo
      * @component
      */
     private ArtifactFactory artifactFactory;
+    
+    /**
+     * Boolean parameter denoting if creation of NBM file shall be skipped or not.
+     * If skipped, just the expanded directory for cluster is created
+     * @parameter expression="${maven.nbm.skip}" default-value="false"
+     */
+    private boolean skipNbm;
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -90,6 +97,12 @@ public class CreateNbmMojo
             return;
         }
         super.execute();
+
+        if ( skipNbm )
+        {
+            getLog().info( "Skipping generation of NBM file.");
+            return;
+        }
 
         // 3. generate nbm
         File nbmFile = new File( nbmBuildDir, finalName + ".nbm" );
@@ -197,8 +210,7 @@ public class CreateNbmMojo
             nbmTask.execute();
         } catch ( BuildException e )
         {
-            getLog().error( "Cannot Generate nbm file" );
-            throw new MojoExecutionException( e.getMessage(), e );
+            throw new MojoExecutionException( "Cannot Generate nbm file:" + e.getMessage(), e );
         }
         try
         {
@@ -208,7 +220,6 @@ public class CreateNbmMojo
 
         } catch ( IOException ex )
         {
-            getLog().error( "Cannot copy nbm to build directory" );
             throw new MojoExecutionException(
                     "Cannot copy nbm to build directory", ex );
         }

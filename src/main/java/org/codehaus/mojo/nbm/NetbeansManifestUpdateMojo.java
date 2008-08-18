@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,23 +32,20 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.mojo.nbm.model.Dependency;
 import org.codehaus.mojo.nbm.model.NetbeansModule;
 import org.apache.maven.project.MavenProject;
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.Jar;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
-import org.apache.tools.ant.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  * Goal for updating the artifact jar with netbeans specific entries, part of "nbm" lifecycle/packaging.
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal jar
- * @phase package
+ * @goal manifest
+ * @phase generate-resources
  * @requiresDependencyResolution runtime
  * @requiresProject
  */
-public class NetbeansJarUpdateMojo
+public class NetbeansManifestUpdateMojo
         extends AbstractNbmMojo
 {
 
@@ -57,19 +55,6 @@ public class NetbeansJarUpdateMojo
      * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      */
     protected String nbmBuildDir;
-    /**
-     * @todo Change type to File
-     *
-     * @parameter expression="${project.build.directory}"
-     * @required
-     * @readonly
-     */
-    private String buildDir;
-    /**
-     * Name of the final jar produced by the default jar:jar goal.
-     * @parameter expression="${project.build.finalName}"
-     */
-    private String finalName;
     /**
      * a netbeans module descriptor containing dependency information and more
      *
@@ -115,29 +100,27 @@ public class NetbeansJarUpdateMojo
      * @since 2.7
      */
     protected File nbmJavahelpSource;
+    
+    /**
+     * Path to manifest file that will be used as base for the 
+     *
+     * @parameter default-value="${basedir}/src/main/nbm/manifest.mf"
+     * @required
+     */
+    private File sourceManifestFile;
+    
+    /**
+     * Path to the generated MANIFEST file to use. It will be used by nbm:jar plugin.
+     *
+     * @parameter expression="${project.build.outputDirectory}/META-INF/MANIFEST.MF"
+     * @readonly
+     * @required
+     */
+    private File targetManifestFile;
 
     public void execute()
             throws MojoExecutionException
     {
-        Project antProject = registerNbmAntTasks();
-
-
-        // need to delete if exists, otherwise we get the weirdo multiplied Class-Path manifest attribute. -->
-        File jarFile = new File( nbmBuildDir, finalName + ".jar" );
-        if ( jarFile.exists() )
-        {
-            jarFile.delete();
-        }
-        // copy the original jar made by jar:jar goal to target/nbm -->
-        File original = new File( buildDir, finalName + ".jar" );
-        try
-        {
-            FileUtils.newFileUtils().copyFile( original, jarFile );
-        } catch ( IOException ex )
-        {
-            getLog().error( "Cannot copy module jar" );
-            throw new MojoExecutionException( "Cannot copy module jar", ex );
-        }
         NetbeansModule module;
         if ( descriptor != null && descriptor.exists() )
         {
@@ -155,26 +138,26 @@ public class NetbeansJarUpdateMojo
         }
 //<!-- if a netbeans specific manifest is defined, examine this one, otherwise the already included one.
 // ignoring the case when some of the netbeans attributes are already defined in the jar and more is included.
-        File specialManifest = null;
+        File specialManifest = sourceManifestFile;
         File nbmManifest = (module.getManifest() != null ? new File(
                 project.getBasedir(), module.getManifest() ) : null);
         if ( nbmManifest != null && nbmManifest.exists() )
         {
+            //deprecated, but if actually defined, will use it.
             specialManifest = nbmManifest;
         }
         ExamineManifest examinator = new ExamineManifest( getLog() );
         if ( specialManifest != null )
         {
             examinator.setManifestFile( specialManifest );
+            examinator.checkFile();
         } else
         {
-            examinator.setJarFile( jarFile );
+//            examinator.setJarFile( jarFile );
         }
-        examinator.checkFile();
 
-        getLog().info( "NBM Plugin updates jar." );
+        getLog().info( "NBM Plugin generates manifest" );
 
-        Jar jarTask = (Jar) antProject.createTask( "jar" );
         Manifest manifest = null;
         if ( specialManifest != null )
         {
@@ -187,24 +170,14 @@ public class NetbeansJarUpdateMojo
             } catch ( IOException exc )
             {
                 manifest = new Manifest();
-            //TODO some reporting
+                getLog().warn( "Error reading manifest at " + specialManifest, exc );
             } catch ( ManifestException ex )
             {
-                //TODO some reporting
-                ex.printStackTrace();
+                getLog().warn( "Error reading manifest at " + specialManifest, ex );
                 manifest = new Manifest();
             } finally
             {
-                if ( reader != null )
-                {
-                    try
-                    {
-                        reader.close();
-                    } catch ( IOException io )
-                    {
-                        io.printStackTrace();
-                    }
-                }
+                IOUtil.close( reader );
             }
         } else
         {
@@ -253,7 +226,6 @@ public class NetbeansJarUpdateMojo
             {
                 librList.addAll( module.getLibraries() );
             }
-            ;
             List deps = module.getDependencies();
             List artifacts = project.getCompileArtifacts();
             for ( Iterator iter = artifacts.iterator(); iter.hasNext();)
@@ -347,31 +319,21 @@ public class NetbeansJarUpdateMojo
                         "Some libraries could not be found in the dependency chain: " + list );
             }
         }
+        PrintWriter writer = null;
         try
         {
-            jarTask.setDestFile( jarFile );
-            jarTask.addConfiguredManifest( manifest );
-            jarTask.setUpdate( true );
-            jarTask.execute();
-        } catch ( ManifestException ex )
-        {
-            getLog().error( "Cannot set updated manifest" );
-            throw new MojoExecutionException( ex.getMessage(), ex );
-        } catch ( BuildException e )
-        {
-            getLog().error( "Cannot update jar" );
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
-        try
-        {
-            original.delete();
-            FileUtils.newFileUtils().copyFile( jarFile, original );
-            jarFile.delete();
+            if ( !targetManifestFile.exists() )
+            {
+                targetManifestFile.getParentFile().mkdirs();
+                targetManifestFile.createNewFile();
+            }
+            writer = new PrintWriter( targetManifestFile, "UTF-8"); //TODO really UTF-8??
+            manifest.write( writer );
         } catch ( IOException ex )
         {
-            getLog().error( "Cannot copy module jar to original location" );
-            throw new MojoExecutionException(
-                    "Cannot copy module jar to original location", ex );
+            throw new MojoExecutionException( ex.getMessage(), ex );
+        } finally {
+            IOUtil.close( writer );
         }
     }
 

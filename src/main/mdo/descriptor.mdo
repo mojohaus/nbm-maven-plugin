@@ -51,9 +51,10 @@
                 <field>
                     <name>manifest</name>
                     <version>1.0.0+</version>
-                    <description>Location of the manifest file with Netbeans specific manifest entries.</description>
+                    <description>DEPRECATED, use the plugin configuration instead. Location of the manifest file with Netbeans specific manifest entries.
+                        </description>
                     <type>String</type>
-                    <defaultValue>src/main/nbm/manifest.mf</defaultValue>
+                    <!--defaultValue>src/main/nbm/manifest.mf</defaultValue-->
                 </field>
                 <field>
                     <name>homepageUrl</name>
