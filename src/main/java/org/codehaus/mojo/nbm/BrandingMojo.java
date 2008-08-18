@@ -86,7 +86,10 @@ public class BrandingMojo
 
     public void execute() throws MojoExecutionException
     {
-
+        if ( !"nbm".equals( project.getPackaging() ) ) 
+        {
+            getLog().error( "The nbm:branding goal shall be used within a NetBeans module project only (packaging 'nbm')");
+        }
         try
         {
 
