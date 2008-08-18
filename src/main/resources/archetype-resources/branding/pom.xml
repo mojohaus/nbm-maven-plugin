@@ -6,10 +6,10 @@
       <version>${version}</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>module1</artifactId>
+  <artifactId>branding</artifactId>
   <packaging>nbm</packaging>
   <version>${version}</version>
-  <name>${artifactId} - sample NetBeans Module</name>
+  <name>${artifactId} - Platform application branding resources</name>
   <dependencies>
     <dependency>
       <groupId>org.netbeans.api</groupId>
@@ -19,10 +19,19 @@
   </dependencies>
   <build>
       <plugins>
-          <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>nbm-maven-plugin</artifactId>
-          </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>branding</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>branding</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
