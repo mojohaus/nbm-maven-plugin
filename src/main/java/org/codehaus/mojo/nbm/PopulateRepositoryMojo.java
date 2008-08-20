@@ -41,10 +41,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
@@ -56,13 +54,19 @@ import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
- * A goal for identifying netbeans modules from the installation and populationg the local
+ * A goal for identifying netbeans modules from the installation and populating the local
  * repository with them. Optionally you can also deploy to a remote repository.
 <p/>
  * If you are looking for an existing remote repository for netbeans artifacts, check out
  * http://deadlock.netbeans.org/maven2/ it contains API artifacts for 4.1, 5.0 and 5.5 releases. 
  * 6.0 Milestones and Betas also included.
 
+ * <br/>
+ * Compatibility Note: The 3.0 version puts all unrecognized, non-module, 3rd party jars
+ * in the org.netbeans.external group and added then as dependency to respective modules.
+ * That can cause backward incompatibility with earlier versions which generated incomplete (different)
+ * maven metadata.
+ * 
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal populate-repository
  * @requiresProject false
@@ -301,6 +305,8 @@ public class PopulateRepositoryMojo
             }
         }
 
+        List externals = new ArrayList();
+
         while ( it.hasNext() )
         {
             Map.Entry elem = (Map.Entry) it.next();
@@ -308,7 +314,7 @@ public class PopulateRepositoryMojo
             Artifact art = (Artifact) elem.getValue();
             index = index + 1;
             getLog().info( "Processing " + index + "/" + count );
-            File pom = createMavenProject( man, wrapperList );
+            File pom = createMavenProject( man, wrapperList, externals );
             ArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
             art.addMetadata( metadata );
             File javadoc = null;
@@ -412,6 +418,46 @@ public class PopulateRepositoryMojo
             }
 
         }
+
+        //process collected non-recognized external jars..
+        if ( externals.size() > 0 )
+        {
+            index = 0;
+            count = externals.size();
+            it = externals.iterator();
+            while ( it.hasNext() )
+            {
+                ExternalsWrapper ex = (ExternalsWrapper) it.next();
+                Artifact art = createArtifact( ex.getArtifact(), ex.getVersion(), ex.getGroupid() );
+                index = index + 1;
+                getLog().info( "Processing external " + index + "/" + count );
+                File pom = createExternalProject( ex );
+                ArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
+                art.addMetadata( metadata );
+                try
+                {
+                    artifactInstaller.install( ex.getFile(), art, localRepository );
+                }
+                catch ( ArtifactInstallationException e )
+                {
+                    // TODO: install exception that does not give a trace
+                    throw new MojoExecutionException( "Error installing artifact", e );
+                }
+                try
+                {
+                    if ( deploymentRepository != null )
+                    {
+                        artifactDeployer.deploy( ex.getFile(), art,
+                            deploymentRepository, localRepository );
+                    }
+                }
+                catch ( ArtifactDeploymentException exc )
+                {
+                    throw new MojoExecutionException( "Error Deploying artifact", exc );
+                }
+            }
+        }
+        
         if ( forcedVersion == null )
         {
             getLog().warn( "Version not specified, cannot create cluster POMs." );
@@ -455,7 +501,7 @@ public class PopulateRepositoryMojo
         }
     }
 
-    private File createMavenProject( ModuleWrapper wrapper, List wrapperList )
+    private File createMavenProject( ModuleWrapper wrapper, List wrapperList , List externalsList )
     {
         Model mavenModel = new Model();
 
@@ -499,9 +545,6 @@ public class PopulateRepositoryMojo
             }
         }
         //need some generic way to handle Classpath: items.
-        if ( "org.netbeans.api".equals( wrapper.getGroup() ) && "org-jdesktop-layout".equals(
-                wrapper.getArtifact() ) )
-        {
             //how to figure the right version?
             String cp = wrapper.getModuleManifest().getClasspath();
             if ( cp != null )
@@ -515,8 +558,10 @@ public class PopulateRepositoryMojo
                     {
                         FileInputStream fis = null;
                         DigestOutputStream os = null;
+                        boolean added = false;
                         try
                         {
+                            //TODO have some more generic approach to searching..
                             fis = new FileInputStream( f );
                             MessageDigest md5Dig = MessageDigest.getInstance(
                                     "MD5" );
@@ -533,8 +578,8 @@ public class PopulateRepositoryMojo
                                 dep.setGroupId( "net.java.dev.swing-layout" );
                                 dep.setVersion( "1.0.1" );
                                 dep.setType( "jar" );
-                                dep.setScope( "provided" );
                                 deps.add( dep );
+                                added = true;
                             } else if ( "a7a21e91ecaffdda3fb4f4ff0ae338b1".equals(
                                     md5 ) )
                             {
@@ -543,21 +588,34 @@ public class PopulateRepositoryMojo
                                 dep.setGroupId( "net.java.dev.swing-layout" );
                                 dep.setVersion( "1.0.2" );
                                 dep.setType( "jar" );
-                                dep.setScope( "provided" );
                                 deps.add( dep );
+                                added = true;
                             }
                         } catch ( Exception x )
                         {
                             x.printStackTrace();
                         }
+                        if ( !added )
+                        {
+                            ExternalsWrapper ex = new ExternalsWrapper();
+                            ex.setFile( f );
+                            String artId = f.getName();
+                            if (artId.endsWith( ".jar")) {
+                                artId = artId.substring( 0, artId.length() - ".jar".length());
+                            }
+                            ex.setVersion( wrapper.getVersion() );
+                            ex.setArtifact( artId );
+                            ex.setGroupid( "org.netbeans.external" );
+                            externalsList.add( ex );
+                            Dependency dep = new Dependency();
+                            dep.setArtifactId( artId );
+                            dep.setGroupId( "org.netbeans.external" );
+                            dep.setVersion( wrapper.getVersion() );
+                            dep.setType( "jar" );
+                            deps.add( dep );
+                        }
                     }
                 }
-            }
-        }
-        if ( "org.netbeans.api".equals( wrapper.getGroup() ) && "org-netbeans-libs-javacapi".equals(
-                wrapper.getArtifact() ) )
-        {
-            //how to figure the right version?
         }
 
         mavenModel.setDependencies( deps );
@@ -587,6 +645,45 @@ public class PopulateRepositoryMojo
             }
         }
         return fil;
+    }
+    
+    File createExternalProject( ExternalsWrapper wrapper ) {
+        Model mavenModel = new Model();
+
+        mavenModel.setGroupId( wrapper.getGroupid() );
+        mavenModel.setArtifactId( wrapper.getArtifact() );
+        mavenModel.setVersion( wrapper.getVersion() );
+        mavenModel.setPackaging( "jar" );
+        mavenModel.setModelVersion( "4.0.0" );
+        mavenModel.setName( "Maven definition for " + wrapper.getFile().getName() + " - external part of NetBeans module.");
+        mavenModel.setDescription( "POM and identification for artifact that was not possible to uniquely identify as a maven dependency.");
+        FileWriter writer = null;
+        File fil = null;
+        try
+        {
+            MavenXpp3Writer xpp = new MavenXpp3Writer();
+            fil = File.createTempFile( "maven", "pom" );
+            writer = new FileWriter( fil );
+            xpp.write( writer, mavenModel );
+        } catch ( IOException ex )
+        {
+            ex.printStackTrace();
+
+        } finally
+        {
+            if ( writer != null )
+            {
+                try
+                {
+                    writer.close();
+                } catch ( IOException io )
+                {
+                    io.printStackTrace();
+                }
+            }
+        }
+        return fil;
+        
     }
 
     private File createClusterProject( Artifact cluster, Collection mods )
@@ -663,6 +760,47 @@ public class PopulateRepositoryMojo
                 artifact, version, "pom" );
     }
 
+    private class ExternalsWrapper 
+    {
+        private File file;
+        private String artifact;
+        private String groupid;
+
+        public String getArtifact() {
+            return artifact;
+        }
+
+        public void setArtifact(String artifact) {
+            this.artifact = artifact;
+        }
+
+        public File getFile() {
+            return file;
+        }
+
+        public void setFile(File file) {
+            this.file = file;
+        }
+
+        public String getGroupid() {
+            return groupid;
+        }
+
+        public void setGroupid(String groupid) {
+            this.groupid = groupid;
+        }
+
+        public String getVersion() {
+            return version;
+        }
+
+        public void setVersion(String version) {
+            this.version = version;
+        }
+        private String version;
+        
+    }
+    
     private class ModuleWrapper
     {
 
