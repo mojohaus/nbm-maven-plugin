@@ -30,6 +30,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
@@ -52,6 +63,7 @@ import org.apache.tools.ant.taskdefs.Input;
 import org.apache.tools.ant.taskdefs.PathConvert;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * A goal for identifying netbeans modules from the installation and populating the local
@@ -120,6 +132,20 @@ public class PopulateRepositoryMojo
      * @parameter expression="${forcedVersion}"
      */
     protected String forcedVersion;
+    
+    /**
+     * Optional parameter, when specified it shall point to a directory containing a
+     * Nexus Lucene index. This index will be used to find external libraries that
+     * are referenced by NetBeans modules and populate the POM metadata with correct
+     * dependencies. Any dependencies not found this way, will be generated a unique
+     * id under the org.netbeans.external groupId.
+     * <p/>
+     * The Nexus Lucene index zip file for central repository can be found here:
+     * http://repo1.maven.org/maven2/.index/nexus-maven-repository-index.zip
+     * Unzip it to a directory and use this parameter to point to it.
+     * @parameter expression="${nexusIndexDirectory}"
+     */
+    private File nexusIndexDirectory;
     /**
      * Maven ArtifactFactory.
      *
@@ -306,7 +332,19 @@ public class PopulateRepositoryMojo
         }
 
         List externals = new ArrayList();
-
+        IndexReader nexusReader = null;
+        IndexSearcher searcher = null;
+        if (nexusIndexDirectory != null && nexusIndexDirectory.exists()) {
+            try {
+                Directory nexusDir = FSDirectory.getDirectory(nexusIndexDirectory);
+                nexusReader = IndexReader.open( nexusDir );
+                searcher = new IndexSearcher(nexusReader);
+            } catch (IOException ex) {
+                Logger.getLogger(PopulateRepositoryMojo.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        try {
         while ( it.hasNext() )
         {
             Map.Entry elem = (Map.Entry) it.next();
@@ -314,7 +352,7 @@ public class PopulateRepositoryMojo
             Artifact art = (Artifact) elem.getValue();
             index = index + 1;
             getLog().info( "Processing " + index + "/" + count );
-            File pom = createMavenProject( man, wrapperList, externals );
+            File pom = createMavenProject( man, wrapperList, externals, searcher );
             ArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
             art.addMetadata( metadata );
             File javadoc = null;
@@ -418,6 +456,15 @@ public class PopulateRepositoryMojo
             }
 
         }
+        } finally {
+            if (searcher != null) {
+                try {
+                    searcher.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(PopulateRepositoryMojo.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
 
         //process collected non-recognized external jars..
         if ( externals.size() > 0 )
@@ -501,7 +548,7 @@ public class PopulateRepositoryMojo
         }
     }
 
-    private File createMavenProject( ModuleWrapper wrapper, List wrapperList , List externalsList )
+    private File createMavenProject( ModuleWrapper wrapper, List wrapperList , List externalsList, IndexSearcher searcher )
     {
         Model mavenModel = new Model();
 
@@ -559,41 +606,44 @@ public class PopulateRepositoryMojo
                         FileInputStream fis = null;
                         DigestOutputStream os = null;
                         boolean added = false;
-                        try
+                        if ( searcher != null )
                         {
-                            //TODO have some more generic approach to searching..
-                            fis = new FileInputStream( f );
-                            MessageDigest md5Dig = MessageDigest.getInstance(
-                                    "MD5" );
-                            os = new DigestOutputStream( new NullOutputStream(),
-                                    md5Dig );
-                            IOUtil.copy( fis, os );
-                            IOUtil.close( fis );
-                            IOUtil.close( os );
-                            String md5 = encode( md5Dig.digest() );
-                            if ( "5deb85c331c5a75d2ea6182e22a7f191".equals( md5 ) )
+                            try
                             {
-                                Dependency dep = new Dependency();
-                                dep.setArtifactId( "swing-layout" );
-                                dep.setGroupId( "net.java.dev.swing-layout" );
-                                dep.setVersion( "1.0.1" );
-                                dep.setType( "jar" );
-                                deps.add( dep );
-                                added = true;
-                            } else if ( "a7a21e91ecaffdda3fb4f4ff0ae338b1".equals(
-                                    md5 ) )
-                            {
-                                Dependency dep = new Dependency();
-                                dep.setArtifactId( "swing-layout" );
-                                dep.setGroupId( "net.java.dev.swing-layout" );
-                                dep.setVersion( "1.0.2" );
-                                dep.setType( "jar" );
-                                deps.add( dep );
-                                added = true;
+                                MessageDigest shaDig = MessageDigest.getInstance(
+                                    "SHA1" );
+                                fis = new FileInputStream( f );
+                                os = new DigestOutputStream( new NullOutputStream(),
+                                    shaDig );
+                                IOUtil.copy( fis, os );
+                                IOUtil.close( fis );
+                                IOUtil.close( os );
+                                String sha = encode( shaDig.digest() );
+                                TermQuery q = new TermQuery(new Term("1", sha));
+                                Hits hits = searcher.search( q );
+                                if (hits.length() == 1) {
+                                    Document doc = hits.doc( 0 );
+                                    Field idField = doc.getField( "u" );
+                                    if (idField != null) {
+                                        String id = idField.stringValue();
+                                        String[] splits = StringUtils.split( id, "|");
+                                        Dependency dep = new Dependency();
+                                        dep.setArtifactId( splits[1] );
+                                        dep.setGroupId( splits[0] );
+                                        dep.setVersion( splits[2] );
+                                        dep.setType( "jar" );
+                                        if (splits.length > 3 && !"NA".equals( splits[3] )) {
+                                            dep.setClassifier( splits[3] );
+                                        }
+                                        deps.add(dep);
+                                        added = true;
+                                    }
+                                }
                             }
-                        } catch ( Exception x )
-                        {
-                            x.printStackTrace();
+                            catch ( Exception x )
+                            {
+                                x.printStackTrace();
+                            }
                         }
                         if ( !added )
                         {
