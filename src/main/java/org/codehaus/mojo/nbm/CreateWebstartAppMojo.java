@@ -47,7 +47,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.netbeans.nbbuild.MakeJNLP;
 import org.netbeans.nbbuild.ModuleSelector;
-import org.netbeans.nbbuild.VerifyJNLP;
 
 /**
  * @author <a href="mailto:johan.andren@databyran.se">Johan Andren</a>
@@ -95,10 +94,31 @@ public class CreateWebstartAppMojo
     private File destinationFile;
 
     /**
-     * @parameter expression="${nbm.webstart.codebase}"
+     * Jnlp codebase value within *.jnlp files.
+     * @parameter expression="${nbm.webstart.codebase}" default-value="$$codebase"
      * 
      */
-    private String codebase = "$$codebase";
+    private String codebase;
+    
+    /**
+     * A custom master JNLP file. If not defined, the 
+     * <a href="http://mojo.codehaus.org/nbm-maven-plugin/masterjnlp.txt">default one</a> is used.
+     * The following expressions can be used within the file and will
+     * be replaced when generating content.
+     * <ul>
+     * <li>${jnlp.resources}</li>
+     * <li>${jnlp.codebase} - the 'codebase' parameter value is passed in.</li>
+     * <li>${app.name}</li>
+     * <li>${app.icon}</li>
+     * <li>${app.title}</li>
+     * <li>${app.vendor}</li>
+     * <li>${app.description}</li>
+     * <li>${branding.token} - the 'brandingToken' parameter value is passed in.</li>
+     * <li>${netbeans.jnlp.fixPolicy}</li>
+     * </ul>
+     * @parameter 
+     */
+    private File masterJnlpFile;
 
     /**
      * 
@@ -205,7 +225,7 @@ public class CreateWebstartAppMojo
             props.setProperty("netbeans.jnlp.fixPolicy", "true");
             File masterJnlp = new File(
                     webstartBuildDir.getAbsolutePath() + File.separator + "master.jnlp" );
-            filterCopy( "/master.jnlp", masterJnlp, props );
+            filterCopy( masterJnlpFile, "/master.jnlp", masterJnlp, props );
 
             copyLauncher( webstartBuildDir, nbmBuildDirFile );
 
@@ -232,7 +252,7 @@ public class CreateWebstartAppMojo
             File brandingJnlp = new File(
                     webstartBuildDir.getAbsolutePath() + File.separator + "branding.jnlp" );
             props.setProperty( "jnlp.branding.jars", brandRefs.toString() );
-            filterCopy("/branding.jnlp", brandingJnlp, props);
+            filterCopy(null, "/branding.jnlp", brandingJnlp, props);
 
 // somehow expects a give folder/file format that we don't have..            
 //            getLog().info( "Verifying generated webstartable content." );
@@ -300,7 +320,7 @@ public class CreateWebstartAppMojo
         }
     }
 
-    private void filterCopy( String resourcePath, File destinationFile, Properties filterProperties )
+    private void filterCopy( File sourceFile, String resourcePath, File destinationFile, Properties filterProperties )
             throws IOException
     {
         // buffer so it isn't reading a byte at a time!
@@ -308,8 +328,13 @@ public class CreateWebstartAppMojo
         Writer destination = null;
         try
         {
-            InputStream instream = getClass().getClassLoader().getResourceAsStream(
+            InputStream instream;
+            if (sourceFile != null) {
+                instream = new FileInputStream(sourceFile);
+            } else {
+                instream = getClass().getClassLoader().getResourceAsStream(
                     resourcePath );
+            }
             FileOutputStream outstream = new FileOutputStream( destinationFile );
 
             source = new BufferedReader( new InputStreamReader( instream,
@@ -327,21 +352,6 @@ public class CreateWebstartAppMojo
             IOUtil.close( destination );
         }
     }
-
-    private String createJarHrefBlock( String[] absolutePaths, File buildDir )
-    {
-        String remove = buildDir.getAbsolutePath();
-        StringBuffer buffer = new StringBuffer();
-        for ( String absolutePath : absolutePaths )
-        {
-            buffer.append( "   <jar href=\"" );
-            buffer.append( absolutePath.replace( remove, "" ) );
-            buffer.append( "\"/>\n" );
-        }
-
-        return buffer.toString();
-    }
-    
 
     /**
      * copied from MakeMasterJNLP ant task.
