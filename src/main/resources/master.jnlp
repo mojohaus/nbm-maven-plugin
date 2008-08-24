@@ -12,11 +12,15 @@
     <!-- The following property is needed when running with unsigned jars: -->
     <property name="netbeans.jnlp.fixPolicy" value="${netbeans.jnlp.fixPolicy}"/>
     <extension name='branding' href='branding.jnlp' />
+    <j2se version="1.5+"/>
+    <jar href="startup.jar"/>
+    <property name="netbeans.user" value="${user.home}/.${branding.token}"/>
+    
 <!-- The following line will be replaced with an automatically generated list of resources: -->
     ${jnlp.resources}
   </resources>
   <resources os="Mac OS X">
-      <property name="netbeans.user" value="${user.home}/Library/Application Support/${app.name}"/>
+      <property name="netbeans.user" value="${user.home}/Library/Application Support/${branding.token}"/>
   </resources>
   <application-desc>
     <argument>--branding</argument>

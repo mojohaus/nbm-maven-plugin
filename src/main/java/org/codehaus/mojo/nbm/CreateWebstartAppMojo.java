@@ -40,11 +40,14 @@ import org.apache.tools.ant.types.Parameter;
 import org.apache.tools.ant.types.selectors.AndSelector;
 import org.apache.tools.ant.types.selectors.FilenameSelector;
 import org.apache.tools.ant.types.selectors.OrSelector;
+import org.codehaus.plexus.archiver.zip.ZipArchiver;
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.netbeans.nbbuild.MakeJNLP;
 import org.netbeans.nbbuild.ModuleSelector;
+import org.netbeans.nbbuild.VerifyJNLP;
 
 /**
  * @author <a href="mailto:johan.andren@databyran.se">Johan Andren</a>
@@ -109,7 +112,6 @@ public class CreateWebstartAppMojo
             throw new MojoExecutionException(
                     "This goal only makes sense on project with nbm-application packaging." );
         }
-        
         Project antProject = new Project();
         antProject.init();
 
@@ -119,8 +121,8 @@ public class CreateWebstartAppMojo
         taskdef.execute();
 
         taskdef = (Taskdef) antProject.createTask( "taskdef" );
-        taskdef.setClassname( "org.netbeans.nbbuild.MakeMasterJNLP" );
-        taskdef.setName( "makemasterjnlp" );
+        taskdef.setClassname( "org.netbeans.nbbuild.VerifyJNLP" );
+        taskdef.setName( "verifyjnlp" );
         taskdef.execute();
 
         
@@ -133,6 +135,8 @@ public class CreateWebstartAppMojo
                 FileUtils.deleteDirectory( webstartBuildDir );
             }
             webstartBuildDir.mkdirs();
+            getLog().info( "Generating webstartable binaries at " + webstartBuildDir.getAbsolutePath());
+            
             File nbmBuildDirFile = new File( buildDirectory, brandingToken );
             
 //            FileUtils.copyDirectoryStructureIfModified( nbmBuildDirFile, webstartBuildDir );
@@ -179,12 +183,13 @@ public class CreateWebstartAppMojo
             jnlpTask.execute();
 
             //TODO is it really netbeans/
-            String extSnippet = generateExtensions(fs, antProject, "netbeans/"); 
+            String extSnippet = generateExtensions(fs, antProject, ""); // "netbeans/"
 
             Properties props = new Properties();
             props.setProperty("jnlp.resources", extSnippet);
             props.setProperty( "jnlp.codebase", codebase);
             props.setProperty( "app.name", brandingToken);
+            props.setProperty( "app.icon", "master.png");
             props.setProperty( "app.title", project.getName() );
             if ( project.getOrganization() != null )
             {
@@ -201,155 +206,56 @@ public class CreateWebstartAppMojo
             File masterJnlp = new File(
                     webstartBuildDir.getAbsolutePath() + File.separator + "master.jnlp" );
             filterCopy( "/master.jnlp", masterJnlp, props );
+
             copyLauncher( webstartBuildDir, nbmBuildDirFile );
+
+            //branding
+            DirectoryScanner ds = new DirectoryScanner();
+            ds.setBasedir( nbmBuildDirFile );
+            ds.setIncludes( new String[] {
+                "**/locale/*.jar"
+            });
+            ds.scan();
+            String[] includes = ds.getIncludedFiles();
+            StringBuffer brandRefs = new StringBuffer();
+            if (includes != null && includes.length > 0) {
+                File brandingDir = new File(webstartBuildDir, "branding");
+                brandingDir.mkdirs();
+                for (String incBran : includes) {
+                    File source = new File(nbmBuildDirFile, incBran);
+                    File dest = new File(brandingDir, source.getName());
+                    FileUtils.copyFile( source, dest );
+                    brandRefs.append( "    <jar href=\'branding/" + dest.getName() + "\'/>\n");
+                }
+            }
+
+            File brandingJnlp = new File(
+                    webstartBuildDir.getAbsolutePath() + File.separator + "branding.jnlp" );
+            props.setProperty( "jnlp.branding.jars", brandRefs.toString() );
+            filterCopy("/branding.jnlp", brandingJnlp, props);
+
+// somehow expects a give folder/file format that we don't have..            
+//            getLog().info( "Verifying generated webstartable content." );
+//            VerifyJNLP verifyTask = (VerifyJNLP) antProject.createTask( "verifyjnlp" );
+//            FileSet verify = new FileSet();
+//            verify.setFile( masterJnlp );
+//            verifyTask.addConfiguredFileset( verify );
+//            verifyTask.execute();
             
-            
-//
-//            // setup filter properties for the jnlp-templates
-//            Properties filterProperties = new Properties();
-//            filterProperties.setProperty( "app.title", project.getName() );
-//            if ( project.getOrganization() != null )
-//            {
-//                filterProperties.setProperty( "app.vendor",
-//                        project.getOrganization().getName() );
-//            } else
-//            {
-//                filterProperties.setProperty( "app.vendor", "Nobody" );
-//            }
-//            String description = project.getDescription() != null ? project.getDescription() : "No Project Description";
-//            filterProperties.setProperty( "app.description", description );
-//            filterProperties.setProperty( "branding.token", brandingToken );
-//
-//            // split default options into <argument> blocks
-//            StringBuffer args = new StringBuffer();
-//            //TODO
-////            if ( defaultOptions != null )
-////            {
-////                for ( String arg : defaultOptions.split( " " ) )
-////                {
-////                    args.append( "<argument>" );
-////                    args.append( arg );
-////                    args.append( "</argument>\n" );
-////                }
-////            }
-//            filterProperties.setProperty( "app.arguments", args.toString() );
-//
-//            // external library jars first, modules depend on them
-//            DirectoryScanner scanner = new DirectoryScanner();
-//            scanner.setBasedir( webstartBuildDir );
-//            scanner.setIncludes( new String[]
-//                    {
-//                        "**/modules/ext/*.jar"
-//                    } );
-//            scanner.scan();
-//
-//            StringBuffer externalJnlps = new StringBuffer();
-//
-//            // one jnlp for each since they could be signed by other certificates
-//            for ( String extJarPath : scanner.getIncludedFiles() )
-//            {
-//                String jarHref = extJarPath.replace(
-//                        webstartBuildDir.getAbsolutePath(), "" );
-//                String externalName = new File( extJarPath ).getName().replace(
-//                        ".jar", "" );
-//                filterProperties.setProperty( "external.jar",
-//                        "<jar href=\"" + jarHref + "\"/>" );
-//                File externalJnlp = new File(
-//                        webstartBuildDir.getAbsolutePath() + File.separator + externalName + ".jnlp" );
-//                filterCopy( "/external.jnlp", externalJnlp, filterProperties );
-//
-//                externalJnlps.append( "<extension name=\"" );
-//                externalJnlps.append( externalName );
-//                externalJnlps.append( "\" href=\"" );
-//                externalJnlps.append( externalJnlp.getName() );
-//                externalJnlps.append( "\"/>\n" );
-//            }
-//            filterProperties.setProperty( "application.ext.jnlps",
-//                    externalJnlps.toString() );
-//
-//            // one jnlp for the platform files
-//            scanner.setIncludes( new String[]
-//                    {
-//                        "platform*/**/*.jar"
-//                    } );
-//            scanner.scan();
-//
-//            String platformHrefs = createJarHrefBlock(
-//                    scanner.getIncludedFiles(), webstartBuildDir );
-//            filterProperties.setProperty( "platform.jars", platformHrefs );
-//
-//            File platformJnlp = new File(
-//                    webstartBuildDir.getAbsolutePath() + File.separator + "platform.jnlp" );
-//            filterCopy( "/platform.jnlp", platformJnlp, filterProperties );
-//
-//            // all regular modules and eagerly loaded modules
-//            scanner.setIncludes( new String[]
-//                    {
-//                        "**/modules/*.jar", "**/modules/eager/*.jar"
-//                    } );
-//            scanner.setExcludes( new String[]
-//                    {
-//                        "platform*/**", brandingToken + "/**"
-//                    } );
-//            scanner.scan();
-//            String moduleJars = createJarHrefBlock( scanner.getIncludedFiles(),
-//                    webstartBuildDir );
-//            filterProperties.setProperty( "application.jars", moduleJars );
-//
-//            File masterJnlp = new File(
-//                    webstartBuildDir.getAbsolutePath() + File.separator + "master.jnlp" );
-//            filterCopy( "/master.jnlp", masterJnlp, filterProperties );
-//
-//            // branding modules
-//            // all jars for branding should be directly in the brandingToken-directory
-//            scanner.setIncludes( new String[]
-//                    {
-//                        brandingToken + "/**/*.jar"
-//                    } );
-//            scanner.setExcludes( new String[]
-//                    {
-//                    } );
-//            scanner.scan();
-//            File brandingDirectory = new File(
-//                    webstartBuildDir.getAbsolutePath() + File.separator + brandingToken );
-//            for ( String brandingJarPath : scanner.getIncludedFiles() )
-//            {
-//                File brandingJar = new File(
-//                        webstartBuildDir.getAbsolutePath() + File.separator + brandingJarPath );
-//                File brandingDirectoryJar = new File(
-//                        brandingDirectory + File.separator + brandingJar.getName() );
-//                FileUtils.copyFile( brandingJar, brandingDirectoryJar );
-//                brandingJar.delete();
-//            }
-//
-//            scanner.setIncludes( new String[]
-//                    {
-//                        brandingToken + "/*.jar"
-//                    } );
-//            scanner.scan();
-//            String brandingJarHrefs = createJarHrefBlock(
-//                    scanner.getIncludedFiles(), webstartBuildDir );
-//            filterProperties.setProperty( "branding.jars", brandingJarHrefs );
-//
-//            File brandingJnlp = new File(
-//                    webstartBuildDir.getAbsolutePath() + File.separator + "branding.jnlp" );
-//            filterCopy( "/branding.jnlp", brandingJnlp, filterProperties );
-//
-//            // TODO sign jars
-//
-//            // create zip archive
-//            if ( destinationFile.exists() )
-//            {
-//                destinationFile.delete();
-//            }
-//            ZipArchiver archiver = new ZipArchiver();
-//            archiver.addDirectory( webstartBuildDir );
-//            archiver.setDestFile( destinationFile );
-//            archiver.createArchive();
-//
-//            // attach standalone so that it gets installed/deployed
-//            projectHelper.attachArtifact( project, "zip", "webstart",
-//                    destinationFile );
+
+            // create zip archive
+            if ( destinationFile.exists() )
+            {
+                destinationFile.delete();
+            }
+            ZipArchiver archiver = new ZipArchiver();
+            archiver.addDirectory( webstartBuildDir );
+            archiver.setDestFile( destinationFile );
+            archiver.createArchive();
+
+            // attach standalone so that it gets installed/deployed
+            projectHelper.attachArtifact( project, "zip", "webstart",
+                    destinationFile );
 
         } catch ( Exception ex )
         {
