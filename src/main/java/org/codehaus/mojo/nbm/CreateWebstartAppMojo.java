@@ -34,6 +34,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.taskdefs.GenerateKey;
+import org.apache.tools.ant.taskdefs.SignJar;
 import org.apache.tools.ant.taskdefs.Taskdef;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Parameter;
@@ -119,6 +121,23 @@ public class CreateWebstartAppMojo
      * @parameter 
      */
     private File masterJnlpFile;
+    
+    /**
+     * keystore location for signing the nbm file
+     * @parameter expression="${keystore}"
+     */
+    private String keystore;
+    /**
+     * keystore password
+     * @parameter expression="${keystorepass}"
+     */
+    private String keystorepassword;
+    /**
+     * keystore alias
+     * @parameter expression="${keystorealias}"
+     */
+    private String keystorealias;
+    
 
     /**
      * 
@@ -134,6 +153,33 @@ public class CreateWebstartAppMojo
         }
         Project antProject = new Project();
         antProject.init();
+        
+        if ( keystore != null && keystorealias != null && keystorepassword != null )
+        {
+            File ks = new File( keystore );
+            if ( !ks.exists() )
+            {
+                throw new MojoFailureException(
+                        "Cannot find keystore file at " + ks.getAbsolutePath() );
+            } else
+            {
+                //proceed..
+            }
+        } else if ( keystore != null || keystorepassword != null || keystorealias != null )
+        {
+            throw new MojoFailureException("If you want to sign the jnlp application, you need to define all three keystore related parameters.");
+        } else {
+            getLog().warn("Keystore related parameters not set, generating a default keystore.");
+            GenerateKey genTask = (GenerateKey) antProject.createTask( "genkey" );
+            genTask.setAlias("jnlp");
+            genTask.setStorepass("netbeans");
+            genTask.setDname("CN=" + System.getProperty("user.name"));
+            genTask.setKeystore(new File(buildDirectory, "generated.keystore").getAbsolutePath());
+            genTask.execute();
+            keystore = new File(buildDirectory, "generated.keystore").getAbsolutePath();
+            keystorepassword = "netbeans";
+            keystorealias = "jnlp";
+        }
 
         Taskdef taskdef = (Taskdef) antProject.createTask( "taskdef" );
         taskdef.setClassname( "org.netbeans.nbbuild.MakeJNLP" );
@@ -167,7 +213,12 @@ public class CreateWebstartAppMojo
             //TODO, how to figure verify excludes..
             jnlpTask.setVerify(false);
             jnlpTask.setPermissions("<security><all-permissions/></security>");
-            jnlpTask.setSignJars(false);
+            jnlpTask.setSignJars(true);
+
+            jnlpTask.setAlias(keystorealias);
+            jnlpTask.setKeystore(keystore);
+            jnlpTask.setStorePass(keystorepassword);
+            
             FileSet fs = jnlpTask.createModules();
             fs.setDir(nbmBuildDirFile);
             OrSelector or = new OrSelector();
@@ -226,8 +277,19 @@ public class CreateWebstartAppMojo
             File masterJnlp = new File(
                     webstartBuildDir.getAbsolutePath() + File.separator + "master.jnlp" );
             filterCopy( masterJnlpFile, "/master.jnlp", masterJnlp, props );
+            
 
-            copyLauncher( webstartBuildDir, nbmBuildDirFile );
+            File startup = copyLauncher( buildDirectory, nbmBuildDirFile );
+            File jnlpDestination = new File(
+                webstartBuildDir.getAbsolutePath() + File.separator + "startup.jar" );
+            
+            SignJar signTask = (SignJar)antProject.createTask("signjar");
+            signTask.setKeystore(keystore);
+            signTask.setStorepass(keystorepassword);
+            signTask.setAlias(keystorealias);
+            signTask.setSignedjar(jnlpDestination);
+            signTask.setJar(startup);
+            signTask.execute();
 
             //branding
             DirectoryScanner ds = new DirectoryScanner();
@@ -247,6 +309,17 @@ public class CreateWebstartAppMojo
                     FileUtils.copyFile( source, dest );
                     brandRefs.append( "    <jar href=\'branding/" + dest.getName() + "\'/>\n");
                 }
+                //signing of branding items doens't work for some reason.
+                // -> branding.jnlp with <security/>
+//                signTask = (SignJar)antProject.createTask("signjar");
+//                signTask.setKeystore(keystore);
+//                signTask.setStorepass(keystorepassword);
+//                signTask.setAlias(keystorealias);
+//                FileSet set = new FileSet();
+//                set.setDir(brandingDir);
+//                set.setIncludes("*.jar");
+//                signTask.addFileset(fs);
+//                signTask.execute();
             }
 
             File brandingJnlp = new File(
@@ -289,7 +362,7 @@ public class CreateWebstartAppMojo
      * @param standaloneBuildDir
      * @return The name of the jnlp-launcher jarfile in the build directory
      */
-    private void copyLauncher( File standaloneBuildDir, File builtInstallation ) throws IOException
+    private File copyLauncher( File standaloneBuildDir, File builtInstallation ) throws IOException
     {
         File jnlpStarter = new File( builtInstallation.getAbsolutePath() +
                 File.separator + "harness" +
@@ -308,10 +381,11 @@ public class CreateWebstartAppMojo
                 source = new FileInputStream(jnlpStarter);
             }
             File jnlpDestination = new File(
-                standaloneBuildDir.getAbsolutePath() + File.separator + "startup.jar" );
+                standaloneBuildDir.getAbsolutePath() + File.separator + "jnlp-launcher.jar" );
 
             outstream = new FileOutputStream( jnlpDestination );
             IOUtil.copy( source, outstream );
+            return jnlpDestination;
         }
         finally
         {
