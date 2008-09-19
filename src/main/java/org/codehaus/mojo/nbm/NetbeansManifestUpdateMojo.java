@@ -23,15 +23,21 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.mojo.nbm.model.Dependency;
 import org.codehaus.mojo.nbm.model.NetbeansModule;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.dependency.tree.DependencyNode;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
 import org.codehaus.plexus.util.IOUtil;
@@ -110,13 +116,58 @@ public class NetbeansManifestUpdateMojo
     private File sourceManifestFile;
     
     /**
-     * Path to the generated MANIFEST file to use. It will be used by nbm:jar plugin.
+     * Path to the generated MANIFEST file to use. It will be used by jar:jar plugin.
      *
      * @parameter expression="${project.build.outputDirectory}/META-INF/MANIFEST.MF"
      * @readonly
      * @required
      */
     private File targetManifestFile;
+
+    /**
+     * The artifact repository to use.
+     *
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
+    private ArtifactRepository localRepository;
+
+    /**
+     * The artifact factory to use.
+     *
+     * @component
+     * @required
+     * @readonly
+     */
+    private ArtifactFactory artifactFactory;
+
+    /**
+     * The artifact metadata source to use.
+     *
+     * @component
+     * @required
+     * @readonly
+     */
+    private ArtifactMetadataSource artifactMetadataSource;
+
+    /**
+     * The artifact collector to use.
+     *
+     * @component
+     * @required
+     * @readonly
+     */
+    private ArtifactCollector artifactCollector;
+
+    /**
+     * The dependency tree builder to use.
+     *
+     * @component
+     * @required
+     * @readonly
+     */
+    private DependencyTreeBuilder dependencyTreeBuilder;
 
     public void execute()
             throws MojoExecutionException
@@ -218,71 +269,56 @@ public class NetbeansManifestUpdateMojo
         getLog().debug( "module =" + module );
         if ( module != null )
         {
+            DependencyNode treeroot = createDependencyTree(project, dependencyTreeBuilder, localRepository, artifactFactory, artifactMetadataSource, artifactCollector, "compile");
+            Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
+            List<Artifact> libArtifacts = getLibraryArtifacts(treeroot, module, project, examinerCache, getLog());
+            List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts(treeroot, module, project, examinerCache, libArtifacts, getLog());
             String classPath = "";
             String dependencies = "";
             String depSeparator = " ";
-            List librList = new ArrayList();
-            if ( module.getLibraries() != null )
-            {
-                librList.addAll( module.getLibraries() );
+
+            for (Artifact a : libArtifacts) {
+                classPath = classPath + " ext/" + a.getFile().getName();
             }
-            List deps = module.getDependencies();
-            List artifacts = project.getCompileArtifacts();
-            for ( Iterator iter = artifacts.iterator(); iter.hasNext();)
-            {
-                Artifact artifact = (Artifact) iter.next();
-                ExamineManifest depExaminator = new ExamineManifest( getLog() );
-                depExaminator.setJarFile( artifact.getFile() );
-                depExaminator.checkFile();
-                if ( matchesLibrary( artifact, librList, depExaminator ) )
+
+            for (ModuleWrapper wr : moduleArtifacts) {
+                Dependency dep = wr.dependency;
+                Artifact artifact = wr.artifact;
+                ExamineManifest depExaminator = examinerCache.get(artifact);
+                String type = dep.getType();
+                String depToken = dep.getExplicitValue();
+                if ( depToken == null )
                 {
-                    if ( depExaminator.isNetbeansModule() )
+                    if ( "loose".equals( type ) )
                     {
-                        getLog().warn(
-                                "You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId() );
-                    }
-                    classPath = classPath + " ext/" + artifact.getFile().getName();
-                    continue;
-                }
-                Dependency dep = resolveNetbeansDependency( artifact, deps,
-                        depExaminator );
-                if ( dep != null )
-                {
-                    String type = dep.getType();
-                    String depToken = dep.getExplicitValue();
-                    if ( depToken == null )
+                        depToken = depExaminator.getModule();
+                    } else if ( "spec".equals( type ) )
                     {
-                        if ( "loose".equals( type ) )
-                        {
-                            depToken = depExaminator.getModule();
-                        } else if ( "spec".equals( type ) )
-                        {
-                            depToken = depExaminator.getModule() + " > " +
-                                    (depExaminator.isNetbeansModule() ? depExaminator.getSpecVersion() : AdaptNbVersion.adaptVersion(
-                                    depExaminator.getSpecVersion(),
-                                    AdaptNbVersion.TYPE_SPECIFICATION ));
-                        } else if ( "impl".equals( type ) )
-                        {
-                            depToken = depExaminator.getModule() + " = " +
-                                    (depExaminator.isNetbeansModule() ? depExaminator.getImplVersion() : AdaptNbVersion.adaptVersion(
-                                    depExaminator.getImplVersion(),
-                                    AdaptNbVersion.TYPE_IMPLEMENTATION ));
-                        } else
-                        {
-                            throw new MojoExecutionException(
-                                    "Wrong type of Netbeans dependency: " + type + " Allowed values are: loose, spec, impl." );
-                        }
-                    }
-                    if ( depToken == null )
+                        depToken = depExaminator.getModule() + " > " +
+                                (depExaminator.isNetbeansModule() ? depExaminator.getSpecVersion() : AdaptNbVersion.adaptVersion(
+                                depExaminator.getSpecVersion(),
+                                AdaptNbVersion.TYPE_SPECIFICATION ));
+                    } else if ( "impl".equals( type ) )
                     {
-                        //TODO report
-                        getLog().error(
-                                "Cannot properly resolve the netbeans dependency for " + dep.getId() );
+                        depToken = depExaminator.getModule() + " = " +
+                                (depExaminator.isNetbeansModule() ? depExaminator.getImplVersion() : AdaptNbVersion.adaptVersion(
+                                depExaminator.getImplVersion(),
+                                AdaptNbVersion.TYPE_IMPLEMENTATION ));
                     } else
                     {
-                        dependencies = dependencies + depSeparator + depToken;
-                        depSeparator = ", ";
+                        throw new MojoExecutionException(
+                                "Wrong type of Netbeans dependency: " + type + " Allowed values are: loose, spec, impl." );
                     }
+                }
+                if ( depToken == null )
+                {
+                    //TODO report
+                    getLog().error(
+                            "Cannot properly resolve the netbeans dependency for " + dep.getId() );
+                } else
+                {
+                    dependencies = dependencies + depSeparator + depToken;
+                    depSeparator = ", ";
                 }
             }
 
@@ -308,16 +344,16 @@ public class NetbeansManifestUpdateMojo
                 conditionallyAddAttribute( mainSection,
                         "OpenIDE-Module-Module-Dependencies", dependencies );
             }
-            if ( librList.size() > 0 )
-            {
-                String list = "";
-                for ( int i = 0; i < librList.size(); i++ )
-                {
-                    list = list + " " + librList.get( i );
-                }
-                getLog().warn(
-                        "Some libraries could not be found in the dependency chain: " + list );
-            }
+//            if ( librList.size() > 0 )
+//            {
+//                String list = "";
+//                for ( int i = 0; i < librList.size(); i++ )
+//                {
+//                    list = list + " " + librList.get( i );
+//                }
+//                getLog().warn(
+//                        "Some libraries could not be found in the dependency chain: " + list );
+//            }
         }
         PrintWriter writer = null;
         try

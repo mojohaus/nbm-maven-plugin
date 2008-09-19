@@ -20,12 +20,25 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactCollector;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.dependency.tree.DependencyNode;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
+import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Taskdef;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -82,7 +95,7 @@ public abstract class AbstractNbmMojo
         return antProject;
     }
 
-    protected final boolean matchesLibrary( Artifact artifact, List libraries, ExamineManifest depExaminator )
+    static final boolean matchesLibrary( Artifact artifact, List<String> libraries, ExamineManifest depExaminator, Log log )
     {
 // when we have classifier like jar-assembly this condition is not true..
 // just take everything that is a dependecy, no matter of what type..
@@ -96,14 +109,14 @@ public abstract class AbstractNbmMojo
         boolean explicit = libraries.remove( id );
         if ( explicit )
         {
-            getLog().debug(
+            log.debug(
                     id + " included as module library, explicitly declared in module descriptor." );
             return explicit;
         }
         if ( Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) || Artifact.SCOPE_SYSTEM.equals(
                 artifact.getScope() ) )
         {
-            getLog().debug(
+            log.debug(
                     id + " omitted as module library, has scope 'provided/system'" );
             return false;
         }
@@ -118,25 +131,23 @@ public abstract class AbstractNbmMojo
         //only direct deps matter to us..
         if ( artifact.getDependencyTrail().size() > 2 )
         {
-            getLog().debug(
+            log.debug(
                     id + " omitted as module library, not direct dependency." );
             return false;
         }
-        getLog().debug(
+        log.debug(
                 id + " included as module library, squeezed through all the filters." );
-        getLog().info( "Adding as module's library:" + id );
+        log.info( "Adding as module's library:" + id );
         return true;
     }
 
-    protected final Dependency resolveNetbeansDependency( Artifact artifact, List deps, ExamineManifest manifest )
+    static final Dependency resolveNetbeansDependency( Artifact artifact, List<Dependency> deps, ExamineManifest manifest, Log log )
     {
         String artId = artifact.getArtifactId();
         String grId = artifact.getGroupId();
         String id = grId + ":" + artId;
-        Iterator it = deps.iterator();
-        while ( it.hasNext() )
+        for ( Dependency dep : deps )
         {
-            Dependency dep = (Dependency) it.next();
             if ( id.equals( dep.getId() ) )
             {
                 if ( manifest.isNetbeansModule() )
@@ -148,27 +159,24 @@ public abstract class AbstractNbmMojo
                     {
                         return dep;
                     }
-                    getLog().warn(
+                    log.warn(
                             id + " declared as module dependency in descriptor, but not a NetBeans module" );
                     return null;
                 }
             }
         }
-        //TODO this kind of thing works when building but the current
-        // embedder in netbeans is not capable of figuring out the ArtifactHandlers in extensions
-        // thus the compilation classpath in netbeans doens't have them in (which is not acceptable)
         if ( "nbm".equals( artifact.getType() ) )
         {
             Dependency dep = new Dependency();
             dep.setId( id );
             dep.setType( "spec" );
-            getLog().debug( "Adding nbm module dependency - " + id );
+            log.debug( "Adding nbm module dependency - " + id );
             return dep;
         }
         //only direct deps matter to us..
         if ( manifest.isNetbeansModule() && artifact.getDependencyTrail().size() > 2 )
         {
-            getLog().debug(
+            log.debug(
                     id + " omitted as NetBeans module dependency, not a direct one. Declare it in the pom for inclusion." );
             return null;
         }
@@ -177,7 +185,7 @@ public abstract class AbstractNbmMojo
             Dependency dep = new Dependency();
             dep.setId( id );
             dep.setType( "spec" );
-            getLog().debug( "Adding direct NetBeans module dependency - " + id );
+            log.debug( "Adding direct NetBeans module dependency - " + id );
             return dep;
         }
         return null;
@@ -248,5 +256,122 @@ public abstract class AbstractNbmMojo
         }
         module.setRequiresRestart( false );
         return module;
+    }
+
+    static List<Artifact> getLibraryArtifacts(DependencyNode treeRoot, NetbeansModule module,
+            MavenProject project, Map<Artifact, ExamineManifest> examinerCache, Log log) throws MojoExecutionException
+    {
+        List<Artifact> include = new ArrayList<Artifact>();
+        if ( module != null )
+        {
+            List librList = new ArrayList();
+            if ( module.getLibraries() != null )
+            {
+                librList.addAll( module.getLibraries() );
+            }
+            List artifacts = project.getCompileArtifacts();
+            for ( Iterator iter = artifacts.iterator(); iter.hasNext();)
+            {
+                Artifact artifact = (Artifact) iter.next();
+                ExamineManifest depExaminator = examinerCache.get(artifact);
+                if (depExaminator == null) {
+                    depExaminator = new ExamineManifest( log );
+                    depExaminator.setJarFile( artifact.getFile() );
+                    depExaminator.checkFile();
+                    examinerCache.put(artifact, depExaminator);
+                }
+                if ( matchesLibrary( artifact, librList, depExaminator, log ) )
+                {
+                    if ( depExaminator.isNetbeansModule() )
+                    {
+                        log.warn(
+                                "You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId() );
+                    }
+                    include.add(artifact);
+                    continue;
+                }
+            }
+        }
+        return include;
+    }
+
+    static List<ModuleWrapper> getModuleDependencyArtifacts(DependencyNode treeRoot, NetbeansModule module,
+            MavenProject project, Map<Artifact, ExamineManifest> examinerCache,
+            List<Artifact> libraryArtifacts, Log log) throws MojoExecutionException {
+        List<ModuleWrapper> include = new ArrayList<ModuleWrapper>();
+        if ( module != null )
+        {
+            List deps = module.getDependencies();
+            List artifacts = project.getCompileArtifacts();
+            for ( Iterator iter = artifacts.iterator(); iter.hasNext();)
+            {
+                Artifact artifact = (Artifact) iter.next();
+                if (libraryArtifacts.contains(artifact)) {
+                    continue;
+                }
+                ExamineManifest depExaminator = examinerCache.get(artifact);
+                if (depExaminator == null) {
+                    depExaminator = new ExamineManifest( log );
+                    depExaminator.setJarFile( artifact.getFile() );
+                    depExaminator.checkFile();
+                    examinerCache.put(artifact, depExaminator);
+                }
+                Dependency dep = resolveNetbeansDependency( artifact, deps,
+                        depExaminator, log );
+                if ( dep != null )
+                {
+                    ModuleWrapper wr = new ModuleWrapper();
+                    wr.dependency = dep;
+                    wr.artifact = artifact;
+                    include.add(wr);
+                }
+            }
+        }
+        return include;
+    }
+
+    static class ModuleWrapper {
+        Dependency dependency;
+        Artifact artifact;
+    }
+
+    //copied from dependency:tree mojo
+    protected DependencyNode createDependencyTree(MavenProject project,
+            DependencyTreeBuilder dependencyTreeBuilder, ArtifactRepository localRepository,
+            ArtifactFactory artifactFactory, ArtifactMetadataSource artifactMetadataSource,
+            ArtifactCollector artifactCollector,
+            String scope) throws MojoExecutionException {
+        ArtifactFilter artifactFilter = createResolvingArtifactFilter(scope);
+
+        try {
+            // TODO: note that filter does not get applied due to MNG-3236
+            return dependencyTreeBuilder.buildDependencyTree(project,
+                    localRepository, artifactFactory,
+                    artifactMetadataSource, artifactFilter, artifactCollector);
+        } catch (DependencyTreeBuilderException exception) {
+            throw new MojoExecutionException("Cannot build project dependency tree", exception);
+        }
+
+    }
+
+    //copied from dependency:tree mojo
+    /**
+     * Gets the artifact filter to use when resolving the dependency tree.
+     *
+     * @return the artifact filter
+     */
+    private ArtifactFilter createResolvingArtifactFilter(String scope) {
+        ArtifactFilter filter;
+
+        // filter scope
+        if (scope != null) {
+            getLog().debug("+ Resolving dependency tree for scope '" + scope + "'");
+
+            filter = new ScopeArtifactFilter(scope);
+        } else {
+            filter = null;
+        }
+
+        return filter;
     }
 }
