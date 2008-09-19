@@ -251,7 +251,7 @@ public abstract class CreateNetbeansFileStructure
             {
                 librList.addAll( module.getLibraries() );
             }
-            List artifacts = project.getCompileArtifacts();
+            List artifacts = project.getRuntimeArtifacts();
             for ( Iterator iter = artifacts.iterator(); iter.hasNext();)
             {
                 Artifact artifact = (Artifact) iter.next();
