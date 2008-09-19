@@ -17,17 +17,22 @@
 
 package org.codehaus.mojo.nbm;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.apache.maven.shared.dependency.tree.DependencyNode;
 import org.codehaus.mojo.nbm.model.Dependency;
+import org.codehaus.mojo.nbm.model.NetbeansModule;
 
 /**
  *
@@ -35,6 +40,7 @@ import org.codehaus.mojo.nbm.model.Dependency;
  */
 public class AbstractNbmMojoTest extends TestCase {
     Log log = null;
+    DependencyNode treeRoot = null;
     
     public AbstractNbmMojoTest(String testName) {
         super(testName);
@@ -44,6 +50,7 @@ public class AbstractNbmMojoTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         log = new SystemStreamLog();
+        treeRoot = createNode("root", "root", "1.0", "jar", "", true, new ArrayList(), new HashMap());
     }
 
     @Override
@@ -88,17 +95,6 @@ public class AbstractNbmMojoTest extends TestCase {
         libraries = new ArrayList();
         result = AbstractNbmMojo.matchesLibrary(artifact, libraries, depExaminator, log);
         assertFalse("netbeans modules are omitted", result);
-
-        artifact = createArtifact("group", "artifact", "1.0", "jar", "compile");
-        depExaminator = createNonModule();
-        artifact.setDependencyTrail(Arrays.asList(new String[] {
-            "1",
-            "2",
-            "3"
-        })); //transitive artifact
-        libraries = new ArrayList();
-        result = AbstractNbmMojo.matchesLibrary(artifact, libraries, depExaminator, log);
-        assertFalse("transitive dependencies are omitted", result);
 
     }
 
@@ -150,44 +146,113 @@ public class AbstractNbmMojoTest extends TestCase {
         assertEquals("netbeans module defined in descriptor", result, d);
     }
 
-//    /**
-//     * Test of getLibraryArtifacts method, of class AbstractNbmMojo.
-//     */
-//    public void testGetLibraryArtifacts() throws Exception {
-//        System.out.println("getLibraryArtifacts");
-//        DependencyNode treeRoot = null;
-//        NetbeansModule module = null;
-//        MavenProject project = null;
-//        Map<Artifact, ExamineManifest> examinerCache = null;
-//        List<Artifact> expResult = null;
-//        List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, module, project, examinerCache, log);
-//        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-//
-//    /**
-//     * Test of getModuleDependencyArtifacts method, of class AbstractNbmMojo.
-//     */
-//    public void testGetModuleDependencyArtifacts() throws Exception {
-//        System.out.println("getModuleDependencyArtifacts");
-//        DependencyNode treeRoot = null;
-//        NetbeansModule module = null;
-//        MavenProject project = null;
-//        Map<Artifact, ExamineManifest> examinerCache = null;
-//        List<Artifact> libraryArtifacts = null;
-//        List<Artifact> expResult = null;
-//        List<Artifact> result = AbstractNbmMojo.getModuleDependencyArtifacts(treeRoot, module, project, examinerCache, libraryArtifacts, log);
-//        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
+    /**
+     * Module is not a library
+     */
+    public void testGetLibraryArtifacts1() throws Exception {
+        System.out.println("getLibraryArtifacts1");
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
+        List<Artifact> runtimes = new ArrayList<Artifact>();
+        DependencyNode module = createNode("gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
+        treeRoot.addChild( module );
+        NetbeansModule mdl = new NetbeansModule();
+        List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log);
+        assertEquals(0, result.size());
+    }
 
+    /**
+     * direct dependency is a library
+     */
+    public void testGetLibraryArtifact2() throws Exception {
+        System.out.println("getLibraryArtifacts2");
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
+        List<Artifact> runtimes = new ArrayList<Artifact>();
+        DependencyNode library = createNode("gr1", "ar1", "1.0", "jar", "compile", false, runtimes, examinerCache);
+        treeRoot.addChild( library );
+        NetbeansModule mdl = new NetbeansModule();
+        List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log);
+        assertEquals(1, result.size());
+    }
+
+
+    /**
+     * transitive dependency gets included as well.
+     */
+    public void testGetLibraryArtifact3() throws Exception {
+        System.out.println("getLibraryArtifacts3");
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
+        List<Artifact> runtimes = new ArrayList<Artifact>();
+        DependencyNode library = createNode("gr1", "ar1", "1.0", "jar", "compile", false, runtimes, examinerCache);
+        treeRoot.addChild( library );
+        DependencyNode translibrary = createNode("gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
+        library.addChild(translibrary);
+        NetbeansModule mdl = new NetbeansModule();
+        List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log);
+        assertEquals(2, result.size());
+    }
+
+    /**
+     * transitive dependency of a module doesn't get included as library
+     */
+    public void testGetLibraryArtifact4() throws Exception {
+        System.out.println("getLibraryArtifacts4");
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
+        List<Artifact> runtimes = new ArrayList<Artifact>();
+        DependencyNode module = createNode("gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
+        treeRoot.addChild( module );
+        DependencyNode translibrary = createNode("gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
+        module.addChild(translibrary);
+        NetbeansModule mdl = new NetbeansModule();
+        List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log);
+        assertEquals(0, result.size());
+    }
+
+    /**
+     * transitive dependency of a library is a duplicate of a transitive dependency of a module
+     * ->doesn't get included.
+     */
+    public void testGetLibraryArtifact5() throws Exception {
+        System.out.println("getLibraryArtifacts5");
+        Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
+        List<Artifact> runtimes = new ArrayList<Artifact>();
+        DependencyNode module = createNode("gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
+        treeRoot.addChild( module );
+        DependencyNode translibrary = createNode("gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
+        module.addChild(translibrary);
+
+        DependencyNode library = createNode("gr3", "ar3", "1.0", "jar", "compile", false, runtimes, examinerCache);
+        treeRoot.addChild( library );
+        DependencyNode translibrary2 = createNode("gr4", "ar4", "1.0", "jar", "runtime", false, runtimes, examinerCache);
+        library.addChild(translibrary2);
+        DependencyNode translibrary3 = createNode(translibrary.getArtifact(), DependencyNode.OMITTED_FOR_DUPLICATE);
+        translibrary2.addChild(translibrary3);
+
+        NetbeansModule mdl = new NetbeansModule();
+        List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log);
+        assertEquals(2, result.size());
+        assertEquals(result.get(0).getId(), library.getArtifact().getId());
+        assertEquals(result.get(1).getId(), translibrary2.getArtifact().getId());
+    }
+
+    private DependencyNode createNode(String gr, String art, String ver, String pack, String scope, boolean isModule, List<Artifact> runtimes, Map<Artifact, ExamineManifest> cache) {
+        Artifact a = createArtifact(gr, art, ver, pack, scope);
+        DependencyNode nd = new DependencyNode(a);
+        ExamineManifest manifest = isModule ? createModule() : createNonModule();
+        runtimes.add(a);
+        cache.put(a, manifest);
+        return nd;
+    }
+
+    private DependencyNode createNode(Artifact a, int state) {
+        DependencyNode nd = new DependencyNode(a, state, a);
+        return nd;
+    }
 
     private Artifact createArtifact(String gr, String art, String ver, String pack, String scope) {
         VersionRange rng = VersionRange.createFromVersion(ver);
-        Artifact a = new DefaultArtifact(gr, art, rng, scope, pack, "dummy classifier to avoid having to declare ArtifactHandler", null);
+        Artifact a = new DefaultArtifact(gr, art, rng, scope, pack, "classifier", null);
         a.setDependencyTrail(Collections.EMPTY_LIST);
+        a.setFile(new File(gr + File.separator + art + File.separator + art + "-"+ ver + ".jar"));
         return a;
     }
 

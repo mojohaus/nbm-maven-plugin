@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -97,12 +96,6 @@ public abstract class AbstractNbmMojo
 
     static final boolean matchesLibrary( Artifact artifact, List<String> libraries, ExamineManifest depExaminator, Log log )
     {
-// when we have classifier like jar-assembly this condition is not true..
-// just take everything that is a dependecy, no matter of what type..
-//        if (!"jar".equals(artifact.getType())) {
-//            // just jars make sense.
-//            return false;
-//        }
         String artId = artifact.getArtifactId();
         String grId = artifact.getGroupId();
         String id = grId + ":" + artId;
@@ -128,16 +121,8 @@ public abstract class AbstractNbmMojo
         {
             return false;
         }
-        //only direct deps matter to us..
-        if ( artifact.getDependencyTrail().size() > 2 )
-        {
-            log.debug(
-                    id + " omitted as module library, not direct dependency." );
-            return false;
-        }
         log.debug(
                 id + " included as module library, squeezed through all the filters." );
-        log.info( "Adding as module's library:" + id );
         return true;
     }
 
@@ -259,38 +244,20 @@ public abstract class AbstractNbmMojo
     }
 
     static List<Artifact> getLibraryArtifacts(DependencyNode treeRoot, NetbeansModule module,
-            MavenProject project, Map<Artifact, ExamineManifest> examinerCache, Log log) throws MojoExecutionException
+            List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache, Log log) throws MojoExecutionException
     {
         List<Artifact> include = new ArrayList<Artifact>();
         if ( module != null )
         {
-            List librList = new ArrayList();
+            List<String> librList = new ArrayList<String>();
             if ( module.getLibraries() != null )
             {
                 librList.addAll( module.getLibraries() );
             }
-            List artifacts = project.getCompileArtifacts();
-            for ( Iterator iter = artifacts.iterator(); iter.hasNext();)
-            {
-                Artifact artifact = (Artifact) iter.next();
-                ExamineManifest depExaminator = examinerCache.get(artifact);
-                if (depExaminator == null) {
-                    depExaminator = new ExamineManifest( log );
-                    depExaminator.setJarFile( artifact.getFile() );
-                    depExaminator.checkFile();
-                    examinerCache.put(artifact, depExaminator);
-                }
-                if ( matchesLibrary( artifact, librList, depExaminator, log ) )
-                {
-                    if ( depExaminator.isNetbeansModule() )
-                    {
-                        log.warn(
-                                "You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId() );
-                    }
-                    include.add(artifact);
-                    continue;
-                }
-            }
+            CollectLibrariesNodeVisitor visitor = new CollectLibrariesNodeVisitor( librList,
+                runtimeArtifacts, examinerCache, log, treeRoot );
+            treeRoot.accept( visitor );
+            include.addAll( visitor.getArtifacts() );
         }
         return include;
     }

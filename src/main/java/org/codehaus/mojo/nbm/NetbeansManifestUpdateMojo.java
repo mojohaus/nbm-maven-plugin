@@ -271,7 +271,7 @@ public class NetbeansManifestUpdateMojo
         {
             DependencyNode treeroot = createDependencyTree(project, dependencyTreeBuilder, localRepository, artifactFactory, artifactMetadataSource, artifactCollector, "compile");
             Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
-            List<Artifact> libArtifacts = getLibraryArtifacts(treeroot, module, project, examinerCache, getLog());
+            List<Artifact> libArtifacts = getLibraryArtifacts(treeroot, module, project.getRuntimeArtifacts(), examinerCache, getLog());
             List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts(treeroot, module, project, examinerCache, libArtifacts, getLog());
             String classPath = "";
             String dependencies = "";
