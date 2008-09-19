@@ -21,17 +21,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.dependency.tree.DependencyNode;
 import org.codehaus.mojo.nbm.model.Dependency;
-import org.codehaus.mojo.nbm.model.NetbeansModule;
 
 /**
  *
@@ -94,6 +90,7 @@ public class AbstractNbmMojoTest extends TestCase {
         assertFalse("netbeans modules are omitted", result);
 
         artifact = createArtifact("group", "artifact", "1.0", "jar", "compile");
+        depExaminator = createNonModule();
         artifact.setDependencyTrail(Arrays.asList(new String[] {
             "1",
             "2",
