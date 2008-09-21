@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -29,6 +30,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Tag examines the manifest of a jar file and retrieves netbeans specific information.
@@ -41,7 +43,6 @@ public class ExamineManifest
     private Log logger;
     private File jarFile;
     private File manifestFile;
-    // package private to simplify testing
     private boolean netbeansModule;
     private boolean localized;
     private String specVersion;
@@ -53,6 +54,11 @@ public class ExamineManifest
     private boolean publicPackages;
     private boolean populateDependencies = false;
     private List dependencyTokens = Collections.EMPTY_LIST;
+
+    private boolean friendPackages = false;
+    private List<String> friends = Collections.<String>emptyList();
+    private List<String> packages = Collections.<String>emptyList();
+
 
     ExamineManifest( Log logger )
     {
@@ -159,13 +165,20 @@ public class ExamineManifest
             setClasspath( attrs.getValue( "Class-Path" ) == null ? "" : attrs.getValue(
                     "Class-Path" ) );
             String value = attrs.getValue( "OpenIDE-Module-Public-Packages" );
-            if ( attrs.getValue( "OpenIDE-Module-Friends" ) != null || value == null || value.trim().equals(
-                    "-" ) )
-            {
+            String frList = attrs.getValue( "OpenIDE-Module-Friends" );
+            if (value == null || value.trim().equals( "-" ) ) {
                 setPublicPackages( false );
-            } else
-            {
-                setPublicPackages( true );
+            } else {
+                if ( frList != null ) {
+                    setPublicPackages( false );
+                    String[] friendList = StringUtils.stripAll( StringUtils.split( frList, ",") );
+                    setFriends( Arrays.asList( friendList ) );
+                } else
+                {
+                    setPublicPackages( true );
+                }
+                String[] packageList = StringUtils.stripAll( StringUtils.split( value, ",") );
+                setPackages( Arrays.asList( packageList ) );
             }
             if ( isPopulateDependencies() )
             {
@@ -334,6 +347,11 @@ public class ExamineManifest
         this.locBundle = locBundle;
     }
 
+    /**
+     * returns true if there are defined public packages and there is no friend
+     * declaration.
+     * @return
+     */
     public boolean hasPublicPackages()
     {
         return publicPackages;
@@ -362,5 +380,41 @@ public class ExamineManifest
     public void setDependencyTokens( List dependencyTokens )
     {
         this.dependencyTokens = dependencyTokens;
+    }
+
+    /**
+     * returns true if both public packages and friend list are declared.
+     * @return
+     */
+    public boolean hasFriendPackages()
+    {
+        return friendPackages;
+    }
+
+    private void setFriends( List<String> fr )
+    {
+        friendPackages = true;
+        friends = fr;
+    }
+
+    public List<String> getFriends()
+    {
+        return friends;
+    }
+
+    private void setPackages( List<String> pack )
+    {
+        packages = pack;
+    }
+
+    /**
+     * list of package statements from OpenIDE-Module-Public-Packages.
+     * All items end with .*
+     *
+     * @return
+     */
+    public List<String> getPackages()
+    {
+        return packages;
     }
 }
