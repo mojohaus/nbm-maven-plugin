@@ -89,14 +89,6 @@ public class PopulateRepositoryMojo
 {
 
     /**
-     * Local maven repository.
-     *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
-     */
-    protected ArtifactRepository localRepository;
-    /**
      * an url where to deploy the netbeans artifacts.. optional, if not specified, the artifacts will be only installed
      * in local repository, if you need to give credentials to access remote repo, the id of the server is hardwired to "netbeans".
      * @parameter expression="${deployUrl}"
@@ -120,9 +112,14 @@ public class PopulateRepositoryMojo
      * @parameter expression="${netbeansSourcesDirectory}"
      */
     protected String netbeansSourcesDirectory;
+
     /**
+     * If defined, will match the nbm files found in the designated folder with the modules
+     * and upload the nbm file next to the module jar in local and remote repositories.
+     *
      * Assumes a folder with &lt;code-name-base&gt;.nbm files containing nbm files for modules.
      * @parameter expression="${netbeansNbmDirectory}"
+     * @since 3.0
      */
     protected String nbmDirectory;
     /**
@@ -144,40 +141,48 @@ public class PopulateRepositoryMojo
      * http://repo1.maven.org/maven2/.index/nexus-maven-repository-index.zip
      * Unzip it to a directory and use this parameter to point to it.
      * @parameter expression="${nexusIndexDirectory}"
+     * @since 3.0
      */
     private File nexusIndexDirectory;
+
+    // <editor-fold defaultstate="collapsed" desc="Component parameters">
+
+    /**
+     * Local maven repository.
+     *
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
+    protected ArtifactRepository localRepository;
+
     /**
      * Maven ArtifactFactory.
      *
-     * @parameter expression="${component.org.apache.maven.artifact.factory.ArtifactFactory}"
-     * @required
-     * @readonly
+     * @component
      */
     private ArtifactFactory artifactFactory;
     /**
      * Maven ArtifactInstaller.
      *
-     * @parameter expression="${component.org.apache.maven.artifact.installer.ArtifactInstaller}"
-     * @required
-     * @readonly
+     * @component
      */
     private ArtifactInstaller artifactInstaller;
     /**
      * Maven ArtifactDeployer.
      *
-     * @parameter expression="${component.org.apache.maven.artifact.deployer.ArtifactDeployer}"
-     * @required
-     * @readonly
+     * @component
      */
     private ArtifactDeployer artifactDeployer;
     /**
      * Maven ArtifactRepositoryFactory.
      *
-     * @parameter expression="${component.org.apache.maven.artifact.repository.ArtifactRepositoryFactory}"
-     * @required
-     * @readonly
+     * @component
      */
     private ArtifactRepositoryFactory repositoryFactory;
+// end of component params custom code folding
+// </editor-fold>
+
 
     public void execute() throws MojoExecutionException
     {

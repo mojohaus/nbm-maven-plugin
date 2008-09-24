@@ -55,6 +55,7 @@ import org.netbeans.nbbuild.ModuleSelector;
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal webstart-app
  * @phase packaging
+ * @since 3.0
  */
 public class CreateWebstartAppMojo
         extends AbstractMojo

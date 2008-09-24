@@ -46,7 +46,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.netbeans.nbbuild.MakeUpdateDesc;
 
 /**
- * Create the Netbeans autupdate site
+ * Create the Netbeans autopdate site definition.
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal autoupdate
  * @aggregator
@@ -87,8 +87,10 @@ public class CreateUpdateSiteMojo
      * it's assumed to be the flat structure and the value is just the URL.
      * 
      * @parameter expression="${maven.nbm.customDistBase}"
+     * @since 3.0 it's also possible to add remote repository as base
      */
     private String distBase;
+
     /**
      * The Maven Project.
      *
@@ -97,6 +99,7 @@ public class CreateUpdateSiteMojo
      * @readonly
      */
     private MavenProject project;
+
     /**
      * If the executed project is a reactor project, this will contains the full list of projects in the reactor.
      *
@@ -105,6 +108,9 @@ public class CreateUpdateSiteMojo
      * @readonly
      */
     private List reactorProjects;
+
+    // <editor-fold defaultstate="collapsed" desc="Component parameters">
+
     /**
      * @component
      */
@@ -119,6 +125,7 @@ public class CreateUpdateSiteMojo
      * @component
      */
     private MavenProjectHelper projectHelper;
+    // </editor-fold>
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {

@@ -66,27 +66,36 @@ public class CreateNbmMojo
      * @parameter expression="${keystorealias}"
      */
     private String keystorealias;
+
     /**
-     * Used for attaching the artifact in the project
-     *
-     * @component
+     * Boolean parameter denoting if creation of NBM file shall be skipped or not.
+     * If skipped, just the expanded directory for cluster is created
+     * @parameter expression="${maven.nbm.skip}" default-value="false"
+     * @since 3.0
      */
-    private MavenProjectHelper projectHelper;
+    private boolean skipNbm;
+
+    // <editor-fold defaultstate="collapsed" desc="Component parameters">
+
     /**
      * Contextualized.
      */
     private PlexusContainer container;
     /**
      * @component
+     * @readonly
      */
     private ArtifactFactory artifactFactory;
-    
     /**
-     * Boolean parameter denoting if creation of NBM file shall be skipped or not.
-     * If skipped, just the expanded directory for cluster is created
-     * @parameter expression="${maven.nbm.skip}" default-value="false"
+     * Used for attaching the artifact in the project
+     *
+     * @component
+     * @readonly
      */
-    private boolean skipNbm;
+    private MavenProjectHelper projectHelper;
+
+    // end of component params custom code folding
+    // </editor-fold>
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
