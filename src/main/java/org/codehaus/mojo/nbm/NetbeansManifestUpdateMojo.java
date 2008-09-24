@@ -39,6 +39,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.mojo.nbm.model.Dependency;
 import org.codehaus.mojo.nbm.model.NetbeansModule;
 import org.apache.maven.project.MavenProject;
@@ -51,7 +52,21 @@ import org.apache.tools.ant.taskdefs.ManifestException;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
- * Goal for updating the artifact jar with netbeans specific entries, part of "nbm" lifecycle/packaging.
+ * Goal for generating NetBeans module system specific manifest entries, part of "nbm" lifecycle/packaging.
+ *
+ * In order to have the generated manifest picked up by the maven-jar-plugin,
+ * one shall add the following configuration snippet to maven-jar-plugin.
+ * <p/>
+ * <code>
+    &lt;plugin&gt;<br/>
+        &lt;groupId>org.apache.maven.plugins&lt;/groupId&gt;<br/>
+        &lt;artifactId>maven-jar-plugin&lt;/artifactId&gt;<br/>
+        &lt;version>2.2&lt;/version&gt;<br/>
+        &lt;configuration&gt;<br/>
+            &lt;useDefaultManifestFile&gt;true&lt;/useDefaultManifestFile&gt;<br/>
+        &lt;/configuration&gt;<br/>
+    &lt;/plugin&gt;<br/>
+ * </code>
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal manifest
@@ -97,18 +112,18 @@ public class NetbeansManifestUpdateMojo
      * of any NetBeans installation. <br/>
     <code>
     &lt;plugin&gt;<br/>
-    &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;<br/>
-    &lt;artifactId&gt;nbm-maven-plugin&lt;/artifactId&gt;<br/>
-    &lt;extensions&gt;true&lt;/extensions&gt;<br/>
-    &lt;dependencies&gt;<br/>
-    &lt;dependency&gt;<br/>
-    &lt;groupId&gt;javax.help&lt;/groupId&gt;<br/>
-    &lt;artifactId&gt;search&lt;/artifactId&gt;<br/>
-    &lt;version&gt;2.0&lt;/version&gt;<br/>
-    &lt;!--scope&gt;system&lt;/scope&gt;<br/>
-    &lt;systemPath&gt;/home/mkleint/netbeans/harness/jsearch-2.0_04.jar&lt;/systemPath--&gt;<br/>
-    &lt;/dependency&gt;<br/>
-    &lt;/dependencies&gt;<br/>
+        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;<br/>
+        &lt;artifactId&gt;nbm-maven-plugin&lt;/artifactId&gt;<br/>
+        &lt;extensions&gt;true&lt;/extensions&gt;<br/>
+        &lt;dependencies&gt;<br/>
+            &lt;dependency&gt;<br/>
+                &lt;groupId&gt;javax.help&lt;/groupId&gt;<br/>
+                &lt;artifactId&gt;search&lt;/artifactId&gt;<br/>
+                &lt;version&gt;2.0&lt;/version&gt;<br/>
+                &lt;!--scope&gt;system&lt;/scope&gt;<br/>
+                &lt;systemPath&gt;/home/mkleint/netbeans/harness/jsearch-2.0_04.jar&lt;/systemPath--&gt;<br/>
+            &lt;/dependency&gt;<br/>
+        &lt;/dependencies&gt;<br/>
     &lt;/plugin&gt;<br/>
     <br/>
     </code>
@@ -122,6 +137,7 @@ public class NetbeansManifestUpdateMojo
      * Path to manifest file that will be used as base for the 
      *
      * @parameter default-value="${basedir}/src/main/nbm/manifest.mf"
+     * @since 3.0
      * @required
      */
     private File sourceManifestFile;
@@ -130,10 +146,30 @@ public class NetbeansManifestUpdateMojo
      * Path to the generated MANIFEST file to use. It will be used by jar:jar plugin.
      *
      * @parameter expression="${project.build.outputDirectory}/META-INF/MANIFEST.MF"
+     * @since 3.0
      * @readonly
      * @required
      */
     private File targetManifestFile;
+
+    /**
+     * Verify the runtime NetBeans module dependencies and Class-Path items
+     * generated from Maven dependencies. The check is done by matcing classes used
+     * in current project. Allowed values for the parameter are "fail", "warn" and "skip".
+     * The default is "fail" in which case the validation failure results in a failed build,
+     * in the vast majority of cases the module would fail at runtime anyway.
+     *
+     * @parameter expression="${maven.nbm.verify}" default-value="fail"
+     * @since 3.0
+     */
+    private String verifyRuntime;
+    
+    private static final String FAIL = "fail";
+    private static final String WARN = "warn";
+    private static final String SKIP = "skip";
+
+
+    // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
     /**
      * The artifact repository to use.
@@ -148,8 +184,6 @@ public class NetbeansManifestUpdateMojo
      * The artifact factory to use.
      *
      * @component
-     * @required
-     * @readonly
      */
     private ArtifactFactory artifactFactory;
 
@@ -157,8 +191,6 @@ public class NetbeansManifestUpdateMojo
      * The artifact metadata source to use.
      *
      * @component
-     * @required
-     * @readonly
      */
     private ArtifactMetadataSource artifactMetadataSource;
 
@@ -166,8 +198,6 @@ public class NetbeansManifestUpdateMojo
      * The artifact collector to use.
      *
      * @component
-     * @required
-     * @readonly
      */
     private ArtifactCollector artifactCollector;
 
@@ -175,13 +205,14 @@ public class NetbeansManifestUpdateMojo
      * The dependency tree builder to use.
      *
      * @component
-     * @required
-     * @readonly
      */
     private DependencyTreeBuilder dependencyTreeBuilder;
 
+// end of component params custom code folding
+// </editor-fold> 
+
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
         NetbeansModule module;
         if ( descriptor != null && descriptor.exists() )
@@ -351,13 +382,15 @@ public class NetbeansManifestUpdateMojo
                     depSeparator = ", ";
                 }
             }
-            try
-            {
-                checkModuleClassPath( treeroot, libArtifacts, examinerCache, moduleArtifacts, projectCNB );
-            }
-            catch ( IOException ex )
-            {
-                throw new MojoExecutionException( "Error while checking runtime dependencies", ex );
+            if (!verifyRuntime.equalsIgnoreCase( SKIP )) {
+                try
+                {
+                    checkModuleClassPath( treeroot, libArtifacts, examinerCache, moduleArtifacts, projectCNB );
+                }
+                catch ( IOException ex )
+                {
+                    throw new MojoExecutionException( "Error while checking runtime dependencies", ex );
+                }
             }
 
             if ( hasJavaHelp && nbmJavahelpSource.exists() )
@@ -446,7 +479,8 @@ public class NetbeansManifestUpdateMojo
 //----------------------------------------------------------------------------------
     private void checkModuleClassPath( DependencyNode treeroot,
         List<Artifact> libArtifacts,
-        Map<Artifact, ExamineManifest> examinerCache, List<ModuleWrapper> moduleArtifacts, String projectCodeNameBase ) throws IOException, MojoExecutionException
+        Map<Artifact, ExamineManifest> examinerCache, List<ModuleWrapper> moduleArtifacts, String projectCodeNameBase ) 
+        throws IOException, MojoExecutionException, MojoFailureException
     {
         Set<String> deps = buildProjectDependencyClasses( project, libArtifacts );
         deps.retainAll( allProjectClasses( project ) );
@@ -471,10 +505,10 @@ public class NetbeansManifestUpdateMojo
             }
         }
 
+        //now we have the classes that are not in publick packages of declared modules,
+        //but are being used
         if ( deps.size() > 0 )
         {
-            //something is wrong.
-
             Map<String, List<Artifact>> transmodules = visitor.getTransitiveArtifacts();
             for ( ModuleWrapper wr : moduleArtifacts )
             {
@@ -497,14 +531,10 @@ public class NetbeansManifestUpdateMojo
                     getLog().error( "Project depends on packages not accessible at runtime in module " + a.getId() );
                 }
             }
-
+            if (verifyRuntime.equalsIgnoreCase( FAIL )) {
+                throw new MojoFailureException("See above for failures in runtime NebBeans dependencies verification.");
+            }
         }
-
-        //now we have the classes that are not in publick packages of declared modules,
-        //but are being used
-        System.out.println( "external classes=" + Arrays.toString( deps.toArray() ) );
-
-
     }
 
     /**
@@ -579,7 +609,7 @@ public class NetbeansManifestUpdateMojo
 
     private Set<String>[] visibleModuleClasses( List<Artifact> moduleLibraries,
         ExamineManifest manifest, Dependency dep, String projectCodeNameBase )
-        throws IOException, MojoExecutionException
+        throws IOException, MojoFailureException
     {
         Set<String> moduleClasses = new HashSet<String>();
         Set<String> visibleModuleClasses = new HashSet<String>();
@@ -608,8 +638,12 @@ public class NetbeansManifestUpdateMojo
             String cnb = stripVersionFromCodebaseName( projectCodeNameBase );
             if ( manifest.hasFriendPackages() && !manifest.getFriends().contains( cnb ) )
             {
-                throw new MojoExecutionException(
-                    "Module dependency has friend dependency on " + manifest.getModule() + "but is not listed as friend." );
+                if (verifyRuntime.equalsIgnoreCase( FAIL) ) {
+                    throw new MojoFailureException(
+                        "Module dependency has friend dependency on " + manifest.getModule() + "but is not listed as friend." );
+                } else {
+                    getLog().warn( "Module dependency has friend dependency on " + manifest.getModule() + "but is not listed as friend." );
+                }
             }
             List<Pattern> compiled = createCompiledPatternList( manifest.getPackages() );
             for ( String clazz : moduleClasses )
@@ -632,7 +666,7 @@ public class NetbeansManifestUpdateMojo
         else
         {
             //HUH?
-            throw new MojoExecutionException( "Wrong type of module dependency " + type );
+            throw new MojoFailureException( "Wrong type of module dependency " + type );
         }
 
         return new Set[]
