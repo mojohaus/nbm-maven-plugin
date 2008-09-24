@@ -58,7 +58,7 @@ import org.netbeans.nbbuild.ModuleSelector;
  * @since 3.0
  */
 public class CreateWebstartAppMojo
-        extends AbstractMojo
+    extends AbstractMojo
 {
 
     /**
@@ -69,6 +69,7 @@ public class CreateWebstartAppMojo
      * @readonly
      */
     private MavenProject project;
+
     /**
      * @component
      */
@@ -80,14 +81,14 @@ public class CreateWebstartAppMojo
      * @required
      */
     protected String brandingToken;
-    
+
     /**
      * output directory where the the netbeans application will be created.
      * @parameter default-value="${project.build.directory}"
      * @required
      */
     private File buildDirectory;
-    
+
     /**
      * Distributable zip file of NetBeans platform application
      * 
@@ -102,7 +103,7 @@ public class CreateWebstartAppMojo
      * 
      */
     private String codebase;
-    
+
     /**
      * A custom master JNLP file. If not defined, the 
      * <a href="http://mojo.codehaus.org/nbm-maven-plugin/masterjnlp.txt">default one</a> is used.
@@ -122,23 +123,24 @@ public class CreateWebstartAppMojo
      * @parameter 
      */
     private File masterJnlpFile;
-    
+
     /**
      * keystore location for signing the nbm file
      * @parameter expression="${keystore}"
      */
     private String keystore;
+
     /**
      * keystore password
      * @parameter expression="${keystorepass}"
      */
     private String keystorepassword;
+
     /**
      * keystore alias
      * @parameter expression="${keystorealias}"
      */
     private String keystorealias;
-    
 
     /**
      * 
@@ -147,37 +149,42 @@ public class CreateWebstartAppMojo
      */
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        if ( ! "nbm-application".equals( project.getPackaging() ) )
+        if ( !"nbm-application".equals( project.getPackaging() ) )
         {
             throw new MojoExecutionException(
-                    "This goal only makes sense on project with nbm-application packaging." );
+                "This goal only makes sense on project with nbm-application packaging." );
         }
         Project antProject = new Project();
         antProject.init();
-        
+
         if ( keystore != null && keystorealias != null && keystorepassword != null )
         {
             File ks = new File( keystore );
             if ( !ks.exists() )
             {
                 throw new MojoFailureException(
-                        "Cannot find keystore file at " + ks.getAbsolutePath() );
-            } else
+                    "Cannot find keystore file at " + ks.getAbsolutePath() );
+            }
+            else
             {
                 //proceed..
             }
-        } else if ( keystore != null || keystorepassword != null || keystorealias != null )
+        }
+        else if ( keystore != null || keystorepassword != null || keystorealias != null )
         {
-            throw new MojoFailureException("If you want to sign the jnlp application, you need to define all three keystore related parameters.");
-        } else {
-            getLog().warn("Keystore related parameters not set, generating a default keystore.");
+            throw new MojoFailureException(
+                "If you want to sign the jnlp application, you need to define all three keystore related parameters." );
+        }
+        else
+        {
+            getLog().warn( "Keystore related parameters not set, generating a default keystore." );
             GenerateKey genTask = (GenerateKey) antProject.createTask( "genkey" );
-            genTask.setAlias("jnlp");
-            genTask.setStorepass("netbeans");
-            genTask.setDname("CN=" + System.getProperty("user.name"));
-            genTask.setKeystore(new File(buildDirectory, "generated.keystore").getAbsolutePath());
+            genTask.setAlias( "jnlp" );
+            genTask.setStorepass( "netbeans" );
+            genTask.setDname( "CN=" + System.getProperty( "user.name" ) );
+            genTask.setKeystore( new File( buildDirectory, "generated.keystore" ).getAbsolutePath() );
             genTask.execute();
-            keystore = new File(buildDirectory, "generated.keystore").getAbsolutePath();
+            keystore = new File( buildDirectory, "generated.keystore" ).getAbsolutePath();
             keystorepassword = "netbeans";
             keystorealias = "jnlp";
         }
@@ -192,36 +199,36 @@ public class CreateWebstartAppMojo
         taskdef.setName( "verifyjnlp" );
         taskdef.execute();
 
-        
+
         try
         {
             File webstartBuildDir = new File(
-                    buildDirectory + File.separator + "webstart" + File.separator + brandingToken );
+                buildDirectory + File.separator + "webstart" + File.separator + brandingToken );
             if ( webstartBuildDir.exists() )
             {
                 FileUtils.deleteDirectory( webstartBuildDir );
             }
             webstartBuildDir.mkdirs();
-            getLog().info( "Generating webstartable binaries at " + webstartBuildDir.getAbsolutePath());
-            
+            getLog().info( "Generating webstartable binaries at " + webstartBuildDir.getAbsolutePath() );
+
             File nbmBuildDirFile = new File( buildDirectory, brandingToken );
-            
+
 //            FileUtils.copyDirectoryStructureIfModified( nbmBuildDirFile, webstartBuildDir );
-            
+
             MakeJNLP jnlpTask = (MakeJNLP) antProject.createTask( "makejnlp" );
-            jnlpTask.setDir(webstartBuildDir);
+            jnlpTask.setDir( webstartBuildDir );
             jnlpTask.setCodebase( codebase );
             //TODO, how to figure verify excludes..
-            jnlpTask.setVerify(false);
-            jnlpTask.setPermissions("<security><all-permissions/></security>");
-            jnlpTask.setSignJars(true);
+            jnlpTask.setVerify( false );
+            jnlpTask.setPermissions( "<security><all-permissions/></security>" );
+            jnlpTask.setSignJars( true );
 
-            jnlpTask.setAlias(keystorealias);
-            jnlpTask.setKeystore(keystore);
-            jnlpTask.setStorePass(keystorepassword);
-            
+            jnlpTask.setAlias( keystorealias );
+            jnlpTask.setKeystore( keystore );
+            jnlpTask.setStorePass( keystorepassword );
+
             FileSet fs = jnlpTask.createModules();
-            fs.setDir(nbmBuildDirFile);
+            fs.setDir( nbmBuildDirFile );
             OrSelector or = new OrSelector();
             AndSelector and = new AndSelector();
             FilenameSelector inc = new FilenameSelector();
@@ -233,85 +240,90 @@ public class CreateWebstartAppMojo
             inc = new FilenameSelector();
             inc.setName( "*/core/**/*.jar" );
             or.addFilename( inc );
-            
+
             ModuleSelector ms = new ModuleSelector();
             Parameter included = new Parameter();
-            included.setName( "includeClusters");
-            included.setValue( "");
+            included.setName( "includeClusters" );
+            included.setValue( "" );
             Parameter excluded = new Parameter();
-            excluded.setName( "excludeClusters");
-            excluded.setValue( "");
+            excluded.setName( "excludeClusters" );
+            excluded.setValue( "" );
             Parameter exModules = new Parameter();
-            exModules.setName( "excludeModules");
-            exModules.setValue( "");
-            ms.setParameters( new Parameter[] {
-                included,
-                excluded,
-                exModules
-            });
-            and.add( or);
+            exModules.setName( "excludeModules" );
+            exModules.setValue( "" );
+            ms.setParameters( new Parameter[]
+                {
+                    included,
+                    excluded,
+                    exModules
+                } );
+            and.add( or );
             and.add( ms );
             fs.addAnd( and );
             jnlpTask.execute();
 
             //TODO is it really netbeans/
-            String extSnippet = generateExtensions(fs, antProject, ""); // "netbeans/"
+            String extSnippet = generateExtensions( fs, antProject, "" ); // "netbeans/"
 
             Properties props = new Properties();
-            props.setProperty("jnlp.resources", extSnippet);
-            props.setProperty( "jnlp.codebase", codebase);
-            props.setProperty( "app.name", brandingToken);
-            props.setProperty( "app.icon", "master.png");
+            props.setProperty( "jnlp.resources", extSnippet );
+            props.setProperty( "jnlp.codebase", codebase );
+            props.setProperty( "app.name", brandingToken );
+            props.setProperty( "app.icon", "master.png" );
             props.setProperty( "app.title", project.getName() );
             if ( project.getOrganization() != null )
             {
                 props.setProperty( "app.vendor",
-                        project.getOrganization().getName() );
-            } else
+                    project.getOrganization().getName() );
+            }
+            else
             {
                 props.setProperty( "app.vendor", "Nobody" );
             }
             String description = project.getDescription() != null ? project.getDescription() : "No Project Description";
             props.setProperty( "app.description", description );
             props.setProperty( "branding.token", brandingToken );
-            props.setProperty("netbeans.jnlp.fixPolicy", "true");
+            props.setProperty( "netbeans.jnlp.fixPolicy", "true" );
             File masterJnlp = new File(
-                    webstartBuildDir.getAbsolutePath() + File.separator + "master.jnlp" );
+                webstartBuildDir.getAbsolutePath() + File.separator + "master.jnlp" );
             filterCopy( masterJnlpFile, "/master.jnlp", masterJnlp, props );
-            
+
 
             File startup = copyLauncher( buildDirectory, nbmBuildDirFile );
             File jnlpDestination = new File(
                 webstartBuildDir.getAbsolutePath() + File.separator + "startup.jar" );
-            
-            SignJar signTask = (SignJar)antProject.createTask("signjar");
-            signTask.setKeystore(keystore);
-            signTask.setStorepass(keystorepassword);
-            signTask.setAlias(keystorealias);
-            signTask.setSignedjar(jnlpDestination);
-            signTask.setJar(startup);
+
+            SignJar signTask = (SignJar) antProject.createTask( "signjar" );
+            signTask.setKeystore( keystore );
+            signTask.setStorepass( keystorepassword );
+            signTask.setAlias( keystorealias );
+            signTask.setSignedjar( jnlpDestination );
+            signTask.setJar( startup );
             signTask.execute();
 
             //branding
             DirectoryScanner ds = new DirectoryScanner();
             ds.setBasedir( nbmBuildDirFile );
-            ds.setIncludes( new String[] {
-                "**/locale/*.jar"
-            });
+            ds.setIncludes( new String[]
+                {
+                    "**/locale/*.jar"
+                } );
             ds.scan();
             String[] includes = ds.getIncludedFiles();
             StringBuffer brandRefs = new StringBuffer();
-            if (includes != null && includes.length > 0) {
-                File brandingDir = new File(webstartBuildDir, "branding");
+            if ( includes != null && includes.length > 0 )
+            {
+                File brandingDir = new File( webstartBuildDir, "branding" );
                 brandingDir.mkdirs();
-                for (String incBran : includes) {
-                    File source = new File(nbmBuildDirFile, incBran);
-                    File dest = new File(brandingDir, source.getName());
+                for ( String incBran : includes )
+                {
+                    File source = new File( nbmBuildDirFile, incBran );
+                    File dest = new File( brandingDir, source.getName() );
                     FileUtils.copyFile( source, dest );
-                    brandRefs.append( "    <jar href=\'branding/" + dest.getName() + "\'/>\n");
+                    brandRefs.append( "    <jar href=\'branding/" + dest.getName() + "\'/>\n" );
                 }
-                //signing of branding items doens't work for some reason.
-                // -> branding.jnlp with <security/>
+            //signing of branding items doens't work for some reason.
+            // -> branding.jnlp with <security/>
 //                signTask = (SignJar)antProject.createTask("signjar");
 //                signTask.setKeystore(keystore);
 //                signTask.setStorepass(keystorepassword);
@@ -324,9 +336,9 @@ public class CreateWebstartAppMojo
             }
 
             File brandingJnlp = new File(
-                    webstartBuildDir.getAbsolutePath() + File.separator + "branding.jnlp" );
+                webstartBuildDir.getAbsolutePath() + File.separator + "branding.jnlp" );
             props.setProperty( "jnlp.branding.jars", brandRefs.toString() );
-            filterCopy(null, "/branding.jnlp", brandingJnlp, props);
+            filterCopy( null, "/branding.jnlp", brandingJnlp, props );
 
 // somehow expects a give folder/file format that we don't have..            
 //            getLog().info( "Verifying generated webstartable content." );
@@ -335,7 +347,7 @@ public class CreateWebstartAppMojo
 //            verify.setFile( masterJnlp );
 //            verifyTask.addConfiguredFileset( verify );
 //            verifyTask.execute();
-            
+
 
             // create zip archive
             if ( destinationFile.exists() )
@@ -349,9 +361,10 @@ public class CreateWebstartAppMojo
 
             // attach standalone so that it gets installed/deployed
             projectHelper.attachArtifact( project, "zip", "webstart",
-                    destinationFile );
+                destinationFile );
 
-        } catch ( Exception ex )
+        }
+        catch ( Exception ex )
         {
             throw new MojoExecutionException( "Error creating webstartable binary.", ex );
         }
@@ -366,7 +379,7 @@ public class CreateWebstartAppMojo
     private File copyLauncher( File standaloneBuildDir, File builtInstallation ) throws IOException
     {
         File jnlpStarter = new File( builtInstallation.getAbsolutePath() +
-                File.separator + "harness" +
+            File.separator + "harness" +
             File.separator + "jnlp" +
             File.separator + "jnlp-launcher.jar" );
         // buffer so it isn't reading a byte at a time!
@@ -378,8 +391,10 @@ public class CreateWebstartAppMojo
             {
                 source = getClass().getClassLoader().getResourceAsStream(
                     "webstart/jnlp-launcher.jar" );
-            } else {
-                source = new FileInputStream(jnlpStarter);
+            }
+            else
+            {
+                source = new FileInputStream( jnlpStarter );
             }
             File jnlpDestination = new File(
                 standaloneBuildDir.getAbsolutePath() + File.separator + "jnlp-launcher.jar" );
@@ -396,7 +411,7 @@ public class CreateWebstartAppMojo
     }
 
     private void filterCopy( File sourceFile, String resourcePath, File destinationFile, Properties filterProperties )
-            throws IOException
+        throws IOException
     {
         // buffer so it isn't reading a byte at a time!
         Reader source = null;
@@ -404,24 +419,28 @@ public class CreateWebstartAppMojo
         try
         {
             InputStream instream;
-            if (sourceFile != null) {
-                instream = new FileInputStream(sourceFile);
-            } else {
+            if ( sourceFile != null )
+            {
+                instream = new FileInputStream( sourceFile );
+            }
+            else
+            {
                 instream = getClass().getClassLoader().getResourceAsStream(
                     resourcePath );
             }
             FileOutputStream outstream = new FileOutputStream( destinationFile );
 
             source = new BufferedReader( new InputStreamReader( instream,
-                    "UTF-8" ) );
+                "UTF-8" ) );
             destination = new OutputStreamWriter( outstream, "UTF-8" );
 
             // support ${token}
             Reader reader = new InterpolationFilterReader( source,
-                    filterProperties, "${", "}" );
+                filterProperties, "${", "}" );
 
             IOUtil.copy( reader, destination );
-        } finally
+        }
+        finally
         {
             IOUtil.close( source );
             IOUtil.close( destination );
@@ -436,33 +455,37 @@ public class CreateWebstartAppMojo
      * @return
      * @throws java.io.IOException
      */
-    private String generateExtensions(FileSet files, Project antProject, String masterPrefix) throws IOException {
+    private String generateExtensions( FileSet files, Project antProject, String masterPrefix ) throws IOException
+    {
         StringBuffer buff = new StringBuffer();
-        for (String nm : files.getDirectoryScanner(antProject).getIncludedFiles()) {
-            File jar = new File (files.getDir(antProject), nm);
-            
-            if (!jar.canRead()) {
-                throw new IOException("Cannot read file: " + jar);
+        for ( String nm : files.getDirectoryScanner( antProject ).getIncludedFiles() )
+        {
+            File jar = new File( files.getDir( antProject ), nm );
+
+            if ( !jar.canRead() )
+            {
+                throw new IOException( "Cannot read file: " + jar );
             }
-            
-            JarFile theJar = new JarFile(jar);
-            String codenamebase = theJar.getManifest().getMainAttributes().getValue("OpenIDE-Module");
-            if (codenamebase == null) {
-                throw new IOException("Not a NetBeans Module: " + jar);
+
+            JarFile theJar = new JarFile( jar );
+            String codenamebase = theJar.getManifest().getMainAttributes().getValue( "OpenIDE-Module" );
+            if ( codenamebase == null )
+            {
+                throw new IOException( "Not a NetBeans Module: " + jar );
             }
             {
-                int slash = codenamebase.indexOf('/');
-                if (slash >= 0) {
-                    codenamebase = codenamebase.substring(0, slash);
+                int slash = codenamebase.indexOf( '/' );
+                if ( slash >= 0 )
+                {
+                    codenamebase = codenamebase.substring( 0, slash );
                 }
             }
-            String dashcnb = codenamebase.replace('.', '-');
+            String dashcnb = codenamebase.replace( '.', '-' );
 
-            buff.append("    <extension name='" + codenamebase + "' href='" + masterPrefix + dashcnb + ".jnlp' />\n");
+            buff.append( "    <extension name='" + codenamebase + "' href='" + masterPrefix + dashcnb + ".jnlp' />\n" );
             theJar.close();
         }
         return buff.toString();
-        
+
     }
-    
 }
