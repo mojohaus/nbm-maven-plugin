@@ -22,11 +22,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.regex.Pattern;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -36,6 +42,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.mojo.nbm.model.Dependency;
 import org.codehaus.mojo.nbm.model.NetbeansModule;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.dependency.analyzer.DefaultClassAnalyzer;
+import org.apache.maven.shared.dependency.analyzer.asm.ASMDependencyAnalyzer;
 import org.apache.maven.shared.dependency.tree.DependencyNode;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
 import org.apache.tools.ant.taskdefs.Manifest;
@@ -47,12 +55,12 @@ import org.codehaus.plexus.util.IOUtil;
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal manifest
- * @phase generate-resources
+ * @phase process-classes
  * @requiresDependencyResolution runtime
  * @requiresProject
  */
 public class NetbeansManifestUpdateMojo
-        extends AbstractNbmMojo
+    extends AbstractNbmMojo
 {
 
     /**
@@ -61,12 +69,14 @@ public class NetbeansManifestUpdateMojo
      * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      */
     protected String nbmBuildDir;
+
     /**
      * a netbeans module descriptor containing dependency information and more
      *
      * @parameter default-value="${basedir}/src/main/nbm/module.xml"
      */
     protected File descriptor;
+
     /**
      * maven project
      * @parameter expression="${project}"
@@ -74,6 +84,7 @@ public class NetbeansManifestUpdateMojo
      * @readonly
      */
     private MavenProject project;
+
     /**
      * The location of JavaHelp sources for the project. The documentation
      * itself is expected to be in the directory structure based on codenamebase of the module.
@@ -106,7 +117,7 @@ public class NetbeansManifestUpdateMojo
      * @since 2.7
      */
     protected File nbmJavahelpSource;
-    
+
     /**
      * Path to manifest file that will be used as base for the 
      *
@@ -114,7 +125,7 @@ public class NetbeansManifestUpdateMojo
      * @required
      */
     private File sourceManifestFile;
-    
+
     /**
      * Path to the generated MANIFEST file to use. It will be used by jar:jar plugin.
      *
@@ -170,13 +181,14 @@ public class NetbeansManifestUpdateMojo
     private DependencyTreeBuilder dependencyTreeBuilder;
 
     public void execute()
-            throws MojoExecutionException
+        throws MojoExecutionException
     {
         NetbeansModule module;
         if ( descriptor != null && descriptor.exists() )
         {
             module = readModuleDescriptor( descriptor );
-        } else
+        }
+        else
         {
             module = createDefaultDescriptor( project, false );
         }
@@ -190,8 +202,8 @@ public class NetbeansManifestUpdateMojo
 //<!-- if a netbeans specific manifest is defined, examine this one, otherwise the already included one.
 // ignoring the case when some of the netbeans attributes are already defined in the jar and more is included.
         File specialManifest = sourceManifestFile;
-        File nbmManifest = (module.getManifest() != null ? new File(
-                project.getBasedir(), module.getManifest() ) : null);
+        File nbmManifest = ( module.getManifest() != null ? new File(
+            project.getBasedir(), module.getManifest() ) : null );
         if ( nbmManifest != null && nbmManifest.exists() )
         {
             //deprecated, but if actually defined, will use it.
@@ -202,7 +214,8 @@ public class NetbeansManifestUpdateMojo
         {
             examinator.setManifestFile( specialManifest );
             examinator.checkFile();
-        } else
+        }
+        else
         {
 //            examinator.setJarFile( jarFile );
         }
@@ -216,75 +229,88 @@ public class NetbeansManifestUpdateMojo
             try
             {
                 reader = new InputStreamReader( new FileInputStream(
-                        specialManifest ) );
+                    specialManifest ) );
                 manifest = new Manifest( reader );
-            } catch ( IOException exc )
+            }
+            catch ( IOException exc )
             {
                 manifest = new Manifest();
                 getLog().warn( "Error reading manifest at " + specialManifest, exc );
-            } catch ( ManifestException ex )
+            }
+            catch ( ManifestException ex )
             {
                 getLog().warn( "Error reading manifest at " + specialManifest, ex );
                 manifest = new Manifest();
-            } finally
+            }
+            finally
             {
                 IOUtil.close( reader );
             }
-        } else
+        }
+        else
         {
             manifest = new Manifest();
         }
         String specVersion = AdaptNbVersion.adaptVersion( project.getVersion(),
-                AdaptNbVersion.TYPE_SPECIFICATION );
+            AdaptNbVersion.TYPE_SPECIFICATION );
         String implVersion = AdaptNbVersion.adaptVersion( project.getVersion(),
-                AdaptNbVersion.TYPE_IMPLEMENTATION );
+            AdaptNbVersion.TYPE_IMPLEMENTATION );
         Manifest.Section mainSection = manifest.getMainSection();
         conditionallyAddAttribute( mainSection,
-                "OpenIDE-Module-Specification-Version", specVersion );
+            "OpenIDE-Module-Specification-Version", specVersion );
         conditionallyAddAttribute( mainSection,
-                "OpenIDE-Module-Implementation-Version", implVersion );
+            "OpenIDE-Module-Implementation-Version", implVersion );
 //     create a timestamp value for OpenIDE-Module-Build-Version: manifest entry
         String timestamp = new SimpleDateFormat( "yyyyMMddhhmm" ).format(
-                new Date() );
+            new Date() );
         conditionallyAddAttribute( mainSection, "OpenIDE-Module-Build-Version",
-                timestamp );
-        conditionallyAddAttribute( mainSection, "OpenIDE-Module", moduleName );
+            timestamp );
+        String projectCNB = conditionallyAddAttribute( mainSection, "OpenIDE-Module", moduleName );
 
         //See http://www.netbeans.org/download/dev/javadoc/org-openide-modules/apichanges.html#split-of-openide-jar
         conditionallyAddAttribute( mainSection, "OpenIDE-Module-Requires",
-                "org.openide.modules.ModuleFormat1" );
+            "org.openide.modules.ModuleFormat1" );
 //        conditionallyAddAttribute(mainSection, "OpenIDE-Module-IDE-Dependencies", "IDE/1 > 3.40");
         // localization items
         if ( !examinator.isLocalized() )
         {
             conditionallyAddAttribute( mainSection,
-                    "OpenIDE-Module-Display-Category", project.getGroupId() );
+                "OpenIDE-Module-Display-Category", project.getGroupId() );
             conditionallyAddAttribute( mainSection, "OpenIDE-Module-Name",
-                    project.getName() );
+                project.getName() );
             conditionallyAddAttribute( mainSection,
-                    "OpenIDE-Module-Short-Description", project.getDescription() );
+                "OpenIDE-Module-Short-Description", project.getDescription() );
             conditionallyAddAttribute( mainSection,
-                    "OpenIDE-Module-Long-Description", project.getDescription() );
+                "OpenIDE-Module-Long-Description", project.getDescription() );
         }
         getLog().debug( "module =" + module );
         if ( module != null )
         {
-            DependencyNode treeroot = createDependencyTree(project, dependencyTreeBuilder, localRepository, artifactFactory, artifactMetadataSource, artifactCollector, "compile");
+            DependencyNode treeroot = createDependencyTree( project, dependencyTreeBuilder, localRepository,
+                artifactFactory, artifactMetadataSource, artifactCollector, "compile" );
             Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
-            List<Artifact> libArtifacts = getLibraryArtifacts(treeroot, module, project.getRuntimeArtifacts(), examinerCache, getLog());
-            List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts(treeroot, module, project, examinerCache, libArtifacts, getLog());
+            List<Artifact> libArtifacts = getLibraryArtifacts( treeroot, module, project.getRuntimeArtifacts(),
+                examinerCache, getLog() );
+            List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts( treeroot, module, project, examinerCache,
+                libArtifacts, getLog() );
             String classPath = "";
             String dependencies = "";
             String depSeparator = " ";
 
-            for (Artifact a : libArtifacts) {
+            for ( Artifact a : libArtifacts )
+            {
                 classPath = classPath + " ext/" + a.getFile().getName();
             }
 
-            for (ModuleWrapper wr : moduleArtifacts) {
+            for ( ModuleWrapper wr : moduleArtifacts )
+            {
+                if ( wr.transitive )
+                {
+                    continue;
+                }
                 Dependency dep = wr.dependency;
                 Artifact artifact = wr.artifact;
-                ExamineManifest depExaminator = examinerCache.get(artifact);
+                ExamineManifest depExaminator = examinerCache.get( artifact );
                 String type = dep.getType();
                 String depToken = dep.getExplicitValue();
                 if ( depToken == null )
@@ -292,57 +318,63 @@ public class NetbeansManifestUpdateMojo
                     if ( "loose".equals( type ) )
                     {
                         depToken = depExaminator.getModule();
-                    } else if ( "spec".equals( type ) )
+                    }
+                    else if ( "spec".equals( type ) )
                     {
                         depToken = depExaminator.getModule() + " > " +
-                                (depExaminator.isNetbeansModule() ? depExaminator.getSpecVersion() : AdaptNbVersion.adaptVersion(
-                                depExaminator.getSpecVersion(),
-                                AdaptNbVersion.TYPE_SPECIFICATION ));
-                    } else if ( "impl".equals( type ) )
+                            ( depExaminator.isNetbeansModule() ? depExaminator.getSpecVersion() : AdaptNbVersion.adaptVersion(
+                            depExaminator.getSpecVersion(),
+                            AdaptNbVersion.TYPE_SPECIFICATION ) );
+                    }
+                    else if ( "impl".equals( type ) )
                     {
                         depToken = depExaminator.getModule() + " = " +
-                                (depExaminator.isNetbeansModule() ? depExaminator.getImplVersion() : AdaptNbVersion.adaptVersion(
-                                depExaminator.getImplVersion(),
-                                AdaptNbVersion.TYPE_IMPLEMENTATION ));
-                    } else
+                            ( depExaminator.isNetbeansModule() ? depExaminator.getImplVersion() : AdaptNbVersion.adaptVersion(
+                            depExaminator.getImplVersion(),
+                            AdaptNbVersion.TYPE_IMPLEMENTATION ) );
+                    }
+                    else
                     {
                         throw new MojoExecutionException(
-                                "Wrong type of Netbeans dependency: " + type + " Allowed values are: loose, spec, impl." );
+                            "Wrong type of Netbeans dependency: " + type + " Allowed values are: loose, spec, impl." );
                     }
                 }
                 if ( depToken == null )
                 {
                     //TODO report
                     getLog().error(
-                            "Cannot properly resolve the netbeans dependency for " + dep.getId() );
-                } else
+                        "Cannot properly resolve the netbeans dependency for " + dep.getId() );
+                }
+                else
                 {
                     dependencies = dependencies + depSeparator + depToken;
                     depSeparator = ", ";
                 }
             }
+            try
+            {
+                checkModuleClassPath( treeroot, libArtifacts, examinerCache, moduleArtifacts, projectCNB );
+            }
+            catch ( IOException ex )
+            {
+                throw new MojoExecutionException( "Error while checking runtime dependencies", ex );
+            }
 
             if ( hasJavaHelp && nbmJavahelpSource.exists() )
             {
-                String moduleJarName = moduleName.replace( '.', '-' );
-                // it can happen the moduleName is in format org.milos/1
-                int index = moduleJarName.indexOf( '/' );
-                if ( index > -1 )
-                {
-                    moduleJarName = moduleJarName.substring( 0, index ).trim();
-                }
+                String moduleJarName = stripVersionFromCodebaseName( moduleName ).replace( ".", "-" );
                 classPath = classPath + " docs/" + moduleJarName + ".jar";
             }
 
             if ( classPath.length() > 0 )
             {
                 conditionallyAddAttribute( mainSection, "Class-Path",
-                        classPath.trim() );
+                    classPath.trim() );
             }
             if ( dependencies.length() > 0 )
             {
                 conditionallyAddAttribute( mainSection,
-                        "OpenIDE-Module-Module-Dependencies", dependencies );
+                    "OpenIDE-Module-Module-Dependencies", dependencies );
             }
 //            if ( librList.size() > 0 )
 //            {
@@ -363,17 +395,32 @@ public class NetbeansManifestUpdateMojo
                 targetManifestFile.getParentFile().mkdirs();
                 targetManifestFile.createNewFile();
             }
-            writer = new PrintWriter( targetManifestFile, "UTF-8"); //TODO really UTF-8??
+            writer = new PrintWriter( targetManifestFile, "UTF-8" ); //TODO really UTF-8??
             manifest.write( writer );
-        } catch ( IOException ex )
+        }
+        catch ( IOException ex )
         {
             throw new MojoExecutionException( ex.getMessage(), ex );
-        } finally {
+        }
+        finally
+        {
             IOUtil.close( writer );
         }
     }
 
-    private void conditionallyAddAttribute( Manifest.Section section, String key, String value )
+    private String stripVersionFromCodebaseName( String cnb )
+    {
+        // it can happen the moduleName is in format org.milos/1
+        String base = cnb;
+        int index = base.indexOf( '/' );
+        if ( index > -1 )
+        {
+            base = base.substring( 0, index ).trim();
+        }
+        return base;
+    }
+
+    private String conditionallyAddAttribute( Manifest.Section section, String key, String value )
     {
         Manifest.Attribute attr = section.getAttribute( key );
         if ( attr == null )
@@ -384,11 +431,241 @@ public class NetbeansManifestUpdateMojo
             try
             {
                 section.addConfiguredAttribute( attr );
-            } catch ( ManifestException ex )
+            }
+            catch ( ManifestException ex )
             {
                 getLog().error( "Cannot update manifest (key=" + key + ")" );
                 ex.printStackTrace();
             }
         }
+        return attr.getValue();
+    }
+
+//----------------------------------------------------------------------------------
+// classpat checking related.
+//----------------------------------------------------------------------------------
+    private void checkModuleClassPath( DependencyNode treeroot,
+        List<Artifact> libArtifacts,
+        Map<Artifact, ExamineManifest> examinerCache, List<ModuleWrapper> moduleArtifacts, String projectCodeNameBase ) throws IOException, MojoExecutionException
+    {
+        Set<String> deps = buildProjectDependencyClasses( project, libArtifacts );
+        deps.retainAll( allProjectClasses( project ) );
+
+        Set<String> own = projectModuleOwnClasses( project, libArtifacts );
+        deps.removeAll( own );
+        CollectModuleLibrariesNodeVisitor visitor = new CollectModuleLibrariesNodeVisitor(
+            project.getRuntimeArtifacts(), examinerCache, getLog(), treeroot );
+        treeroot.accept( visitor );
+        Map<String, List<Artifact>> modules = visitor.getDeclaredArtifacts();
+        Map<Artifact, Set<String>> moduleAllClasses = new HashMap<Artifact, Set<String>>();
+
+        for ( ModuleWrapper wr : moduleArtifacts )
+        {
+            if ( modules.containsKey( wr.artifact.getDependencyConflictId() ) )
+            {
+                ExamineManifest man = examinerCache.get( wr.artifact );
+                List<Artifact> arts = modules.get( wr.artifact.getDependencyConflictId() );
+                Set<String>[] classes = visibleModuleClasses( arts, man, wr.dependency, projectCodeNameBase );
+                deps.removeAll( classes[0] );
+                moduleAllClasses.put( wr.artifact, classes[1] );
+            }
+        }
+
+        if ( deps.size() > 0 )
+        {
+            //something is wrong.
+
+            Map<String, List<Artifact>> transmodules = visitor.getTransitiveArtifacts();
+            for ( ModuleWrapper wr : moduleArtifacts )
+            {
+                if ( transmodules.containsKey( wr.artifact.getDependencyConflictId() ) )
+                {
+                    ExamineManifest man = examinerCache.get( wr.artifact );
+                    List<Artifact> arts = transmodules.get( wr.artifact.getDependencyConflictId() );
+                    Set<String>[] classes = visibleModuleClasses( arts, man, wr.dependency, projectCodeNameBase );
+                    classes[0].retainAll( deps );
+                    if (classes[0].size() > 0) {
+                        getLog().error( "Project uses classes from transtive module " + wr.artifact.getId() + " which will not be accessible at runtime." );
+                        deps.removeAll( classes[0] );
+                    }
+                }
+            }
+            for ( Artifact a : moduleAllClasses.keySet() )
+            {
+                if ( deps.removeAll( moduleAllClasses.get( a ) ) )
+                {
+                    getLog().error( "Project depends on packages not accessible at runtime in module " + a.getId() );
+                }
+            }
+
+        }
+
+        //now we have the classes that are not in publick packages of declared modules,
+        //but are being used
+        System.out.println( "external classes=" + Arrays.toString( deps.toArray() ) );
+
+
+    }
+
+    /**
+     * The current projects's dependencies, includes classes used in teh module itself
+     * and the classpath libraries as well.
+     * @param project
+     * @param libraries
+     * @return
+     * @throws java.io.IOException
+     */
+    private Set<String> buildProjectDependencyClasses( MavenProject project, List<Artifact> libraries )
+        throws IOException
+    {
+        Set<String> dependencyClasses = new HashSet<String>();
+
+        String outputDirectory = project.getBuild().getOutputDirectory();
+        dependencyClasses.addAll( buildDependencyClasses( outputDirectory ) );
+
+        for ( Artifact lib : libraries )
+        {
+            dependencyClasses.addAll( buildDependencyClasses( lib.getFile().getAbsolutePath() ) );
+        }
+        return dependencyClasses;
+    }
+
+    private Set<String> projectModuleOwnClasses( MavenProject project, List<Artifact> libraries )
+        throws IOException
+    {
+        Set projectClasses = new HashSet();
+        DefaultClassAnalyzer analyzer = new DefaultClassAnalyzer();
+
+        String outputDirectory = project.getBuild().getOutputDirectory();
+        URL fl = new File( outputDirectory ).toURI().toURL();
+        projectClasses.addAll( analyzer.analyze( fl ) );
+
+        for ( Artifact lib : libraries )
+        {
+            URL url = lib.getFile().toURI().toURL();
+            projectClasses.addAll( analyzer.analyze( url ) );
+        }
+
+        return projectClasses;
+    }
+
+    /**
+     * complete list of classes on project runtime classpath (excluding
+     * jdk bit)
+     * @param project
+     * @return
+     * @throws java.io.IOException
+     */
+    private Set<String> allProjectClasses( MavenProject project )
+        throws IOException
+    {
+        Set projectClasses = new HashSet();
+        DefaultClassAnalyzer analyzer = new DefaultClassAnalyzer();
+
+        String outputDirectory = project.getBuild().getOutputDirectory();
+        URL fl = new File( outputDirectory ).toURI().toURL();
+        projectClasses.addAll( analyzer.analyze( fl ) );
+
+        List<Artifact> libs = project.getRuntimeArtifacts();
+
+        for ( Artifact lib : libs )
+        {
+            URL url = lib.getFile().toURI().toURL();
+            projectClasses.addAll( analyzer.analyze( url ) );
+        }
+
+        return projectClasses;
+    }
+
+    private Set<String>[] visibleModuleClasses( List<Artifact> moduleLibraries,
+        ExamineManifest manifest, Dependency dep, String projectCodeNameBase )
+        throws IOException, MojoExecutionException
+    {
+        Set<String> moduleClasses = new HashSet<String>();
+        Set<String> visibleModuleClasses = new HashSet<String>();
+        DefaultClassAnalyzer analyzer = new DefaultClassAnalyzer();
+        String type = dep.getType();
+        if ( dep.getExplicitValue() != null )
+        {
+            if ( dep.getExplicitValue().contains( "=" ) )
+            {
+                type = "impl";
+            }
+        }
+        if ( type == null || "loose".equals( type ) )
+        {
+            type = "spec";
+        }
+
+        for ( Artifact lib : moduleLibraries )
+        {
+            URL url = lib.getFile().toURI().toURL();
+            moduleClasses.addAll( analyzer.analyze( url ) );
+        }
+
+        if ( "spec".equals( type ) )
+        {
+            String cnb = stripVersionFromCodebaseName( projectCodeNameBase );
+            if ( manifest.hasFriendPackages() && !manifest.getFriends().contains( cnb ) )
+            {
+                throw new MojoExecutionException(
+                    "Module dependency has friend dependency on " + manifest.getModule() + "but is not listed as friend." );
+            }
+            List<Pattern> compiled = createCompiledPatternList( manifest.getPackages() );
+            for ( String clazz : moduleClasses )
+            {
+                for ( Pattern patt : compiled )
+                {
+                    if ( patt.matcher( clazz ).matches() )
+                    {
+                        visibleModuleClasses.add( clazz );
+                        break;
+                    }
+                }
+            }
+
+        }
+        else if ( "impl".equals( type ) )
+        {
+            visibleModuleClasses.addAll( moduleClasses );
+        }
+        else
+        {
+            //HUH?
+            throw new MojoExecutionException( "Wrong type of module dependency " + type );
+        }
+
+        return new Set[]
+            {
+                visibleModuleClasses,
+                moduleClasses
+            };
+    }
+
+    static List<Pattern> createCompiledPatternList( List<String> packages )
+    {
+        List<Pattern> toRet = new ArrayList<Pattern>();
+        for ( String token : packages )
+        {
+            if ( token.endsWith( ".**" ) )
+            {
+                String patt = "^" + Pattern.quote( token.substring( 0, token.length() - 2 ) ) + "(.+)";
+                toRet.add( 0, Pattern.compile( patt ) );
+            }
+            else
+            {
+                String patt = "^" + Pattern.quote( token.substring( 0, token.length() - 1 ) ) + "([^\\.]+)";
+                toRet.add( Pattern.compile( patt ) );
+            }
+        }
+        return toRet;
+    }
+
+    private Set<String> buildDependencyClasses( String path )
+        throws IOException
+    {
+        URL url = new File( path ).toURI().toURL();
+        ASMDependencyAnalyzer dependencyAnalyzer = new ASMDependencyAnalyzer();
+        return dependencyAnalyzer.analyze( url );
     }
 }

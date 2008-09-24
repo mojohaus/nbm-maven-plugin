@@ -117,15 +117,6 @@ public class AbstractNbmMojoTest extends TestCase {
         result = AbstractNbmMojo.resolveNetbeansDependency(artifact, deps, manifest, log);
         assertNotNull("nbm type is a netbeans module", result);
 
-        manifest = createModule();
-        artifact = createArtifact("group", "artifact", "1.0", "jar", "compile");
-        artifact.setDependencyTrail(Arrays.asList(new String[] {
-            "1",
-            "2",
-            "3"
-        })); //transitive artifact
-        result = AbstractNbmMojo.resolveNetbeansDependency(artifact, deps, manifest, log);
-        assertNull("is a netbeans module but transitive, skip", result);
 
         artifact = createArtifact("group", "artifact", "1.0", "jar", "compile");
         deps = new ArrayList();

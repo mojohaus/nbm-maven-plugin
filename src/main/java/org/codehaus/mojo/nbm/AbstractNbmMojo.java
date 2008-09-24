@@ -158,13 +158,6 @@ public abstract class AbstractNbmMojo
             log.debug( "Adding nbm module dependency - " + id );
             return dep;
         }
-        //only direct deps matter to us..
-        if ( manifest.isNetbeansModule() && artifact.getDependencyTrail().size() > 2 )
-        {
-            log.debug(
-                    id + " omitted as NetBeans module dependency, not a direct one. Declare it in the pom for inclusion." );
-            return null;
-        }
         if ( manifest.isNetbeansModule() )
         {
             Dependency dep = new Dependency();
@@ -290,7 +283,16 @@ public abstract class AbstractNbmMojo
                     ModuleWrapper wr = new ModuleWrapper();
                     wr.dependency = dep;
                     wr.artifact = artifact;
-                    include.add(wr);
+                    wr.transitive = false;
+                    //only direct deps matter to us..
+                    if ( depExaminator.isNetbeansModule() && artifact.getDependencyTrail().size() > 2 )
+                    {
+                        log.debug(
+                            artifact.getId() + " omitted as NetBeans module dependency, not a direct one. Declare it in the pom for inclusion." );
+                        wr.transitive = true;
+
+                    }
+                    include.add( wr );
                 }
             }
         }
@@ -300,6 +302,7 @@ public abstract class AbstractNbmMojo
     static class ModuleWrapper {
         Dependency dependency;
         Artifact artifact;
+        boolean transitive = true;
     }
 
     //copied from dependency:tree mojo
