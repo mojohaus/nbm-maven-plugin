@@ -85,7 +85,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @aggregator
  */
 public class PopulateRepositoryMojo
-        extends AbstractNbmMojo
+    extends AbstractNbmMojo
 {
 
     /**
@@ -94,12 +94,14 @@ public class PopulateRepositoryMojo
      * @parameter expression="${deployUrl}"
      */
     private String deployUrl;
+
     /**
      * Location of netbeans installation
      *
      * @parameter expression="${netbeansInstallDirectory}"
      */
     protected String netbeansInstallDirectory;
+
     /**
      * If you want to install/deploy also netbeans api javadocs, download the javadoc zip file from netbeans.org
      * expand it to a directory, it should contain multiple zip files. Define this parameter as absolute path to the zip files folder.
@@ -107,6 +109,7 @@ public class PopulateRepositoryMojo
      * @parameter expression="${netbeansJavadocDirectory}"
      */
     protected String netbeansJavadocDirectory;
+
     /**
      * Assumes a folder with &lt;code-name-base&gt;.zip files containing sources for modules.
      * @parameter expression="${netbeansSourcesDirectory}"
@@ -122,6 +125,7 @@ public class PopulateRepositoryMojo
      * @since 3.0
      */
     protected String nbmDirectory;
+
     /**
      * Optional parameter, when specified, will force all modules to have the designated version.
      * Good when depending on releases. Then you would for example specify RELEASE50 in this parameter and
@@ -129,7 +133,7 @@ public class PopulateRepositoryMojo
      * @parameter expression="${forcedVersion}"
      */
     protected String forcedVersion;
-    
+
     /**
      * Optional parameter, when specified it shall point to a directory containing a
      * Nexus Lucene index. This index will be used to find external libraries that
@@ -146,7 +150,6 @@ public class PopulateRepositoryMojo
     private File nexusIndexDirectory;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
-
     /**
      * Local maven repository.
      *
@@ -162,18 +165,21 @@ public class PopulateRepositoryMojo
      * @component
      */
     private ArtifactFactory artifactFactory;
+
     /**
      * Maven ArtifactInstaller.
      *
      * @component
      */
     private ArtifactInstaller artifactInstaller;
+
     /**
      * Maven ArtifactDeployer.
      *
      * @component
      */
     private ArtifactDeployer artifactDeployer;
+
     /**
      * Maven ArtifactRepositoryFactory.
      *
@@ -182,7 +188,6 @@ public class PopulateRepositoryMojo
     private ArtifactRepositoryFactory repositoryFactory;
 // end of component params custom code folding
 // </editor-fold>
-
 
     public void execute() throws MojoExecutionException
     {
@@ -193,7 +198,7 @@ public class PopulateRepositoryMojo
         {
             ArtifactRepositoryLayout layout = new DefaultRepositoryLayout();
             deploymentRepository = repositoryFactory.createDeploymentArtifactRepository(
-                    "netbeans", deployUrl, layout, true );
+                "netbeans", deployUrl, layout, true );
         }
 
 
@@ -205,7 +210,8 @@ public class PopulateRepositoryMojo
             try
             {
                 input.execute();
-            } catch ( BuildException e )
+            }
+            catch ( BuildException e )
             {
                 getLog().error( "Cannot run ant:input" );
                 throw new MojoExecutionException( e.getMessage(), e );
@@ -219,10 +225,10 @@ public class PopulateRepositoryMojo
         {
             getLog().error( "Netbeans installation doesn't exist." );
             throw new MojoExecutionException(
-                    "Netbeans installation doesn't exist." );
+                "Netbeans installation doesn't exist." );
         }
         getLog().info(
-                "Copying Netbeans artifacts from " + netbeansInstallDirectory );
+            "Copying Netbeans artifacts from " + netbeansInstallDirectory );
 
         PathConvert convert = (PathConvert) antProject.createTask( "pathconvert" );
         convert.setPathSep( "," );
@@ -239,7 +245,8 @@ public class PopulateRepositoryMojo
         try
         {
             convert.execute();
-        } catch ( BuildException e )
+        }
+        catch ( BuildException e )
         {
             getLog().error( "Cannot run ant:pathconvert" );
             throw new MojoExecutionException( e.getMessage(), e );
@@ -254,7 +261,7 @@ public class PopulateRepositoryMojo
             String token = tok.nextToken();
             File module = new File( token );
             String clust = module.getAbsolutePath().substring(
-                    rootDir.getAbsolutePath().length() + 1 );
+                rootDir.getAbsolutePath().length() + 1 );
             clust = clust.substring( 0, clust.indexOf( File.separator ) );
             ExamineManifest examinator = new ExamineManifest( getLog() );
             examinator.setPopulateDependencies( true );
@@ -264,7 +271,7 @@ public class PopulateRepositoryMojo
             {
                 //TODO get artifact id from the module's manifest?
                 String artifact = module.getName().substring( 0,
-                        module.getName().indexOf( ".jar" ) );
+                    module.getName().indexOf( ".jar" ) );
                 if ( "boot".equals( artifact ) )
                 {
                     artifact = "org-netbeans-bootstrap";
@@ -274,7 +281,7 @@ public class PopulateRepositoryMojo
                     artifact = "org-netbeans-core-startup";
                 }
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
-                String group = "org.netbeans." + (examinator.hasPublicPackages() ? "api" : "modules");
+                String group = "org.netbeans." + ( examinator.hasPublicPackages() ? "api" : "modules" );
                 String m = examinator.getModule();
                 int slash = m.indexOf( "/" );
                 if ( slash > 0 )
@@ -285,7 +292,7 @@ public class PopulateRepositoryMojo
                 examinator.setModule( m );
                 Artifact art = createArtifact( artifact, version, group );
                 ModuleWrapper wr = new ModuleWrapper( artifact, version, group,
-                        examinator, module );
+                    examinator, module );
                 wr.setCluster( clust );
                 moduleDefinitions.put( wr, art );
                 Collection col = (Collection) clusters.get( clust );
@@ -309,7 +316,7 @@ public class PopulateRepositoryMojo
             {
                 javadocRoot = null;
                 throw new MojoExecutionException(
-                        "The netbeansJavadocDirectory parameter doesn't point to an existing folder" );
+                    "The netbeansJavadocDirectory parameter doesn't point to an existing folder" );
             }
         }
         File sourceRoot = null;
@@ -320,7 +327,7 @@ public class PopulateRepositoryMojo
             {
                 sourceRoot = null;
                 throw new MojoExecutionException(
-                        "The netbeansSourceDirectory parameter doesn't point to an existing folder" );
+                    "The netbeansSourceDirectory parameter doesn't point to an existing folder" );
             }
         }
 
@@ -332,141 +339,154 @@ public class PopulateRepositoryMojo
             {
                 nbmRoot = null;
                 throw new MojoExecutionException(
-                        "The nbmDirectory parameter doesn't point to an existing folder" );
+                    "The nbmDirectory parameter doesn't point to an existing folder" );
             }
         }
 
         List externals = new ArrayList();
         IndexReader nexusReader = null;
         IndexSearcher searcher = null;
-        if (nexusIndexDirectory != null && nexusIndexDirectory.exists()) {
-            try {
-                Directory nexusDir = FSDirectory.getDirectory(nexusIndexDirectory);
-                nexusReader = IndexReader.open( nexusDir );
-                searcher = new IndexSearcher(nexusReader);
-            } catch (IOException ex) {
-                Logger.getLogger(PopulateRepositoryMojo.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-        }
-        try {
-        while ( it.hasNext() )
+        if ( nexusIndexDirectory != null && nexusIndexDirectory.exists() )
         {
-            Map.Entry elem = (Map.Entry) it.next();
-            ModuleWrapper man = (ModuleWrapper) elem.getKey();
-            Artifact art = (Artifact) elem.getValue();
-            index = index + 1;
-            getLog().info( "Processing " + index + "/" + count );
-            File pom = createMavenProject( man, wrapperList, externals, searcher );
-            ArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
-            art.addMetadata( metadata );
-            File javadoc = null;
-            Artifact javadocArt = null;
-            if ( javadocRoot != null )
+            try
             {
-                File zip = new File( javadocRoot, art.getArtifactId() + ".zip" );
-                if ( zip.exists() )
+                Directory nexusDir = FSDirectory.getDirectory( nexusIndexDirectory );
+                nexusReader = IndexReader.open( nexusDir );
+                searcher = new IndexSearcher( nexusReader );
+            }
+            catch ( IOException ex )
+            {
+                Logger.getLogger( PopulateRepositoryMojo.class.getName() ).log( Level.SEVERE, null, ex );
+            }
+
+        }
+        try
+        {
+            while ( it.hasNext() )
+            {
+                Map.Entry elem = (Map.Entry) it.next();
+                ModuleWrapper man = (ModuleWrapper) elem.getKey();
+                Artifact art = (Artifact) elem.getValue();
+                index = index + 1;
+                getLog().info( "Processing " + index + "/" + count );
+                File pom = createMavenProject( man, wrapperList, externals, searcher );
+                ArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
+                art.addMetadata( metadata );
+                File javadoc = null;
+                Artifact javadocArt = null;
+                if ( javadocRoot != null )
                 {
-                    javadoc = zip;
-                    javadocArt = artifactFactory.createArtifactWithClassifier(
+                    File zip = new File( javadocRoot, art.getArtifactId() + ".zip" );
+                    if ( zip.exists() )
+                    {
+                        javadoc = zip;
+                        javadocArt = artifactFactory.createArtifactWithClassifier(
                             art.getGroupId(),
                             art.getArtifactId(),
                             art.getVersion(),
                             "jar", "javadoc" );
+                    }
                 }
-            }
-            File source = null;
-            Artifact sourceArt = null;
-            if ( sourceRoot != null )
-            {
-                File zip = new File( sourceRoot, art.getArtifactId() + ".zip" );
-                if ( zip.exists() )
+                File source = null;
+                Artifact sourceArt = null;
+                if ( sourceRoot != null )
                 {
-                    source = zip;
-                    sourceArt = artifactFactory.createArtifactWithClassifier(
+                    File zip = new File( sourceRoot, art.getArtifactId() + ".zip" );
+                    if ( zip.exists() )
+                    {
+                        source = zip;
+                        sourceArt = artifactFactory.createArtifactWithClassifier(
                             art.getGroupId(),
                             art.getArtifactId(),
                             art.getVersion(),
                             "jar", "sources" );
+                    }
                 }
-            }
-            File nbm = null;
-            Artifact nbmArt = null;
-            if ( nbmRoot != null )
-            {
-                File zip = new File( nbmRoot, art.getArtifactId() + ".nbm" );
+                File nbm = null;
+                Artifact nbmArt = null;
+                if ( nbmRoot != null )
+                {
+                    File zip = new File( nbmRoot, art.getArtifactId() + ".nbm" );
 
-                if ( !zip.exists() )
-                {
-                    zip = new File( nbmRoot,
+                    if ( !zip.exists() )
+                    {
+                        zip = new File( nbmRoot,
                             man.getCluster() + File.separator + art.getArtifactId() + ".nbm" );
-                }
-                if ( zip.exists() )
-                {
-                    nbm = zip;
-                    nbmArt = artifactFactory.createArtifact( art.getGroupId(),
+                    }
+                    if ( zip.exists() )
+                    {
+                        nbm = zip;
+                        nbmArt = artifactFactory.createArtifact( art.getGroupId(),
                             art.getArtifactId(),
                             art.getVersion(),
                             "compile", "nbm" );
+                    }
                 }
-            }
 
-            try
-            {
-                if ( javadoc != null )
-                {
-                    artifactInstaller.install( javadoc, javadocArt,
-                            localRepository );
-                }
-                if ( source != null )
-                {
-                    artifactInstaller.install( source, sourceArt,
-                            localRepository );
-                }
-                if ( nbm != null )
-                {
-                    artifactInstaller.install( nbm, nbmArt, localRepository );
-                }
-                artifactInstaller.install( man.getFile(), art, localRepository );
-            } catch ( ArtifactInstallationException e )
-            {
-                // TODO: install exception that does not give a trace
-                throw new MojoExecutionException( "Error installing artifact", e );
-            }
-            try
-            {
-                if ( deploymentRepository != null )
+                try
                 {
                     if ( javadoc != null )
                     {
-                        artifactDeployer.deploy( javadoc, javadocArt,
-                                deploymentRepository, localRepository );
+                        artifactInstaller.install( javadoc, javadocArt,
+                            localRepository );
                     }
                     if ( source != null )
                     {
-                        artifactDeployer.deploy( source, sourceArt,
-                                deploymentRepository, localRepository );
+                        artifactInstaller.install( source, sourceArt,
+                            localRepository );
                     }
                     if ( nbm != null )
                     {
-                        artifactDeployer.deploy( nbm, nbmArt,
-                                deploymentRepository, localRepository );
+                        artifactInstaller.install( nbm, nbmArt, localRepository );
                     }
-                    artifactDeployer.deploy( man.getFile(), art,
-                            deploymentRepository, localRepository );
+                    artifactInstaller.install( man.getFile(), art, localRepository );
                 }
-            } catch ( ArtifactDeploymentException ex )
-            {
-                throw new MojoExecutionException( "Error Deploying artifact", ex );
-            }
+                catch ( ArtifactInstallationException e )
+                {
+                    // TODO: install exception that does not give a trace
+                    throw new MojoExecutionException( "Error installing artifact", e );
+                }
+                try
+                {
+                    if ( deploymentRepository != null )
+                    {
+                        if ( javadoc != null )
+                        {
+                            artifactDeployer.deploy( javadoc, javadocArt,
+                                deploymentRepository, localRepository );
+                        }
+                        if ( source != null )
+                        {
+                            artifactDeployer.deploy( source, sourceArt,
+                                deploymentRepository, localRepository );
+                        }
+                        if ( nbm != null )
+                        {
+                            artifactDeployer.deploy( nbm, nbmArt,
+                                deploymentRepository, localRepository );
+                        }
+                        artifactDeployer.deploy( man.getFile(), art,
+                            deploymentRepository, localRepository );
+                    }
+                }
+                catch ( ArtifactDeploymentException ex )
+                {
+                    throw new MojoExecutionException( "Error Deploying artifact", ex );
+                }
 
+            }
         }
-        } finally {
-            if (searcher != null) {
-                try {
+        finally
+        {
+            if ( searcher != null )
+            {
+                try
+                {
                     searcher.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(PopulateRepositoryMojo.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                catch ( IOException ex )
+                {
+                    Logger.getLogger( PopulateRepositoryMojo.class.getName() ).log( Level.SEVERE, null, ex );
                 }
             }
         }
@@ -509,11 +529,12 @@ public class PopulateRepositoryMojo
                 }
             }
         }
-        
+
         if ( forcedVersion == null )
         {
             getLog().warn( "Version not specified, cannot create cluster POMs." );
-        } else
+        }
+        else
         {
             it = clusters.entrySet().iterator();
             while ( it.hasNext() )
@@ -525,35 +546,37 @@ public class PopulateRepositoryMojo
                 Artifact art = createClusterArtifact( cluster, forcedVersion );
                 File pom = createClusterProject( art, modules );
                 ProjectArtifactMetadata metadata = new ProjectArtifactMetadata(
-                        art, pom );
+                    art, pom );
                 art.addMetadata( metadata );
                 try
                 {
                     artifactInstaller.install( pom, art, localRepository );
-                } catch ( ArtifactInstallationException e )
+                }
+                catch ( ArtifactInstallationException e )
                 {
                     // TODO: install exception that does not give a trace
                     throw new MojoExecutionException(
-                            "Error installing artifact", e );
+                        "Error installing artifact", e );
                 }
                 try
                 {
                     if ( deploymentRepository != null )
                     {
                         artifactDeployer.deploy( pom, art, deploymentRepository,
-                                localRepository );
+                            localRepository );
                     }
-                } catch ( ArtifactDeploymentException ex )
+                }
+                catch ( ArtifactDeploymentException ex )
                 {
                     throw new MojoExecutionException( "Error Deploying artifact",
-                            ex );
+                        ex );
                 }
             }
 
         }
     }
 
-    private File createMavenProject( ModuleWrapper wrapper, List wrapperList , List externalsList, IndexSearcher searcher )
+    private File createMavenProject( ModuleWrapper wrapper, List wrapperList, List externalsList, IndexSearcher searcher )
     {
         Model mavenModel = new Model();
 
@@ -578,7 +601,7 @@ public class PopulateRepositoryMojo
                     wr = (ModuleWrapper) wrapperList.get( index );
                     //we don't want the API modules to depend on non-api ones..
                     // otherwise the transitive dependency mechanism pollutes your classpath..
-                    if ( (wr.getModuleManifest().hasPublicPackages() && wrapper.getModuleManifest().hasPublicPackages()) || !wrapper.getModuleManifest().hasPublicPackages() )
+                    if ( ( wr.getModuleManifest().hasPublicPackages() && wrapper.getModuleManifest().hasPublicPackages() ) || !wrapper.getModuleManifest().hasPublicPackages() )
                     {
                         Dependency dep = new Dependency();
                         dep.setArtifactId( wr.getArtifact() );
@@ -589,88 +612,93 @@ public class PopulateRepositoryMojo
 //                      dep.setOptional(true);
                         deps.add( dep );
                     }
-                } else
+                }
+                else
                 {
                     getLog().warn(
-                            "No module found for dependency '" + elem + "'" );
+                        "No module found for dependency '" + elem + "'" );
                 }
             }
         }
         //need some generic way to handle Classpath: items.
-            //how to figure the right version?
-            String cp = wrapper.getModuleManifest().getClasspath();
-            if ( cp != null )
+        //how to figure the right version?
+        String cp = wrapper.getModuleManifest().getClasspath();
+        if ( cp != null )
+        {
+            StringTokenizer tok = new StringTokenizer( cp );
+            while ( tok.hasMoreTokens() )
             {
-                StringTokenizer tok = new StringTokenizer( cp );
-                while ( tok.hasMoreTokens() )
+                String path = tok.nextToken();
+                File f = new File( wrapper.getFile().getParentFile(), path );
+                if ( f.exists() )
                 {
-                    String path = tok.nextToken();
-                    File f = new File( wrapper.getFile().getParentFile(), path );
-                    if ( f.exists() )
+                    FileInputStream fis = null;
+                    DigestOutputStream os = null;
+                    boolean added = false;
+                    if ( searcher != null )
                     {
-                        FileInputStream fis = null;
-                        DigestOutputStream os = null;
-                        boolean added = false;
-                        if ( searcher != null )
+                        try
                         {
-                            try
+                            MessageDigest shaDig = MessageDigest.getInstance(
+                                "SHA1" );
+                            fis = new FileInputStream( f );
+                            os = new DigestOutputStream( new NullOutputStream(),
+                                shaDig );
+                            IOUtil.copy( fis, os );
+                            IOUtil.close( fis );
+                            IOUtil.close( os );
+                            String sha = encode( shaDig.digest() );
+                            TermQuery q = new TermQuery( new Term( "1", sha ) );
+                            Hits hits = searcher.search( q );
+                            if ( hits.length() == 1 )
                             {
-                                MessageDigest shaDig = MessageDigest.getInstance(
-                                    "SHA1" );
-                                fis = new FileInputStream( f );
-                                os = new DigestOutputStream( new NullOutputStream(),
-                                    shaDig );
-                                IOUtil.copy( fis, os );
-                                IOUtil.close( fis );
-                                IOUtil.close( os );
-                                String sha = encode( shaDig.digest() );
-                                TermQuery q = new TermQuery(new Term("1", sha));
-                                Hits hits = searcher.search( q );
-                                if (hits.length() == 1) {
-                                    Document doc = hits.doc( 0 );
-                                    Field idField = doc.getField( "u" );
-                                    if (idField != null) {
-                                        String id = idField.stringValue();
-                                        String[] splits = StringUtils.split( id, "|");
-                                        Dependency dep = new Dependency();
-                                        dep.setArtifactId( splits[1] );
-                                        dep.setGroupId( splits[0] );
-                                        dep.setVersion( splits[2] );
-                                        dep.setType( "jar" );
-                                        if (splits.length > 3 && !"NA".equals( splits[3] )) {
-                                            dep.setClassifier( splits[3] );
-                                        }
-                                        deps.add(dep);
-                                        added = true;
+                                Document doc = hits.doc( 0 );
+                                Field idField = doc.getField( "u" );
+                                if ( idField != null )
+                                {
+                                    String id = idField.stringValue();
+                                    String[] splits = StringUtils.split( id, "|" );
+                                    Dependency dep = new Dependency();
+                                    dep.setArtifactId( splits[1] );
+                                    dep.setGroupId( splits[0] );
+                                    dep.setVersion( splits[2] );
+                                    dep.setType( "jar" );
+                                    if ( splits.length > 3 && !"NA".equals( splits[3] ) )
+                                    {
+                                        dep.setClassifier( splits[3] );
                                     }
+                                    deps.add( dep );
+                                    added = true;
                                 }
                             }
-                            catch ( Exception x )
-                            {
-                                x.printStackTrace();
-                            }
                         }
-                        if ( !added )
+                        catch ( Exception x )
                         {
-                            ExternalsWrapper ex = new ExternalsWrapper();
-                            ex.setFile( f );
-                            String artId = f.getName();
-                            if (artId.endsWith( ".jar")) {
-                                artId = artId.substring( 0, artId.length() - ".jar".length());
-                            }
-                            ex.setVersion( wrapper.getVersion() );
-                            ex.setArtifact( artId );
-                            ex.setGroupid( "org.netbeans.external" );
-                            externalsList.add( ex );
-                            Dependency dep = new Dependency();
-                            dep.setArtifactId( artId );
-                            dep.setGroupId( "org.netbeans.external" );
-                            dep.setVersion( wrapper.getVersion() );
-                            dep.setType( "jar" );
-                            deps.add( dep );
+                            x.printStackTrace();
                         }
                     }
+                    if ( !added )
+                    {
+                        ExternalsWrapper ex = new ExternalsWrapper();
+                        ex.setFile( f );
+                        String artId = f.getName();
+                        if ( artId.endsWith( ".jar" ) )
+                        {
+                            artId = artId.substring( 0, artId.length() - ".jar".length() );
+                        }
+                        ex.setVersion( wrapper.getVersion() );
+                        ex.setArtifact( artId );
+                        ex.setGroupid( "org.netbeans.external" );
+                        externalsList.add( ex );
+                        Dependency dep = new Dependency();
+                        dep.setArtifactId( artId );
+                        dep.setGroupId( "org.netbeans.external" );
+                        dep.setVersion( wrapper.getVersion() );
+                        dep.setType( "jar" );
+                        deps.add( dep );
+                    }
                 }
+            }
         }
 
         mavenModel.setDependencies( deps );
@@ -682,18 +710,21 @@ public class PopulateRepositoryMojo
             fil = File.createTempFile( "maven", "pom" );
             writer = new FileWriter( fil );
             xpp.write( writer, mavenModel );
-        } catch ( IOException ex )
+        }
+        catch ( IOException ex )
         {
             ex.printStackTrace();
 
-        } finally
+        }
+        finally
         {
             if ( writer != null )
             {
                 try
                 {
                     writer.close();
-                } catch ( IOException io )
+                }
+                catch ( IOException io )
                 {
                     io.printStackTrace();
                 }
@@ -701,8 +732,9 @@ public class PopulateRepositoryMojo
         }
         return fil;
     }
-    
-    File createExternalProject( ExternalsWrapper wrapper ) {
+
+    File createExternalProject( ExternalsWrapper wrapper )
+    {
         Model mavenModel = new Model();
 
         mavenModel.setGroupId( wrapper.getGroupid() );
@@ -710,8 +742,10 @@ public class PopulateRepositoryMojo
         mavenModel.setVersion( wrapper.getVersion() );
         mavenModel.setPackaging( "jar" );
         mavenModel.setModelVersion( "4.0.0" );
-        mavenModel.setName( "Maven definition for " + wrapper.getFile().getName() + " - external part of NetBeans module.");
-        mavenModel.setDescription( "POM and identification for artifact that was not possible to uniquely identify as a maven dependency.");
+        mavenModel.setName( 
+            "Maven definition for " + wrapper.getFile().getName() + " - external part of NetBeans module." );
+        mavenModel.setDescription( 
+            "POM and identification for artifact that was not possible to uniquely identify as a maven dependency." );
         FileWriter writer = null;
         File fil = null;
         try
@@ -720,25 +754,28 @@ public class PopulateRepositoryMojo
             fil = File.createTempFile( "maven", "pom" );
             writer = new FileWriter( fil );
             xpp.write( writer, mavenModel );
-        } catch ( IOException ex )
+        }
+        catch ( IOException ex )
         {
             ex.printStackTrace();
 
-        } finally
+        }
+        finally
         {
             if ( writer != null )
             {
                 try
                 {
                     writer.close();
-                } catch ( IOException io )
+                }
+                catch ( IOException io )
                 {
                     io.printStackTrace();
                 }
             }
         }
         return fil;
-        
+
     }
 
     private File createClusterProject( Artifact cluster, Collection mods )
@@ -783,18 +820,21 @@ public class PopulateRepositoryMojo
             fil = File.createTempFile( "maven", "pom" );
             writer = new FileWriter( fil );
             xpp.write( writer, mavenModel );
-        } catch ( IOException ex )
+        }
+        catch ( IOException ex )
         {
             ex.printStackTrace();
 
-        } finally
+        }
+        finally
         {
             if ( writer != null )
             {
                 try
                 {
                     writer.close();
-                } catch ( IOException io )
+                }
+                catch ( IOException io )
                 {
                     io.printStackTrace();
                 }
@@ -806,65 +846,82 @@ public class PopulateRepositoryMojo
     private Artifact createArtifact( String artifact, String version, String group )
     {
         return artifactFactory.createBuildArtifact( group, artifact, version,
-                "jar" );
+            "jar" );
     }
 
     private Artifact createClusterArtifact( String artifact, String version )
     {
         return artifactFactory.createBuildArtifact( "org.netbeans.cluster",
-                artifact, version, "pom" );
+            artifact, version, "pom" );
     }
 
-    private class ExternalsWrapper 
+    private class ExternalsWrapper
     {
+
         private File file;
+
         private String artifact;
+
         private String groupid;
 
-        public String getArtifact() {
+        public String getArtifact()
+        {
             return artifact;
         }
 
-        public void setArtifact(String artifact) {
+        public void setArtifact( String artifact )
+        {
             this.artifact = artifact;
         }
 
-        public File getFile() {
+        public File getFile()
+        {
             return file;
         }
 
-        public void setFile(File file) {
+        public void setFile( File file )
+        {
             this.file = file;
         }
 
-        public String getGroupid() {
+        public String getGroupid()
+        {
             return groupid;
         }
 
-        public void setGroupid(String groupid) {
+        public void setGroupid( String groupid )
+        {
             this.groupid = groupid;
         }
 
-        public String getVersion() {
+        public String getVersion()
+        {
             return version;
         }
 
-        public void setVersion(String version) {
+        public void setVersion( String version )
+        {
             this.version = version;
         }
         private String version;
-        
+
     }
-    
+
     private class ModuleWrapper
     {
 
         ExamineManifest man;
+
         private String artifact;
+
         private String version;
+
         private String group;
+
         private File file;
+
         private String cluster;
+
         String module;
 
         public ModuleWrapper( String module )
@@ -888,7 +945,7 @@ public class PopulateRepositoryMojo
 
         public boolean equals( Object obj )
         {
-            return getModule().equals( ((ModuleWrapper) obj).getModule() );
+            return getModule().equals( ( (ModuleWrapper) obj ).getModule() );
         }
 
         public String getModule()
@@ -933,7 +990,7 @@ public class PopulateRepositoryMojo
     }
 
     private static class NullOutputStream
-            extends OutputStream
+        extends OutputStream
     {
 
         public void write( int b ) throws IOException
@@ -953,7 +1010,7 @@ public class PopulateRepositoryMojo
         {
             int bitLength = binaryData.length * 8;
             throw new IllegalArgumentException(
-                    "Unrecognised length for binary data: " + bitLength + " bits" );
+                "Unrecognised length for binary data: " + bitLength + " bits" );
         }
 
         String retValue = "";
@@ -964,8 +1021,9 @@ public class PopulateRepositoryMojo
 
             if ( t.length() == 1 )
             {
-                retValue += ("0" + t);
-            } else
+                retValue += ( "0" + t );
+            }
+            else
             {
                 retValue += t;
             }

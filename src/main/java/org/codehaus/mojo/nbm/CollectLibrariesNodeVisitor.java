@@ -33,35 +33,45 @@ import org.apache.maven.shared.dependency.tree.traversal.DependencyNodeVisitor;
  * children of known libraries
  * @author milos kleint
  */
-public class CollectLibrariesNodeVisitor implements DependencyNodeVisitor
+public class CollectLibrariesNodeVisitor
+    implements DependencyNodeVisitor
 {
 
     /**
      * The collected list of nodes.
      */
     private final List<Artifact> nodes;
+
     private Map<String, Artifact> artifacts;
+
     private Map<Artifact, ExamineManifest> examinerCache;
+
     private List<String> explicitLibs;
+
     private final Log log;
+
     private MojoExecutionException throwable;
+
     private DependencyNode root;
 
     private Set<String> duplicates;
+
     private Set<String> conflicts;
+
     private Set<String> includes;
 
     /**
      * Creates a dependency node visitor that collects visited nodes for further processing.
      */
-    public CollectLibrariesNodeVisitor(List<String> explicitLibraries,
-            List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
-            Log log, DependencyNode root)
+    public CollectLibrariesNodeVisitor( List<String> explicitLibraries,
+        List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
+        Log log, DependencyNode root )
     {
         nodes = new ArrayList<Artifact>();
         artifacts = new HashMap<String, Artifact>();
-        for (Artifact a : runtimeArtifacts) {
-            artifacts.put( a.getDependencyConflictId(), a);
+        for ( Artifact a : runtimeArtifacts )
+        {
+            artifacts.put( a.getDependencyConflictId(), a );
         }
         this.examinerCache = examinerCache;
         this.explicitLibs = explicitLibraries;
@@ -77,25 +87,30 @@ public class CollectLibrariesNodeVisitor implements DependencyNodeVisitor
      */
     public boolean visit( DependencyNode node )
     {
-        if (throwable != null) {
+        if ( throwable != null )
+        {
             return false;
         }
-        if (root == node) {
+        if ( root == node )
+        {
             return true;
         }
         try
         {
             Artifact artifact = node.getArtifact();
-            if (!artifacts.containsKey( artifact.getDependencyConflictId() )) {
+            if ( !artifacts.containsKey( artifact.getDependencyConflictId() ) )
+            {
                 //ignore non-runtime stuff..
                 return false;
             }
-            if ( node.getState() != DependencyNode.INCLUDED)
+            if ( node.getState() != DependencyNode.INCLUDED )
             {
-                if (node.getState() == DependencyNode.OMITTED_FOR_DUPLICATE) {
+                if ( node.getState() == DependencyNode.OMITTED_FOR_DUPLICATE )
+                {
                     duplicates.add( artifact.getDependencyConflictId() );
                 }
-                if (node.getState() == DependencyNode.OMITTED_FOR_CONFLICT) {
+                if ( node.getState() == DependencyNode.OMITTED_FOR_CONFLICT )
+                {
                     conflicts.add( artifact.getDependencyConflictId() );
                 }
                 return true;
@@ -142,14 +157,17 @@ public class CollectLibrariesNodeVisitor implements DependencyNodeVisitor
         {
             return false;
         }
-        if (node == root) {
+        if ( node == root )
+        {
             Set<String> badDuplicates = new HashSet<String>();
             badDuplicates.addAll( duplicates );
             badDuplicates.removeAll( includes );
-            if (nodes.size() > 0) {
+            if ( nodes.size() > 0 )
+            {
                 log.info( "Adding on module's Class-Path:" );
-                for (Artifact inc : nodes) {
-                    log.info("    " + inc.getId());
+                for ( Artifact inc : nodes )
+                {
+                    log.info( "    " + inc.getId() );
                 }
             }
 
@@ -157,18 +175,22 @@ public class CollectLibrariesNodeVisitor implements DependencyNodeVisitor
             badConflicts.addAll( conflicts );
             badConflicts.removeAll( conflicts );
 
-            if (badDuplicates.size() > 0 || badConflicts.size() > 0) {
+            if ( badDuplicates.size() > 0 || badConflicts.size() > 0 )
+            {
                 log.warn( "There are transitive dependencies that were not included " +
-                        "in the module's Class-Path because they were resolved as part of another NetBeans module.");
-                if (badConflicts.size() > 0) {
-                    log.warn( "Some are used in different version.");
+                    "in the module's Class-Path because they were resolved as part of another NetBeans module." );
+                if ( badConflicts.size() > 0 )
+                {
+                    log.warn( "Some are used in different version." );
                 }
-                for (String dup : badConflicts) {
-                    log.warn( "  " + dup + " (with different version)");
+                for ( String dup : badConflicts )
+                {
+                    log.warn( "  " + dup + " (with different version)" );
                 }
                 badDuplicates.removeAll( badConflicts );
-                for (String dup : badDuplicates) {
-                    log.warn( "  " + dup);
+                for ( String dup : badDuplicates )
+                {
+                    log.warn( "  " + dup );
                 }
 
             }

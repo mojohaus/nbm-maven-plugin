@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.maven.artifact.Artifact;
@@ -211,6 +210,11 @@ public class NetbeansManifestUpdateMojo
 // end of component params custom code folding
 // </editor-fold> 
 
+    /**
+     * execute plugin
+     * @throws org.apache.maven.plugin.MojoExecutionException
+     * @throws org.apache.maven.plugin.MojoFailureException
+     */
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -382,7 +386,8 @@ public class NetbeansManifestUpdateMojo
                     depSeparator = ", ";
                 }
             }
-            if (!verifyRuntime.equalsIgnoreCase( SKIP )) {
+            if ( !verifyRuntime.equalsIgnoreCase( SKIP ) )
+            {
                 try
                 {
                     checkModuleClassPath( treeroot, libArtifacts, examinerCache, moduleArtifacts, projectCNB );
@@ -479,7 +484,7 @@ public class NetbeansManifestUpdateMojo
 //----------------------------------------------------------------------------------
     private void checkModuleClassPath( DependencyNode treeroot,
         List<Artifact> libArtifacts,
-        Map<Artifact, ExamineManifest> examinerCache, List<ModuleWrapper> moduleArtifacts, String projectCodeNameBase ) 
+        Map<Artifact, ExamineManifest> examinerCache, List<ModuleWrapper> moduleArtifacts, String projectCodeNameBase )
         throws IOException, MojoExecutionException, MojoFailureException
     {
         Set<String> deps = buildProjectDependencyClasses( project, libArtifacts );
@@ -518,8 +523,10 @@ public class NetbeansManifestUpdateMojo
                     List<Artifact> arts = transmodules.get( wr.artifact.getDependencyConflictId() );
                     Set<String>[] classes = visibleModuleClasses( arts, man, wr.dependency, projectCodeNameBase );
                     classes[0].retainAll( deps );
-                    if (classes[0].size() > 0) {
-                        getLog().error( "Project uses classes from transtive module " + wr.artifact.getId() + " which will not be accessible at runtime." );
+                    if ( classes[0].size() > 0 )
+                    {
+                        getLog().error(
+                            "Project uses classes from transtive module " + wr.artifact.getId() + " which will not be accessible at runtime." );
                         deps.removeAll( classes[0] );
                     }
                 }
@@ -531,8 +538,9 @@ public class NetbeansManifestUpdateMojo
                     getLog().error( "Project depends on packages not accessible at runtime in module " + a.getId() );
                 }
             }
-            if (verifyRuntime.equalsIgnoreCase( FAIL )) {
-                throw new MojoFailureException("See above for failures in runtime NebBeans dependencies verification.");
+            if ( verifyRuntime.equalsIgnoreCase( FAIL ) )
+            {
+                throw new MojoFailureException( "See above for failures in runtime NebBeans dependencies verification." );
             }
         }
     }
@@ -638,11 +646,15 @@ public class NetbeansManifestUpdateMojo
             String cnb = stripVersionFromCodebaseName( projectCodeNameBase );
             if ( manifest.hasFriendPackages() && !manifest.getFriends().contains( cnb ) )
             {
-                if (verifyRuntime.equalsIgnoreCase( FAIL) ) {
+                if ( verifyRuntime.equalsIgnoreCase( FAIL ) )
+                {
                     throw new MojoFailureException(
                         "Module dependency has friend dependency on " + manifest.getModule() + "but is not listed as friend." );
-                } else {
-                    getLog().warn( "Module dependency has friend dependency on " + manifest.getModule() + "but is not listed as friend." );
+                }
+                else
+                {
+                    getLog().warn(
+                        "Module dependency has friend dependency on " + manifest.getModule() + "but is not listed as friend." );
                 }
             }
             List<Pattern> compiled = createCompiledPatternList( manifest.getPackages() );
