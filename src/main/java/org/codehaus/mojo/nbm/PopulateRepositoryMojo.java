@@ -68,17 +68,19 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * A goal for identifying netbeans modules from the installation and populating the local
  * repository with them. Optionally you can also deploy to a remote repository.
-<p/>
+ * <p/>
  * If you are looking for an existing remote repository for netbeans artifacts, check out
- * http://deadlock.netbeans.org/maven2/ it contains API artifacts for 4.1, 5.0 and 5.5 releases. 
- * 6.0 Milestones and Betas also included.
-
- * <br/>
- * Compatibility Note: The 3.0 version puts all unrecognized, non-module, 3rd party jars
- * in the org.netbeans.external group and added then as dependency to respective modules.
+ * <a href="http://deadlock.netbeans.org/maven2/">http://deadlock.netbeans.org/maven2/</a>,
+ * it contains API artifacts for multiple releases.
+ * <p/>
+ * See this <a href="repository.html">HOWTO</a> on how to generate the NetBeans binaries required
+ * by this goal.
+ * <p/>
+ * <b>Compatibility Note</b>: The 3.0+ version puts all unrecognized, non-module, 3rd party jars
+ * in the org.netbeans.external group and adds them as dependencies to respective modules.
  * That can cause backward incompatibility with earlier versions which generated incomplete (different)
  * maven metadata.
- * 
+ *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal populate-repository
  * @requiresProject false
@@ -124,12 +126,14 @@ public class PopulateRepositoryMojo
      * @parameter expression="${netbeansNbmDirectory}"
      * @since 3.0
      */
-    protected String nbmDirectory;
+    protected String netbeansNbmDirectory;
 
     /**
      * Optional parameter, when specified, will force all modules to have the designated version.
      * Good when depending on releases. Then you would for example specify RELEASE50 in this parameter and
      * all modules get this version in the repository.
+     * <p/>
+     * Highly Recommended!
      * @parameter expression="${forcedVersion}"
      */
     protected String forcedVersion;
@@ -332,9 +336,9 @@ public class PopulateRepositoryMojo
         }
 
         File nbmRoot = null;
-        if ( nbmDirectory != null )
+        if ( netbeansNbmDirectory != null )
         {
-            nbmRoot = new File( nbmDirectory );
+            nbmRoot = new File( netbeansNbmDirectory );
             if ( !nbmRoot.exists() )
             {
                 nbmRoot = null;

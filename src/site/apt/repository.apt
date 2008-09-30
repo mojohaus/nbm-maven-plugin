@@ -1,0 +1,33 @@
+ ------
+ Maven 2 NBM Plugin 
+ ------
+ Milos Kleint
+ <mkleint@codehaus.org>
+ ------
+ Sep 30, 2008
+
+HOWTO on uploading NetBeans release binaries to a Maven repository.
+
+ There is a goal that converts the NetBeans module information into Maven metadata
+and is capable of uploading the module jar file, javadoc, sources and nbm files to local
+and remote repositories. See {{{populate-repository-mojo.html}populate-repository goal}} description.
+
+ For the complete upload, you will need to checkout the sources of the IDE/Platform you
+want to upload. See this FAQ entry on {{{http://wiki.netbeans.org/DevFaqAccessSourcesUsingMercurial}HowTo checkout sources from Hg}}
+
+ The goal has multiple input parameters that link the goal to binaries prepared beforehand.
+
+   * <<netbeansInstallDirectory>> designates the base directory where resides the NetBeans installation
+that shall be uploaded. It can be either downloaded as zip or built from sources.
+Run "ant" in your local hg clone to build the installation at "nbbuild/netbeans" directory.
+
+   * <<netbeansNbmDirectory>> designates the base directory where the nbm files are located.
+Run "ant build-nbms" in your local hg clone to build the nbms at "nbbuild/nbms" directory.
+
+  * <<netbeansSourcesDirectory>> designates the base directory containing zip files with module jar sources.
+Run "ant build-source-zips" in your local hg clone to build the nbms at "nbbuild/build/source-zips" directory.
+
+  * <<netbeansJavadocDirectory>> designates the base directory containing zip files with javadoc zips for modules with public apis.
+Run "ant build-javadoc" in your local hg clone to build the nbms at "nbbuild/build/javadoc" directory.
+
+

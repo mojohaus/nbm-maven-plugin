@@ -25,6 +25,7 @@
       <item name="Example Descriptor" href="descriptor.html"/>
       <item name="2.4 -> 2.5 upgrade" href="2425upgrade.html"/>
       <item name="2.6 -> 3.0 upgrade" href="2630upgrade.html"/>
+      <item name="HOWTO - populate repository" href="repository.html"/>
       <item name="Javadoc" href="apidocs/index.html"/>
       <!--item name="FAQ" href="faq.html"/-->
     </menu>
