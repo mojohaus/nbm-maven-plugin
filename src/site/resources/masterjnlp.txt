@@ -15,7 +15,7 @@
     <j2se version="1.5+"/>
     <jar href="startup.jar"/>
     <property name="netbeans.user" value="${user.home}/.${branding.token}"/>
-    
+
 <!-- The following line will be replaced with an automatically generated list of resources: -->
     ${jnlp.resources}
   </resources>

@@ -36,8 +36,16 @@ See the {{{populate-repository-mojo.html}nbm:populate-repository}} goal and the 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>RELEASE</version>
+                <version>3.0</version>
                 <extensions>true</extensions>
+            </plugin>
+            <plugin> <!-- required since nbm-plugin 3.0-->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <useDefaultManifestFile>true</useDefaultManifestFile>
+                </configuration>
             </plugin>
         </plugins>
   </build>

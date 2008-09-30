@@ -58,9 +58,9 @@ import org.codehaus.plexus.util.IOUtil;
  * <p/>
  * <code>
     &lt;plugin&gt;<br/>
-        &lt;groupId>org.apache.maven.plugins&lt;/groupId&gt;<br/>
-        &lt;artifactId>maven-jar-plugin&lt;/artifactId&gt;<br/>
-        &lt;version>2.2&lt;/version&gt;<br/>
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;<br/>
+        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;<br/>
+        &lt;version&gt;2.2&lt;/version&gt;<br/>
         &lt;configuration&gt;<br/>
             &lt;useDefaultManifestFile&gt;true&lt;/useDefaultManifestFile&gt;<br/>
         &lt;/configuration&gt;<br/>
