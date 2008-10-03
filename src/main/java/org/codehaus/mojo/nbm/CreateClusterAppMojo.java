@@ -78,13 +78,15 @@ public class CreateClusterAppMojo
     protected String brandingToken;
 
     /**
-     * 
+     * Optional path to custom etc/${brandingToken}.conf file. If not defined,
+     * a default template will be used.
      * @parameter expression="${netbeans.conf.file}"
      */
     private File etcConfFile;
 
     /**
-     * 
+     * Optional path to custom etc/${brandingToken}.clusters file. If not defined,
+     * a default one will be generated.
      * @parameter expression="${netbeans.clusters.file}"
      */
     private File etcClustersFile;
