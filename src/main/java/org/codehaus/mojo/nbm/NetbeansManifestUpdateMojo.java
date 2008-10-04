@@ -167,6 +167,17 @@ public class NetbeansManifestUpdateMojo
     private static final String WARN = "warn";
     private static final String SKIP = "skip";
 
+    /**
+     * A list of module's public packages. If not defined, no packages are exported as public.
+     * Allowed values are single package names
+     * or package names ending with .* which represent the package and all subpackages.
+     * <p/>
+     * Eg. "org.kleint.milos.api" designates just the one package, while "org.kleint.milos.spi.*"
+     * denotes the spi package an all it's subpackages.
+     * @parameter
+     * @since 3.0
+     */
+    private List<String> publicPackages;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
@@ -301,6 +312,28 @@ public class NetbeansManifestUpdateMojo
         conditionallyAddAttribute( mainSection, "OpenIDE-Module-Build-Version",
             timestamp );
         String projectCNB = conditionallyAddAttribute( mainSection, "OpenIDE-Module", moduleName );
+        String packagesValue;
+        if (publicPackages != null && publicPackages.size() > 0) {
+            StringBuffer sb = new StringBuffer();
+            for (String pub : publicPackages) {
+                if (pub.endsWith( ".**")) {
+                    // well, just sort of wrong value but accept
+                    sb.append(pub);
+                } else if (pub.endsWith(".*")) {
+                    //multipackage value
+                    sb.append(pub).append("*");
+                } else {
+                    sb.append(pub).append(".*");
+                }
+                sb.append(", ");
+            }
+            sb.setLength( sb.length() - 2); //cut the last 2 ", " characters
+            packagesValue = sb.toString();
+        } else {
+            // no packages available
+            packagesValue = "-";
+        }
+        conditionallyAddAttribute( mainSection, "OpenIDE-Module-Public-Packages", packagesValue );
 
         //See http://www.netbeans.org/download/dev/javadoc/org-openide-modules/apichanges.html#split-of-openide-jar
         conditionallyAddAttribute( mainSection, "OpenIDE-Module-Requires",

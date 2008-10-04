@@ -59,3 +59,9 @@ match the actual classes being used in the project and it's libraries on Class-P
 the {{{http://maven.apache.org/plugins/maven-dependency-plugin/analyze-mojo.html}dependency:analyze}}
 goal but takes the NetBeans module system constraints into account (non-transitivity of module dependencies,
 public vs. private packages constraint etc)
+
+   * The previous versions didn't define the OpenIDE-Module-Public-Packages entry in the manifest file.
+The result was a deprecated state that made all classes publicly accessible from other modules
+and printed a warning to the application's log file. In 3.0, we introduced a new optional parameter "publicPackages"
+that lists all public packages in the module. If not defined, no package is exported as public. See
+{{{http://jira.codehaus.org/browse/MNBMODULE-32}issue MNBMODULE-32}} for details.
