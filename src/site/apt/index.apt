@@ -10,7 +10,7 @@ Netbeans Module plugin
 
  This m2 plugin is able to create Netbeans module(plugin) artifacts. It registers a new packaging type "nbm". Any project with
 this packaging will be automatically turned into a netbeans module project. Additionally it allows to create clusters of modules, generate
-an autoupdate site content or build application on top of NetBeans platform.
+an autoupdate site content or build and assemble an application on top of NetBeans platform.
 
  To get access to NetBeans.org API artifacts, add {{{http://deadlock.netbeans.org/maven2/}http://deadlock.netbeans.org/maven2/}} to the list of remote repositories for your project.
 However (as usual) you are encouraged to create your own repository as the deadlock machine doesn't guarantee 24/7 operations.
@@ -118,6 +118,69 @@ Multi module setup
  If you have a set of NetBeans modules, or are building on top of NetBeans platform,
 you will make use of the additional goals provided by the plugin.
 
+ Since 3.0, if you are building a platform based application, you shall use a project
+with "nbm-application" packaging to perform the final application assembly.
+This packaging type (defined in nbm-maven-plugin), shall have your module projects
+and all dependencies of the target netbeans platform included as dependencies.
+The dependencies shall have type 'nbm-file' which points to the actual "nbm" files
+in the local/remote repository.
+
+ For the netbeans platform/ide modules, there are artifacts that aggregate modules in clusters.
+These are put in the org.netbeans.clusters groupId (on deadlock.netbeans.org or in your own repository)
+The following snippet will include the basic netbeans platform cluster and your own
+module in the application. You can use standard dependency exclusion lists to cut out module from platform that
+you don't need.
+
+------
+    <artifactId>application</artifactId>
+    <packaging>nbm-application</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <dependencies>
+        <dependency>
+            <groupId>org.netbeans.cluster</groupId>
+            <artifactId>platform8</artifactId>
+            <version>${netbeans.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>com.mycompany</groupId>
+            <artifactId>module1</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>nbm-file</type>
+        </dependency>
+    </dependencies>
+    ....
+------
+
+ The nbm-aplication project/packaging defines a build lifecycle that creates a final application
+from the nbm files in local/remote repotories and bundles them in a zip file (also uploadable to the repository)
+In addition to that you can configure the project to generate an autoupdate site and/or
+a webstartable binaries of the applications.
+
+------
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>extra</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>autoupdate</goal>
+                            <goal>webstart-app</goal>
+                        </goals>
+                        <configuration>
+                            <!--distBase>central::default::http://repo1.maven.org/maven2</distBase-->
+                            <codebase>${project.build.directory}/webstart/milos</codebase>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+------
+
+ See the {{{autoupdate-mojo.html}autoupdate}} and {{{webstart-app-mojo.html}webstart-app}} goals
+for more details.
+
 +-------------------------------------------------------------------------------+
 mvn nbm:cluster
 +-------------------------------------------------------------------------------+
@@ -126,7 +189,7 @@ mvn nbm:cluster
 or more clusters in the current project. So usually one runs this goal on parent pom project,
 and aggregates the content of all it's modules. 
 The resulting cluster structure can later be used for running the application, creating an installer or similar.
-Since 2.7, you should invoke nbm:directory on affected projects before nbm:cluster. See {{{2727upgrade.html}2.6-2.7 upgrade}} page. 
+A variant of this goal is already included in the nbm-application project build lifecycle in 3.0+ versions.
 
 +-------------------------------------------------------------------------------+
 mvn nbm:branding
@@ -136,11 +199,11 @@ mvn nbm:branding
 Branding contains all the resources that are to be changed in the platform binaries (resource bundles, images, html files etc) 
 to give the application it's unique touch. 
 
- This goal can be attached either to one of the nbm module projects or directly to the parent pom project that 
-is the root of your platform based application project tree.
+ This goal can be attached to one of the nbm module projects that will be part of the
+NetBeans platform based application.
 
  For more detailed tutorial, check the {{{http://www.netbeans.org/download/magazine/04/nbmag4-modulesmaven.pdf}NetBeans Platform Development with Maven2}}
-article written by Emilian Bold.
+article written by Emilian Bold. (Please note that the article works with nbm-plugin version 2.6.x and ming not represent the latest state)
 
 
 +-------------------------------------------------------------------------------+
@@ -148,9 +211,9 @@ mvn nbm:run-ide nbm:run-platform
 +-------------------------------------------------------------------------------+
  
  These two goals do almost the same, they allow you to execute your projects content within
-the IDE or NetBeans platform. Usually one wants to prepent the nbm:cluster goal to any execution of these goals. (in case it's not part of your regular build cycle).
-run-platform allows to include/exclude clusters from the executed application and runs with the branded resources, while
-run-ide runs only adds your modules to an instance of the IDE.
+the IDE or NetBeans platform.
+
+ In version 3.0.x, the nbm:run-platform makes only sense to execute on projects with nbm-application packaging.
 
  For more information on plugin configuration and customization, see {{{plugin-info.html}goal documentation}}. 
 
@@ -163,22 +226,21 @@ Archetypes anyone?
 one if you are developing a NetBeans IDE module or a module for NetBeans platform based application module.
 
 +-------------------------------------------------------------------------------+
-mvn -B -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=nbm-archetype -DarchetypeVersion=1.0 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 -Dpackage=org.kleint.milos org.apache.maven.plugins:maven-archetype-plugin:2.0-alpha-1:create
+mvn -B -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=nbm-archetype -DarchetypeVersion=1.1 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 -Dpackage=org.kleint.milos org.apache.maven.plugins:maven-archetype-plugin:2.0-alpha-3:create
 +-------------------------------------------------------------------------------+
 
  The second one creates a parent pom project containing configuration and application branding for your NetBeans platform based application.
 Additionally it contains a sample empty module.
 
 +-------------------------------------------------------------------------------+
-mvn -B -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=netbeans-platform-app-archetype -DarchetypeVersion=1.0 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 -Dpackage=org.kleint.milos -Dcluster=milos -Dnetbeans-install=/home/mkleint/netbeans-6.0 -Dbrandingtoken=milos org.apache.maven.plugins:maven-archetype-plugin:2.0-alpha-1:create
+mvn -B -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=netbeans-platform-app-archetype -DarchetypeVersion=1.1 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 -Dpackage=org.kleint.milos -Dcluster=milos -Dnetbeans-install=/home/mkleint/netbeans-6.0 -Dbrandingtoken=milos org.apache.maven.plugins:maven-archetype-plugin:2.0-alpha-3:create
 +-------------------------------------------------------------------------------+
 
- PLEASE NOTE: Due to a bug in 2.0-alpha-1, the command needs to run in batch mode (-B) and all archetype properties need to be specified.
-Alternatively one can use the latest binaries of mevenide from {{{http://deadlock.netbeans.org/hudson/job/mevenide/}NetBeans CI Hudson server}} which
-have these archetypes listed in the basic set of archetypes.
+Note: If you are looking for archetypes for older versions of the nbm-plugin (2.6.x), grab the 1.0.x versions of the archetypes..
  
 IDE support
 
- The NetBeans 6.0 M9+ builds have Maven support available on the default update center. Among other features, it
+ Since NetBeans IDE 6.0, Maven support available on the default update center. Among other features, it
 contains additional support for working with Netbeans module projects. The support includes file templates,
 important nodes in projects view, running module(s) in IDE or platform.
+Please note that support for projects with nbm-application packaging might be limited in current (NetBeans 6.5) builds.
