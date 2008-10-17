@@ -43,7 +43,9 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
- * Create the Netbeans module clusters/application
+ * Create the Netbeans module clusters/application for the 'nbm-application' packaging
+ * projects
+ *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal cluster-app
  * @phase process-resources

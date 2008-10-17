@@ -51,6 +51,7 @@ import org.netbeans.nbbuild.MakeJNLP;
 import org.netbeans.nbbuild.ModuleSelector;
 
 /**
+ * Create webstartable binaries for a 'nbm-application'.
  * @author <a href="mailto:johan.andren@databyran.se">Johan Andren</a>
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal webstart-app
