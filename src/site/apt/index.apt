@@ -243,14 +243,14 @@ Archetypes anyone?
 one if you are developing a NetBeans IDE module or a module for NetBeans platform based application module.
 
 +-------------------------------------------------------------------------------+
-mvn -B -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=nbm-archetype -DarchetypeVersion=1.1 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 -Dpackage=org.kleint.milos org.apache.maven.plugins:maven-archetype-plugin:2.0-alpha-3:create
+mvn -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=nbm-archetype -DarchetypeVersion=1.1 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 archetype:generate
 +-------------------------------------------------------------------------------+
 
  The second one creates a parent pom project containing configuration and application branding for your NetBeans platform based application.
 Additionally it contains a sample empty module.
 
 +-------------------------------------------------------------------------------+
-mvn -B -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=netbeans-platform-app-archetype -DarchetypeVersion=1.1 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 -Dpackage=org.kleint.milos -Dcluster=milos -Dnetbeans-install=/home/mkleint/netbeans-6.0 -Dbrandingtoken=milos org.apache.maven.plugins:maven-archetype-plugin:2.0-alpha-3:create
+mvn -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=netbeans-platform-app-archetype -DarchetypeVersion=1.1 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 archetype:generate
 +-------------------------------------------------------------------------------+
 
  Note: If you are looking for archetypes for older versions of the nbm-plugin (2.6.x), grab the 1.0.x versions of the archetypes..
