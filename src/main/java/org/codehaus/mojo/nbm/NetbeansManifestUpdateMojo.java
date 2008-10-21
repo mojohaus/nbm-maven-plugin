@@ -228,7 +228,10 @@ public class NetbeansManifestUpdateMojo
      */
     public void execute()
         throws MojoExecutionException, MojoFailureException
+
     {
+        //need to do this to chekc for javahelp on CP.
+        super.registerNbmAntTasks();
         NetbeansModule module;
         if ( descriptor != null && descriptor.exists() )
         {
