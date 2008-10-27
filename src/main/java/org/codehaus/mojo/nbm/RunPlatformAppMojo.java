@@ -97,7 +97,7 @@ public class RunPlatformAppMojo
         boolean windows = Os.isFamily( "windows" );
 
         Commandline cmdLine = new Commandline();
-        File exec = windows ? new File( appbasedir, "bin\\" + brandingToken + ".exe" )
+        File exec = windows ? new File( appbasedir, "bin\\" + brandingToken + "_w.exe" )
                             : new File( appbasedir, "bin/" + brandingToken );
         cmdLine.setExecutable( exec.getAbsolutePath() );
 
