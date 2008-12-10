@@ -27,6 +27,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -125,6 +126,22 @@ public class CreateUpdateSiteMojo
      * @component
      */
     private MavenProjectHelper projectHelper;
+
+    /**
+     * @component
+     * @readonly
+     */
+    private ArtifactResolver artifactResolver;
+
+    /**
+     * Local maven repository.
+     *
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
+    protected ArtifactRepository localRepository;
+
     // </editor-fold>
 
     public void execute() throws MojoExecutionException, MojoFailureException
@@ -157,6 +174,11 @@ public class CreateUpdateSiteMojo
             while ( it.hasNext() )
             {
                 Artifact art = (Artifact) it.next();
+                Artifact nbmArt = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
+                if (nbmArt != null) {
+                    art = nbmArt;
+                }
+
                 if ( art.getType().equals( "nbm-file" ) )
                 {
                     Copy copyTask = (Copy) antProject.createTask( "copy" );

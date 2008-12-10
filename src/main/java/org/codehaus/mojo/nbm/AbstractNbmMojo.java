@@ -29,6 +29,9 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.AbstractMojo;
@@ -366,5 +369,44 @@ public abstract class AbstractNbmMojo
         }
 
         return filter;
+    }
+
+    protected final Artifact turnJarToNbmFile( Artifact art, ArtifactFactory artifactFactory,
+        ArtifactResolver artifactResolver, MavenProject project, ArtifactRepository localRepository ) throws MojoExecutionException
+    {
+        if ( "jar".equals( art.getType() ) || "nbm".equals( art.getType() ) )
+        {
+            //TODO, it would be nice to have a check to see if the
+            // "to-be-created" module nbm artifact is actually already in the
+            // list of dependencies (as "nbm-file") or not..
+            // that would be a timesaver
+            ExamineManifest mnf = new ExamineManifest( getLog() );
+            mnf.setJarFile( art.getFile() );
+            mnf.checkFile();
+            if ( mnf.isNetbeansModule() )
+            {
+                Artifact nbmArt = artifactFactory.createDependencyArtifact(
+                    art.getGroupId(),
+                    art.getArtifactId(),
+                    art.getVersionRange(),
+                    "nbm-file",
+                    art.getClassifier(),
+                    art.getScope() );
+                try
+                {
+                    artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), localRepository );
+                }
+                catch ( ArtifactResolutionException ex )
+                {
+                    throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
+                }
+                catch ( ArtifactNotFoundException ex )
+                {
+                    throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
+                }
+                return nbmArt;
+            }
+        }
+        return null;
     }
 }

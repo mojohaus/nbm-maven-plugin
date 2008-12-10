@@ -150,36 +150,9 @@ public class CreateClusterAppMojo
             {
                 Artifact art = (Artifact) it.next();
 
-                if ( "jar".equals( art.getType() ) || "nbm".equals( art.getType() ) ) {
-                    //TODO, it would be nice to have a check to see if the
-                    // "to-be-created" module nbm artifact is actually already in the
-                    // list of dependencies (as "nbm-file") or not..
-                    // that would be a timesaver
-                    ExamineManifest mnf = new ExamineManifest( getLog() );
-                    mnf.setJarFile( art.getFile() );
-                    mnf.checkFile();
-                    if ( mnf.isNetbeansModule() ) {
-                        Artifact nbmArt = artifactFactory.createDependencyArtifact(
-                                art.getGroupId(),
-                                art.getArtifactId(),
-                                art.getVersionRange(),
-                                "nbm-file",
-                                art.getClassifier(),
-                                art.getScope());
-                        try
-                        {
-                            artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), localRepository );
-                        }
-                        catch ( ArtifactResolutionException ex )
-                        {
-                            throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
-                        }
-                        catch ( ArtifactNotFoundException ex )
-                        {
-                            throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
-                        }
-                        art = nbmArt;
-                    }
+                Artifact nbmArt = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
+                if (nbmArt != null) {
+                    art = nbmArt;
                 }
 
                 if ( art.getType().equals( "nbm-file" ) )
