@@ -25,6 +25,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -569,8 +570,11 @@ public class NetbeansManifestUpdateMojo
             }
             for ( Artifact a : moduleAllClasses.keySet() )
             {
+                List<String> strs = new ArrayList<String>(deps);
                 if ( deps.removeAll( moduleAllClasses.get( a ) ) )
                 {
+                    strs.retainAll( moduleAllClasses.get( a ) );
+                    getLog().info( "Private classes referenced from module: " + Arrays.toString( strs.toArray() ) );
                     getLog().error( "Project depends on packages not accessible at runtime in module " + a.getId() );
                 }
             }
