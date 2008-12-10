@@ -33,6 +33,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -102,6 +107,31 @@ public class CreateClusterAppMojo
      */
     private File binDirectory;
 
+    // <editor-fold defaultstate="collapsed" desc="Component parameters">
+    /**
+     * @component
+     * @readonly
+     */
+    private ArtifactFactory artifactFactory;
+
+    /**
+     * @component
+     * @readonly
+     */
+    private ArtifactResolver artifactResolver;
+
+    /**
+     * Local maven repository.
+     *
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
+    protected ArtifactRepository localRepository;
+
+// end of component params custom code folding
+// </editor-fold>
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
 
@@ -119,6 +149,39 @@ public class CreateClusterAppMojo
             while ( it.hasNext() )
             {
                 Artifact art = (Artifact) it.next();
+
+                if ( "jar".equals( art.getType() ) || "nbm".equals( art.getType() ) ) {
+                    //TODO, it would be nice to have a check to see if the
+                    // "to-be-created" module nbm artifact is actually already in the
+                    // list of dependencies (as "nbm-file") or not..
+                    // that would be a timesaver
+                    ExamineManifest mnf = new ExamineManifest( getLog() );
+                    mnf.setJarFile( art.getFile() );
+                    mnf.checkFile();
+                    if ( mnf.isNetbeansModule() ) {
+                        Artifact nbmArt = artifactFactory.createDependencyArtifact(
+                                art.getGroupId(),
+                                art.getArtifactId(),
+                                art.getVersionRange(),
+                                "nbm-file",
+                                art.getClassifier(),
+                                art.getScope());
+                        try
+                        {
+                            artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), localRepository );
+                        }
+                        catch ( ArtifactResolutionException ex )
+                        {
+                            throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
+                        }
+                        catch ( ArtifactNotFoundException ex )
+                        {
+                            throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
+                        }
+                        art = nbmArt;
+                    }
+                }
+
                 if ( art.getType().equals( "nbm-file" ) )
                 {
                     JarFile jf = null;
