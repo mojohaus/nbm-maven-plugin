@@ -12,12 +12,18 @@ Netbeans Module plugin
 this packaging will be automatically turned into a netbeans module project. Additionally it allows to create clusters of modules, generate
 an autoupdate site content or build and assemble an application on top of NetBeans platform.
 
- To get access to NetBeans.org API artifacts, add {{{http://deadlock.netbeans.org/maven2/}http://deadlock.netbeans.org/maven2/}} to the list of remote repositories for your project.
-However (as usual) you are encouraged to create your own repository as the deadlock machine doesn't guarantee 24/7 operations.
-
  The plugin is also capable of populating the local maven repository with module jars and NBM files from a given NetBeans installation. Useful for
 module development, modules with public APIs are separated from those without a public API.
 See the {{{populate-repository-mojo.html}nbm:populate-repository}} goal and the {{{repository.html}HOWTO document}} for details.
+
+ To get access to a repository with NetBeans.org module artifacts and metadata, add {{{http://bits.netbeans.org/maven2/}http://bits.netbeans.org/maven2/}} repository to your project POM
+or the repository manager you are using. The repository hosts binaries of NetBeans 6.5 and later and is only valid for 3.0+ version of nbm-maven-plugin and can produce unexpected results or failed builds for older versions.
+Please note that the older repository - {{{http://deadlock.netbeans.org/maven2/}http://deadlock.netbeans.org/maven2/}}
+is still operational, but hosts only content for older versions of NetBeans and is to be used by 2.x version of nbm-maven-plugin only.
+If you need NetBeans 6.5 binaries with older version of nbm-maven-plugin or oder versions of NetBeans with new 3.0 nbm-maven-plugin generated metadata,
+you are encouraged to generate the repository content yourself for use with your company. See {{{repository.html}instructions}} for details.
+For explanation why it's like this, see {{{http://blogs.codehaus.org/people/mkleint/archives/001735_nb_65_artifacts_in_a_maven_repository.html}this blog entry}}.
+
 
  Sample pom.xml excerpts for creation of a NetBeans module:
 
@@ -56,7 +62,7 @@ See the {{{populate-repository-mojo.html}nbm:populate-repository}} goal and the 
         <repository>
             <id>netbeans</id>
             <name>repository hosting netbeans.org api artifacts</name>
-            <url>http://deadlock.netbeans.org/maven2/</url>
+            <url>http://bits.netbeans.org/maven2/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -220,7 +226,7 @@ to give the application it's unique touch.
 NetBeans platform based application.
 
  For more detailed tutorial, check the {{{http://www.netbeans.org/download/magazine/04/nbmag4-modulesmaven.pdf}NetBeans Platform Development with Maven2}}
-article written by Emilian Bold. (Please note that the article works with nbm-plugin version 2.6.x and ming not represent the latest state)
+article written by Emilian Bold. (Please note that the article works with nbm-plugin version 2.6.x and might not represent the latest state of the tool)
 
 
 +-------------------------------------------------------------------------------+
