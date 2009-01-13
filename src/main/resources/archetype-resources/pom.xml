@@ -9,13 +9,13 @@
     
     <repositories>
         <!-- this is a remote repository hosting the netbeans api artifacts.
-         the versions of the artifacts are netbeans IDE release based, eg. RELEASE41, RELEASE50.
+         the versions of the artifacts are netbeans IDE release based, eg. RELEASE65.
          You might want to use your own repository. To create one, use the nbm:populate-repository goal.
           -->
         <repository>
             <id>netbeans</id>
             <name>repository hosting netbeans.org api artifacts</name>
-            <url>http://deadlock.netbeans.org/maven2</url>
+            <url>http://bits.netbeans.org/maven2</url>
         </repository>
     </repositories>
 
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>RELEASE61</version>
+            <version>RELEASE65</version>
         </dependency>
     </dependencies>
     <build>
