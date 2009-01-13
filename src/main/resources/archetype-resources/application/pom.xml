@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>org.netbeans.cluster</groupId>
-            <artifactId>platform8</artifactId>
+            <artifactId>platform9</artifactId>
             <version>${netbeans.version}</version>
             <type>pom</type>
         </dependency>
@@ -23,13 +23,13 @@
             <groupId>${groupId}</groupId>
             <artifactId>module1</artifactId>
             <version>${version}</version>
-            <type>nbm-file</type>
+            <type>nbm</type>
         </dependency>
         <dependency>
             <groupId>${groupId}</groupId>
             <artifactId>branding</artifactId>
             <version>${version}</version>
-            <type>nbm-file</type>
+            <type>nbm</type>
         </dependency>
     </dependencies>
     <build>
@@ -67,7 +67,7 @@
                                     <goal>webstart-app</goal>
                                 </goals>
                                 <configuration>
-                                    <codebase>${project.build.directory}/webstart/${brandingtoken}</codebase>
+                                    <codebase>${project.build.directory}/webstart/${brandingToken}</codebase>
                                 </configuration>
                             </execution>
                         </executions>

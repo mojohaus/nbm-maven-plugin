@@ -8,13 +8,13 @@
     <name>${artifactId} - NetBeans Platform Application</name>
     <repositories>
         <!-- this is a remote repository hosting the netbeans api artifacts.
-         the versions of the artifacts are netbeans IDE release based, eg. RELEASE41, RELEASE50.
+         the versions of the artifacts are netbeans IDE release based, eg. RELEASE65
          You might want to use your own repository. To create one, use the nbm:populate-repository goal.
           -->
         <repository>
             <id>netbeans</id>
             <name>repository hosting netbeans.org api artifacts</name>
-            <url>http://deadlock.netbeans.org/maven2</url>
+            <url>http://bits.netbeans.org/maven2</url>
         </repository>
     </repositories>
     <dependencies>
@@ -37,8 +37,8 @@
                     <extensions>true</extensions>
                     <configuration>
                         <descriptor>src/main/nbm/module.xml</descriptor>
-                        <brandingToken>${brandingtoken}</brandingToken>
-                        <cluster>${cluster}</cluster>
+                        <brandingToken>${brandingToken}</brandingToken>
+                        <cluster>foobar</cluster>
                     </configuration>
                 </plugin>
                 
@@ -61,6 +61,7 @@
         <module>application</module>
     </modules>
     <properties>
-        <netbeans.version>RELEASE61</netbeans.version>
+        <netbeans.version>RELEASE65</netbeans.version>
+        <brandingToken>foo</brandingToken>
     </properties>
 </project>
