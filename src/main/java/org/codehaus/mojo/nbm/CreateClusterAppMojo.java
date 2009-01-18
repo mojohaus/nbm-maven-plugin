@@ -46,6 +46,7 @@ import org.apache.tools.ant.taskdefs.Chmod;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Create the Netbeans module clusters/application for the 'nbm-application' packaging
@@ -389,17 +390,47 @@ public class CreateClusterAppMojo
         destBinDir.mkdir();
 
         File binDir;
+        File destExeW = new File( destBinDir, brandingToken + "_w.exe" );
+        File destExe = new File( destBinDir, brandingToken + ".exe" );
+        File destSh = new File( destBinDir, brandingToken );
+
         if ( binDirectory != null )
         {
             binDir = binDirectory;
-            FileUtils.copyDirectoryStructureIfModified( binDir, destBinDir );
+            File[] fls = binDir.listFiles();
+            if ( fls == null )
+            {
+                throw new MojoExecutionException( "Parameter 'binDirectory' has to point to an existing folder." );
+            }
+            for ( File fl : fls )
+            {
+                String name = fl.getName();
+                File dest = null;
+                if ( name.endsWith( "_w.exe" ) )
+                {
+                    dest = destExeW;
+                }
+                else if ( name.endsWith( ".exe" ) )
+                {
+                    dest = destExe;
+                }
+                else if ( !name.contains( "." ) || name.endsWith( ".sh" ) )
+                {
+                    dest = destSh;
+                }
+                if ( dest != null )
+                {
+                    FileUtils.copyFile( fl, dest );
+                }
+                else
+                {
+                    //warn about file not being copied
+                }
+            }
         }
         else
         {
             File harnessDir = new File( buildDir, "harness" );
-            File destExeW = new File( destBinDir, brandingToken + "_w.exe" );
-            File destExe = new File( destBinDir, brandingToken + ".exe" );
-            File destSh = new File( destBinDir, brandingToken );
             if ( harnessDir.exists() )
             {
                 getLog().debug( "Using fallback executables shipping with the nbm-maven-plugin." );
