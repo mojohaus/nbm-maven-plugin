@@ -21,6 +21,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.util.DefaultFileSet;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
 /**
@@ -74,7 +75,19 @@ public class CreateStandaloneMojo
             File nbmBuildDirFile = new File( buildDirectory, brandingToken );
 
             ZipArchiver archiver = new ZipArchiver();
-            archiver.addDirectory( nbmBuildDirFile );
+            DefaultFileSet fs = new DefaultFileSet();
+            fs.setDirectory( buildDirectory );
+            fs.setIncludes( new String[] {
+                brandingToken + "/**",
+            });
+            fs.setExcludes( new String[] {
+                brandingToken + "/bin/*",
+            });
+            archiver.addFileSet( fs);
+            File bins = new File(nbmBuildDirFile, "bin");
+            for (File bin : bins.listFiles()) {
+                archiver.addFile( bin, brandingToken + "/bin/" + bin.getName(), 775);
+            }
             File zipFile = new File( buildDirectory, finalName + ".zip" );
             //TODO - somehow check for last modified content to see if we shall be
             //recreating the zip file.
