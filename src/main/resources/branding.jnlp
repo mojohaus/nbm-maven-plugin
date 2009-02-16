@@ -3,8 +3,8 @@
 <jnlp spec="1.0+" codebase="${jnlp.codebase}">
   <information>
       <title>${app.title}</title>
-      <vendor>${app.title} vendor</vendor>
-      <description>${app.name} application</description>
+      <vendor>${app.vendor}</vendor>
+      <description>${app.description}</description>
       <icon href="${app.icon}"/>
   </information>
   <security/>
