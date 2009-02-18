@@ -98,6 +98,16 @@ public class PopulateRepositoryMojo
     private String deployUrl;
 
     /**
+     * Optional parameter, by default the generated metadata is installed in local repository.
+     * Setting this parameter to false will avoid installing the bits. Only meaningful together with
+     * a defined "deployUrl" parameter.
+     * @parameter expression="${skipInstall}" default-value="false"
+     * @since 3.0
+     */
+    private boolean skipLocalInstall;
+
+
+    /**
      * Location of netbeans installation
      *
      * @parameter expression="${netbeansInstallDirectory}"
@@ -153,6 +163,8 @@ public class PopulateRepositoryMojo
      */
     private File nexusIndexDirectory;
 
+
+
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
     /**
      * Local maven repository.
@@ -203,6 +215,9 @@ public class PopulateRepositoryMojo
             ArtifactRepositoryLayout layout = new DefaultRepositoryLayout();
             deploymentRepository = repositoryFactory.createDeploymentArtifactRepository(
                 "netbeans", deployUrl, layout, true );
+        } else if (skipLocalInstall) {
+            throw new MojoExecutionException(
+                    "When skipping install to local repository, one shall define the deploUrl parameter" );
         }
 
 
@@ -426,29 +441,31 @@ public class PopulateRepositoryMojo
                             "compile", "nbm" );
                     }
                 }
-
-                try
+                if ( !skipLocalInstall )
                 {
-                    if ( javadoc != null )
+                    try
                     {
-                        artifactInstaller.install( javadoc, javadocArt,
-                            localRepository );
+                        if ( javadoc != null )
+                        {
+                            artifactInstaller.install( javadoc, javadocArt,
+                                localRepository );
+                        }
+                        if ( source != null )
+                        {
+                            artifactInstaller.install( source, sourceArt,
+                                localRepository );
+                        }
+                        if ( nbm != null )
+                        {
+                            artifactInstaller.install( nbm, nbmArt, localRepository );
+                        }
+                        artifactInstaller.install( man.getFile(), art, localRepository );
                     }
-                    if ( source != null )
+                    catch ( ArtifactInstallationException e )
                     {
-                        artifactInstaller.install( source, sourceArt,
-                            localRepository );
+                        // TODO: install exception that does not give a trace
+                        throw new MojoExecutionException( "Error installing artifact", e );
                     }
-                    if ( nbm != null )
-                    {
-                        artifactInstaller.install( nbm, nbmArt, localRepository );
-                    }
-                    artifactInstaller.install( man.getFile(), art, localRepository );
-                }
-                catch ( ArtifactInstallationException e )
-                {
-                    // TODO: install exception that does not give a trace
-                    throw new MojoExecutionException( "Error installing artifact", e );
                 }
                 try
                 {
@@ -510,14 +527,17 @@ public class PopulateRepositoryMojo
                 File pom = createExternalProject( ex );
                 ArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
                 art.addMetadata( metadata );
-                try
+                if ( !skipLocalInstall )
                 {
-                    artifactInstaller.install( ex.getFile(), art, localRepository );
-                }
-                catch ( ArtifactInstallationException e )
-                {
-                    // TODO: install exception that does not give a trace
-                    throw new MojoExecutionException( "Error installing artifact", e );
+                    try
+                    {
+                        artifactInstaller.install( ex.getFile(), art, localRepository );
+                    }
+                    catch ( ArtifactInstallationException e )
+                    {
+                        // TODO: install exception that does not give a trace
+                        throw new MojoExecutionException( "Error installing artifact", e );
+                    }
                 }
                 try
                 {
@@ -552,15 +572,18 @@ public class PopulateRepositoryMojo
                 ProjectArtifactMetadata metadata = new ProjectArtifactMetadata(
                     art, pom );
                 art.addMetadata( metadata );
-                try
+                if ( !skipLocalInstall )
                 {
-                    artifactInstaller.install( pom, art, localRepository );
-                }
-                catch ( ArtifactInstallationException e )
-                {
-                    // TODO: install exception that does not give a trace
-                    throw new MojoExecutionException(
-                        "Error installing artifact", e );
+                    try
+                    {
+                        artifactInstaller.install( pom, art, localRepository );
+                    }
+                    catch ( ArtifactInstallationException e )
+                    {
+                        // TODO: install exception that does not give a trace
+                        throw new MojoExecutionException(
+                            "Error installing artifact", e );
+                    }
                 }
                 try
                 {
