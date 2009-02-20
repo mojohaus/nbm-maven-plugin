@@ -6,7 +6,7 @@
  ------
  Sep 30, 2008
 
-Upgrading from 2.6 version to 3.0 (not yet released)
+Upgrading from 2.6 version to 3.0
 
  There are a few significant incompatible changes introduced in 3.0's version of
 NBM packaging lifecycle. The result should be easier to setup builds and better support for building

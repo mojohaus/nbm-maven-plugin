@@ -70,7 +70,7 @@ import org.codehaus.plexus.util.StringUtils;
  * repository with them. Optionally you can also deploy to a remote repository.
  * <p/>
  * If you are looking for an existing remote repository for netbeans artifacts, check out
- * <a href="http://deadlock.netbeans.org/maven2/">http://deadlock.netbeans.org/maven2/</a>,
+ * <a href="http://bits.netbeans.org/maven2/">http://bits.netbeans.org/maven2/</a>,
  * it contains API artifacts for multiple releases.
  * <p/>
  * See this <a href="repository.html">HOWTO</a> on how to generate the NetBeans binaries required
@@ -91,7 +91,7 @@ public class PopulateRepositoryMojo
 {
 
     /**
-     * an url where to deploy the netbeans artifacts.. optional, if not specified, the artifacts will be only installed
+     * an url where to deploy the netbeans artifacts. Optional, if not specified, the artifacts will be only installed
      * in local repository, if you need to give credentials to access remote repo, the id of the server is hardwired to "netbeans".
      * @parameter expression="${deployUrl}"
      */

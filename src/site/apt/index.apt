@@ -132,7 +132,7 @@ system constructs the classpath for the module based on our metadata generated.
 use the special module descriptor file to define the runtime dependencies and libraries.
  
  In nbm-maven-plugin version 2.5 and 2.6.x, we tried to simplify setting the dependencies and remove redundancies. A few rules had
-to be introduced in terms of declaring maven dependencies though. See above.
+to be introduced in terms of declaring maven dependencies though.
 
  
 
@@ -145,11 +145,9 @@ you will make use of the additional goals provided by the plugin.
 with "nbm-application" packaging to perform the final application assembly.
 This packaging type (defined in nbm-maven-plugin), shall have your module projects
 and all dependencies of the target netbeans platform included as dependencies.
-The dependencies shall have type 'nbm-file' which points to the actual "nbm" files
-in the local/remote repository.
 
- For the netbeans platform/ide modules, there are artifacts that aggregate modules in clusters.
-These are put in the org.netbeans.clusters groupId (on deadlock.netbeans.org or in your own repository)
+ For the netbeans platform/IDE modules, there are artifacts that aggregate modules in clusters.
+These are put in the org.netbeans.clusters groupId (on bits.netbeans.org or in your own repository)
 The following snippet will include the basic netbeans platform cluster and your own
 module in the application. You can use standard dependency exclusion lists to cut out module from platform that
 you don't need.
@@ -169,7 +167,6 @@ you don't need.
             <groupId>com.mycompany</groupId>
             <artifactId>module1</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <type>nbm-file</type>
         </dependency>
     </dependencies>
     ....
@@ -228,6 +225,7 @@ NetBeans platform based application.
  For more detailed tutorial, check the {{{http://www.netbeans.org/download/magazine/04/nbmag4-modulesmaven.pdf}NetBeans Platform Development with Maven2}}
 article written by Emilian Bold. (Please note that the article works with nbm-plugin version 2.6.x and might not represent the latest state of the tool)
 
+ Please note that in 3.x version, the branding shall be included as part of a regular nbm subproject and cannto be attached to a "pom" packaged root project.
 
 +-------------------------------------------------------------------------------+
 mvn nbm:run-ide nbm:run-platform
@@ -259,11 +257,11 @@ Additionally it contains a sample empty module.
 mvn -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=netbeans-platform-app-archetype -DarchetypeVersion=1.1 -DarchetypeRepository=http://repo1.maven.org/maven2 -DgroupId=org.kleint -DartifactId=milos -Dversion=1.0 archetype:generate
 +-------------------------------------------------------------------------------+
 
- Note: If you are looking for archetypes for older versions of the nbm-plugin (2.6.x), grab the 1.0.x versions of the archetypes..
+ Note: If you are looking for archetypes for older versions of the nbm-plugin (2.6.x), grab the 1.0.x versions of the archetypes.
  
 IDE support
 
  Since NetBeans IDE 6.0, Maven support available on the default update center. Among other features, it
 contains additional support for working with Netbeans module projects. The support includes file templates,
 important nodes in projects view, running module(s) in IDE or platform.
-Please note that support for projects with nbm-application packaging might be limited in current (NetBeans 6.5) builds.
+Please note that support for projects with nbm-application packaging might be limited in current (NetBeans 6.5) released version.
