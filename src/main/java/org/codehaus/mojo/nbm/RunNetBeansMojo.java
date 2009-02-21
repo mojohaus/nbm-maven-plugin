@@ -52,20 +52,20 @@ public class RunNetBeansMojo
      * @parameter default-value="${project.build.directory}/netbeans_clusters"
      * @required
      */
-    protected String clusterBuildDir;
+    protected File clusterBuildDir;
     /**
      * directory where the the netbeans platform/IDE installation is,
      * denotes the root directory of netbeans installation.
      * @parameter expression="${netbeans.installation}"
      * @required
      */
-    protected String netbeansInstallation;
+    protected File netbeansInstallation;
     /**
      * netbeans user directory for the executed instance.
      * @parameter default-value="${project.build.directory}/userdir" expression="${netbeans.userdir}"
      * @required
      */
-    protected String netbeansUserdir;
+    protected File netbeansUserdir;
     /**
      * additional command line arguments. Eg. 
      * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
@@ -89,12 +89,10 @@ public class RunNetBeansMojo
      */
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        File userDir = new File( netbeansUserdir );
-        userDir.mkdirs();
+        netbeansUserdir.mkdirs();
 
-        File clusterRoot = new File( clusterBuildDir );
         List clusters = new ArrayList();
-        File[] fls = clusterRoot.listFiles();
+        File[] fls = clusterBuildDir.listFiles();
         for ( int i = 0; i < fls.length; i++ )
         {
             if ( fls[i].isDirectory() )
@@ -104,7 +102,7 @@ public class RunNetBeansMojo
         }
 
         // write netbeans.conf file with cluster information...
-        File etc = new File( userDir, "etc" );
+        File etc = new File( netbeansUserdir, "etc" );
         etc.mkdirs();
         StringBuffer buff = new StringBuffer();
         buff.append( "netbeans_extraclusters=\"" );
@@ -144,7 +142,7 @@ public class RunNetBeansMojo
             {
                 //TODO --jdkhome
                 "--userdir",
-                Commandline.quoteArgument( userDir.getAbsolutePath() ),
+                Commandline.quoteArgument( netbeansUserdir.getAbsolutePath() ),
                 "-J-Dnetbeans.logger.console=true",
                 "-J-ea",
             };

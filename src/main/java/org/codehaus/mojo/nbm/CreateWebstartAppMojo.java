@@ -88,7 +88,7 @@ public class CreateWebstartAppMojo
      * @parameter default-value="${project.build.directory}"
      * @required
      */
-    private File buildDirectory;
+    private File outputDirectory;
 
     /**
      * Distributable zip file of NetBeans platform application
@@ -183,9 +183,9 @@ public class CreateWebstartAppMojo
             genTask.setAlias( "jnlp" );
             genTask.setStorepass( "netbeans" );
             genTask.setDname( "CN=" + System.getProperty( "user.name" ) );
-            genTask.setKeystore( new File( buildDirectory, "generated.keystore" ).getAbsolutePath() );
+            genTask.setKeystore( new File( outputDirectory, "generated.keystore" ).getAbsolutePath() );
             genTask.execute();
-            keystore = new File( buildDirectory, "generated.keystore" ).getAbsolutePath();
+            keystore = new File( outputDirectory, "generated.keystore" ).getAbsolutePath();
             keystorepassword = "netbeans";
             keystorealias = "jnlp";
         }
@@ -204,7 +204,7 @@ public class CreateWebstartAppMojo
         try
         {
             File webstartBuildDir = new File(
-                buildDirectory + File.separator + "webstart" + File.separator + brandingToken );
+                outputDirectory + File.separator + "webstart" + File.separator + brandingToken );
             if ( webstartBuildDir.exists() )
             {
                 FileUtils.deleteDirectory( webstartBuildDir );
@@ -212,7 +212,7 @@ public class CreateWebstartAppMojo
             webstartBuildDir.mkdirs();
             getLog().info( "Generating webstartable binaries at " + webstartBuildDir.getAbsolutePath() );
 
-            File nbmBuildDirFile = new File( buildDirectory, brandingToken );
+            File nbmBuildDirFile = new File( outputDirectory, brandingToken );
 
 //            FileUtils.copyDirectoryStructureIfModified( nbmBuildDirFile, webstartBuildDir );
 
@@ -290,7 +290,7 @@ public class CreateWebstartAppMojo
             filterCopy( masterJnlpFile, "/master.jnlp", masterJnlp, props );
 
 
-            File startup = copyLauncher( buildDirectory, nbmBuildDirFile );
+            File startup = copyLauncher( outputDirectory, nbmBuildDirFile );
             File jnlpDestination = new File(
                 webstartBuildDir.getAbsolutePath() + File.separator + "startup.jar" );
 

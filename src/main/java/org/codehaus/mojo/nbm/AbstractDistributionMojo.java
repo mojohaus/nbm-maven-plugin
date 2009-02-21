@@ -42,7 +42,7 @@ public abstract class AbstractDistributionMojo
      * @parameter default-value="${project.build.directory}"
      * @required
      */
-    protected File projectBuildDir;
+    protected File outputDirectory;
     /**
      * directory where the module(s)' netbeans cluster(s) are located.
      * is related to nbm:cluster goal.

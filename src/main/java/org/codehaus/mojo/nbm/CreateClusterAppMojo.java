@@ -67,7 +67,7 @@ public class CreateClusterAppMojo
      * @parameter default-value="${project.build.directory}"
      * @required
      */
-    private File buildDirectory;
+    private File outputDirectory;
 
     /**
      * The Maven Project.
@@ -136,7 +136,7 @@ public class CreateClusterAppMojo
     public void execute() throws MojoExecutionException, MojoFailureException
     {
 
-        File nbmBuildDirFile = new File( buildDirectory, brandingToken );
+        File nbmBuildDirFile = new File( outputDirectory, brandingToken );
         if ( !nbmBuildDirFile.exists() )
         {
             nbmBuildDirFile.mkdirs();

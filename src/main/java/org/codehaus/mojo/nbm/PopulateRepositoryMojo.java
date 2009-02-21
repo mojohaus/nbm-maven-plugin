@@ -112,7 +112,7 @@ public class PopulateRepositoryMojo
      *
      * @parameter expression="${netbeansInstallDirectory}"
      */
-    protected String netbeansInstallDirectory;
+    protected File netbeansInstallDirectory;
 
     /**
      * If you want to install/deploy also netbeans api javadocs, download the javadoc zip file from netbeans.org
@@ -120,13 +120,13 @@ public class PopulateRepositoryMojo
      *
      * @parameter expression="${netbeansJavadocDirectory}"
      */
-    protected String netbeansJavadocDirectory;
+    protected File netbeansJavadocDirectory;
 
     /**
      * Assumes a folder with &lt;code-name-base&gt;.zip files containing sources for modules.
      * @parameter expression="${netbeansSourcesDirectory}"
      */
-    protected String netbeansSourcesDirectory;
+    protected File netbeansSourcesDirectory;
 
     /**
      * If defined, will match the nbm files found in the designated folder with the modules
@@ -136,7 +136,7 @@ public class PopulateRepositoryMojo
      * @parameter expression="${netbeansNbmDirectory}"
      * @since 3.0
      */
-    protected String netbeansNbmDirectory;
+    protected File netbeansNbmDirectory;
 
     /**
      * Optional parameter, when specified, will force all modules to have the designated version.
@@ -236,10 +236,10 @@ public class PopulateRepositoryMojo
                 throw new MojoExecutionException( e.getMessage(), e );
             }
             String prop = antProject.getProperty( "installDir" );
-            netbeansInstallDirectory = prop;
+            netbeansInstallDirectory = new File(prop);
         }
 
-        File rootDir = new File( netbeansInstallDirectory );
+        File rootDir = netbeansInstallDirectory;
         if ( !rootDir.exists() )
         {
             getLog().error( "Netbeans installation doesn't exist." );
@@ -330,7 +330,7 @@ public class PopulateRepositoryMojo
         File javadocRoot = null;
         if ( netbeansJavadocDirectory != null )
         {
-            javadocRoot = new File( netbeansJavadocDirectory );
+            javadocRoot = netbeansJavadocDirectory ;
             if ( !javadocRoot.exists() )
             {
                 javadocRoot = null;
@@ -341,7 +341,7 @@ public class PopulateRepositoryMojo
         File sourceRoot = null;
         if ( netbeansSourcesDirectory != null )
         {
-            sourceRoot = new File( netbeansSourcesDirectory );
+            sourceRoot = netbeansSourcesDirectory;
             if ( !sourceRoot.exists() )
             {
                 sourceRoot = null;
@@ -353,7 +353,7 @@ public class PopulateRepositoryMojo
         File nbmRoot = null;
         if ( netbeansNbmDirectory != null )
         {
-            nbmRoot = new File( netbeansNbmDirectory );
+            nbmRoot = netbeansNbmDirectory;
             if ( !nbmRoot.exists() )
             {
                 nbmRoot = null;

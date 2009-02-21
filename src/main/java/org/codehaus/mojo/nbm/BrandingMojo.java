@@ -57,13 +57,13 @@ public class BrandingMojo
      * @parameter expression="${project.build.directory}/nbm"
      * @required
      */
-    protected String nbmBuildDir;
+    protected File nbmBuildDir;
     /**
      * Location of the branded resources.
      * @parameter expression="${basedir}/src/main/nbm-branding"
      * @required
      */
-    private String brandingSources;
+    private File brandingSources;
     /**
      * The branding token used by the application.
      * @parameter expression="${netbeans.branding.token}"

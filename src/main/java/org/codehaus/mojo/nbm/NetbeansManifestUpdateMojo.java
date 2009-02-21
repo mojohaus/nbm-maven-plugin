@@ -83,7 +83,7 @@ public class NetbeansManifestUpdateMojo
      * directory where the the netbeans jar and nbm file get constructed.
      * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      */
-    protected String nbmBuildDir;
+    protected File nbmBuildDir;
 
     /**
      * a netbeans module descriptor containing dependency information and more

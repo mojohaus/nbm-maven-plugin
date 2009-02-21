@@ -46,7 +46,7 @@ public class CreateClusterMojo
      * @parameter default-value="${project.build.directory}/netbeans_clusters"
      * @required
      */
-    protected String nbmBuildDir;
+    protected File nbmBuildDir;
     /**
      * The Maven Project.
      *
@@ -68,10 +68,9 @@ public class CreateClusterMojo
     {
         Project antProject = registerNbmAntTasks();
 
-        File nbmBuildDirFile = new File( nbmBuildDir );
-        if ( !nbmBuildDirFile.exists() )
+        if ( !nbmBuildDir.exists() )
         {
-            nbmBuildDirFile.mkdirs();
+            nbmBuildDir.mkdirs();
         }
 
         if ( reactorProjects != null && reactorProjects.size() > 0 )
@@ -86,7 +85,7 @@ public class CreateClusterMojo
                 if ( nbmDir.exists() )
                 {
                     Copy copyTask = (Copy) antProject.createTask( "copy" );
-                    copyTask.setTodir( nbmBuildDirFile );
+                    copyTask.setTodir( nbmBuildDir );
                     copyTask.setOverwrite( true );
                     FileSet set = new FileSet();
                     set.setDir( nbmDir );
@@ -113,7 +112,7 @@ public class CreateClusterMojo
                 }
             }
             //in 6.1 the rebuilt modules will be cached if the timestamp is not touched.
-            File[] files = nbmBuildDirFile.listFiles();
+            File[] files = nbmBuildDir.listFiles();
             for ( int i = 0; i < files.length; i++ )
             {
                 if ( files[i].isDirectory() )

@@ -62,7 +62,7 @@ public class CreateUpdateSiteMojo
     /**
      * @parameter default-value="${project.build.directory}"
      */
-    protected String outputDirectory;
+    protected File outputDirectory;
     /**
      * autoupdate site xml file name.
      * @parameter expression="${maven.nbm.updatesitexml}" default-value="Autoupdate_Site.xml"

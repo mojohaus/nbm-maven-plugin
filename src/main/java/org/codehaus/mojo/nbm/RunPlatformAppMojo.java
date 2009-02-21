@@ -49,14 +49,14 @@ public class RunPlatformAppMojo
      * @parameter default-value="${project.build.directory}"
      * @required
      */
-    private File buildDirectory;
+    private File outputDirectory;
 
     /**
      * netbeans user directory for the executed instance.
      * @parameter default-value="${project.build.directory}/userdir" expression="${netbeans.userdir}"
      * @required
      */
-    protected String netbeansUserdir;
+    protected File netbeansUserdir;
     /**
      * additional command line arguments. Eg. 
      * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
@@ -85,10 +85,9 @@ public class RunPlatformAppMojo
             throw new MojoFailureException( "The nbm:run-platform goal shall be used within a NetBeans Application project only ('nbm-application' packaging)");
         }
 
-        File userDir = new File( netbeansUserdir );
-        userDir.mkdirs();
+        netbeansUserdir.mkdirs();
 
-        File appbasedir = new File( buildDirectory, brandingToken );
+        File appbasedir = new File( outputDirectory, brandingToken );
 
         if (!appbasedir.exists()) {
             throw new MojoExecutionException( "The directory that shall contain built application, doesn't exist (" + appbasedir.getAbsolutePath()  + ")\n Please invoke 'mvn install' on the project first");
@@ -107,7 +106,7 @@ public class RunPlatformAppMojo
             {
                 //TODO --jdkhome
                 "--userdir",
-                Commandline.quoteArgument( userDir.getAbsolutePath() ),
+                Commandline.quoteArgument( netbeansUserdir.getAbsolutePath() ),
                 "-J-Dnetbeans.logger.console=true",
                 "-J-ea",
                 "--branding",
