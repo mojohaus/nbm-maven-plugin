@@ -30,6 +30,12 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    <scm>
+        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven-plugin</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven-plugin</developerConnection>
+        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven-plugin</url>
+    </scm>
+
     <developers>
         <developer>
             <id>mkleint</id>
