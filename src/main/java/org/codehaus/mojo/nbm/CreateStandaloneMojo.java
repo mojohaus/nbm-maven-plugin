@@ -47,7 +47,7 @@ public class CreateStandaloneMojo
      * @parameter default-value="${project.build.directory}"
      * @required
      */
-    private File buildDirectory;
+    private File outputDirectory;
     /**
      * Name of the jar packaged by the jar:jar plugin
      * @parameter expression="${project.build.finalName}"
@@ -72,11 +72,11 @@ public class CreateStandaloneMojo
 
         try
         {
-            File nbmBuildDirFile = new File( buildDirectory, brandingToken );
+            File nbmBuildDirFile = new File( outputDirectory, brandingToken );
 
             ZipArchiver archiver = new ZipArchiver();
             DefaultFileSet fs = new DefaultFileSet();
-            fs.setDirectory( buildDirectory );
+            fs.setDirectory( outputDirectory );
             fs.setIncludes( new String[] {
                 brandingToken + "/**",
             });
@@ -88,7 +88,7 @@ public class CreateStandaloneMojo
             for (File bin : bins.listFiles()) {
                 archiver.addFile( bin, brandingToken + "/bin/" + bin.getName(), 775);
             }
-            File zipFile = new File( buildDirectory, finalName + ".zip" );
+            File zipFile = new File( outputDirectory, finalName + ".zip" );
             //TODO - somehow check for last modified content to see if we shall be
             //recreating the zip file.
             archiver.setDestFile( zipFile );

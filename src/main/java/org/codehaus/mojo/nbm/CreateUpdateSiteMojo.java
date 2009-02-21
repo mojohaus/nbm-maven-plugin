@@ -60,7 +60,9 @@ public class CreateUpdateSiteMojo
 {
 
     /**
+     * output directory.
      * @parameter default-value="${project.build.directory}"
+     * @required
      */
     protected File outputDirectory;
     /**
