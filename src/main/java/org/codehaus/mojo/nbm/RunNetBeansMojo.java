@@ -100,10 +100,6 @@ public class RunNetBeansMojo
                 clusters.add( fls[i] );
             }
         }
-
-        // write netbeans.conf file with cluster information...
-        File etc = new File( netbeansUserdir, "etc" );
-        etc.mkdirs();
         StringBuffer buff = new StringBuffer();
         buff.append( "netbeans_extraclusters=\"" );
         Iterator it = clusters.iterator();
@@ -113,9 +109,15 @@ public class RunNetBeansMojo
             buff.append( cluster.getAbsolutePath() );
             buff.append( ":" );
         }
-        buff.deleteCharAt( buff.lastIndexOf( ":" ) );
+        if (buff.lastIndexOf( ":") > -1) {
+            buff.deleteCharAt( buff.lastIndexOf( ":" ) );
+        }
         buff.append( "\"" );
         StringReader sr = new StringReader( buff.toString() );
+
+        // write netbeans.conf file with cluster information...
+        File etc = new File( netbeansUserdir, "etc" );
+        etc.mkdirs();
         File confFile = new File( etc, "netbeans.conf" );
         FileOutputStream conf = null;
         try
