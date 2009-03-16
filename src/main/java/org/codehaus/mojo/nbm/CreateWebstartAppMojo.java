@@ -150,6 +150,10 @@ public class CreateWebstartAppMojo
      */
     public void execute() throws MojoExecutionException, MojoFailureException
     {
+        if ("$codebase".equals(codebase)) {
+            //MNBMODULE-47 maven core seems to strip one of the $ signs
+            codebase = "$$codebase";
+        }
         if ( !"nbm-application".equals( project.getPackaging() ) )
         {
             throw new MojoExecutionException(
