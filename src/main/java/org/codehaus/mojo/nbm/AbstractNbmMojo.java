@@ -396,17 +396,42 @@ public abstract class AbstractNbmMojo
                 {
                     artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), localRepository );
                 }
+
                 catch ( ArtifactResolutionException ex )
                 {
-                    throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
+                    //shall be check before actually resolving from repos?
+                    checkReactor( art, nbmArt );
+                    if (!nbmArt.isResolved()) {
+                        throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
+                    }
                 }
                 catch ( ArtifactNotFoundException ex )
                 {
-                    throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
+                    //shall be check before actually resolving from repos?
+                    checkReactor( art, nbmArt );
+                    if (!nbmArt.isResolved()) {
+                        throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
+                    }
                 }
                 return nbmArt;
             }
         }
         return null;
     }
+
+    private void checkReactor( Artifact art, Artifact nbmArt )
+    {
+        if ( art.getFile().getName().endsWith( ".jar" ) )
+        {
+            String name = art.getFile().getName();
+            name = name.substring( 0, name.length() - ".jar".length() ) + ".nbm";
+            File fl = new File( art.getFile().getParentFile(), name );
+            if ( fl.exists() )
+            {
+                nbmArt.setFile( fl );
+                nbmArt.setResolved( true );
+            }
+        }
+    }
+
 }
