@@ -99,6 +99,14 @@ public class CreateWebstartAppMojo
     private File destinationFile;
 
     /**
+     * Artifact Classifier to use for the webstart distributable zip file.
+     *
+     * @parameter expression="${nbm.webstart.classifier}" default-value="webstart"
+     * @since 3.1
+     */
+    private String webstartClassifier;
+
+    /**
      * Jnlp codebase value within *.jnlp files.
      * @parameter expression="${nbm.webstart.codebase}" default-value="$$codebase"
      * 
@@ -365,7 +373,7 @@ public class CreateWebstartAppMojo
             archiver.createArchive();
 
             // attach standalone so that it gets installed/deployed
-            projectHelper.attachArtifact( project, "zip", "webstart",
+            projectHelper.attachArtifact( project, "zip", webstartClassifier,
                 destinationFile );
 
         }
