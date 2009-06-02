@@ -260,7 +260,7 @@ public class NetbeansManifestUpdateMojo
             specialManifest = nbmManifest;
         }
         ExamineManifest examinator = new ExamineManifest( getLog() );
-        if ( specialManifest != null )
+        if ( specialManifest != null && specialManifest.exists() )
         {
             examinator.setManifestFile( specialManifest );
             examinator.checkFile();
@@ -273,7 +273,7 @@ public class NetbeansManifestUpdateMojo
         getLog().info( "NBM Plugin generates manifest" );
 
         Manifest manifest = null;
-        if ( specialManifest != null )
+        if ( specialManifest != null && specialManifest.exists() )
         {
             Reader reader = null;
             try
