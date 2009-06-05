@@ -241,6 +241,11 @@
             <version>1.0-alpha-9-stable-1</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.help</groupId>
+            <artifactId>javahelp</artifactId>
+            <version>2.0.02</version>
+        </dependency>
     </dependencies>
     <reporting>
         <plugins>
@@ -296,3 +301,4 @@
         <org-netbeans-modules-editor-indent.text.xml.CodeStyle.project.text-limit-width>120</org-netbeans-modules-editor-indent.text.xml.CodeStyle.project.text-limit-width>
     </properties>
 </project>
+

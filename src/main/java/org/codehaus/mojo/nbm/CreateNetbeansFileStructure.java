@@ -366,26 +366,6 @@ public abstract class CreateNetbeansFileStructure
         //javahelp stuff.
         if ( nbmJavahelpSource.exists() )
         {
-            if ( !hasJavaHelp )
-            {
-                getLog().error( "jsearch.jar required on plugin classpath to generate JavaHelp.Please add this section to your nbm-maven-plugin configuration in pom.xml:" +
-                        "\n\n<plugin>" +
-                        "\n  <groupId>org.codehaus.mojo</groupId>" +
-                        "\n  <artifactId>nbm-maven-plugin</artifactId>" +
-                        "\n  <extensions>true</extensions>" +
-                        "\n  <dependencies>" +
-                        "\n    <dependency>" +
-                        "\n      <groupId>javax.help</groupId>" +
-                        "\n      <artifactId>search</artifactId>" +
-                        "\n      <version>2.0</version>" +
-                        "\n      <!--scope>system</scope>" +
-                        "\n      <systemPath>/home/mkleint/netbeans/harness/jsearch-2.0_04.jar</systemPath-->" +
-                        "\n    </dependency>" +
-                        "\n  </dependencies>" +
-                        "\n</plugin>" );
-                throw new MojoExecutionException(
-                        "Required JavaHelp jar not found on nbm-maven-plugin's classpath." );
-            }
             File javahelp_target = new File( buildDir, "javahelp" );
             String javahelpbase = moduleJarName.replace( '-', File.separatorChar ) + File.separator + "docs";
             String javahelpSearch = "JavaHelpSearch";

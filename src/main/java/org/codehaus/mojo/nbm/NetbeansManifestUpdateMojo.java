@@ -435,7 +435,7 @@ public class NetbeansManifestUpdateMojo
                 }
             }
 
-            if ( hasJavaHelp && nbmJavahelpSource.exists() )
+            if ( nbmJavahelpSource.exists() )
             {
                 String moduleJarName = stripVersionFromCodebaseName( moduleName ).replace( ".", "-" );
                 classPath = classPath + " docs/" + moduleJarName + ".jar";

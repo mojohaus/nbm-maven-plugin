@@ -53,8 +53,6 @@ public abstract class AbstractNbmMojo
     extends AbstractMojo
 {
 
-    protected boolean hasJavaHelp = false;
-
     protected final Project registerNbmAntTasks()
     {
         Project antProject = new Project();
@@ -80,20 +78,10 @@ public abstract class AbstractNbmMojo
         taskdef.setName( "createmodulexml" );
         taskdef.execute();
 
-        try
-        {
-            getClass().getClassLoader().loadClass(
-                "javax.help.search.SearchEngine" );
-            hasJavaHelp = true;
-            taskdef = (Taskdef) antProject.createTask( "taskdef" );
-            taskdef.setClassname( "org.netbeans.nbbuild.JHIndexer" );
-            taskdef.setName( "jhindexer" );
-            taskdef.execute();
-        }
-        catch ( ClassNotFoundException ex )
-        {
-            hasJavaHelp = false;
-        }
+        taskdef = (Taskdef) antProject.createTask( "taskdef" );
+        taskdef.setClassname( "org.netbeans.nbbuild.JHIndexer" );
+        taskdef.setName( "jhindexer" );
+        taskdef.execute();
 
         return antProject;
     }
