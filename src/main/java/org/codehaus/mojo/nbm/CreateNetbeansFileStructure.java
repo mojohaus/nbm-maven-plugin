@@ -18,12 +18,16 @@ package org.codehaus.mojo.nbm;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.maven.artifact.Artifact;
 //import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -403,6 +407,7 @@ public abstract class CreateNetbeansFileStructure
             jhTask.setExcludes( javahelpSearch );
             Path path = new Path( antProject );
             jhTask.setClassPath( path );
+            MNMMODULE51hackClearStaticFieldsInJavaHelpIndexer();
             try
             {
                 jhTask.execute();
@@ -479,5 +484,50 @@ public abstract class CreateNetbeansFileStructure
             throw new MojoExecutionException( e.getMessage(), e );
         }
 
+    }
+
+    // repeated invokation of the javahelp indexer (possibly via multiple classloaders)
+    // is causing trouble, residue from previous invokations seems to cause errors
+    // this is a nasty workaround for the problem.
+    // alternatively we could try invoking the indexer from a separate jvm i guess,
+    // ut that's more work.
+    private void MNMMODULE51hackClearStaticFieldsInJavaHelpIndexer()
+    {
+        try
+        {
+            Class clazz = Class.forName( "com.sun.java.help.search.Indexer" );
+            Field fld = clazz.getDeclaredField( "kitRegistry" );
+            fld.setAccessible( true );
+            Hashtable hash = (Hashtable) fld.get( null );
+            hash.clear();
+
+            clazz = Class.forName( "com.sun.java.help.search.HTMLIndexerKit" );
+            fld = clazz.getDeclaredField( "defaultParser" );
+            fld.setAccessible( true );
+            fld.set( null, null);
+
+            fld = clazz.getDeclaredField( "defaultCallback" );
+            fld.setAccessible( true );
+            fld.set( null, null);
+
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
+        }
+        catch ( IllegalAccessException ex )
+        {
+            Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
+        }        catch ( NoSuchFieldException ex )
+        {
+            Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
+        }
+        catch ( SecurityException ex )
+        {
+            Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
+        }        catch ( ClassNotFoundException ex )
+        {
+            Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
+        }
     }
 }
