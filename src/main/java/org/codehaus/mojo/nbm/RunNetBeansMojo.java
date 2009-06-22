@@ -134,8 +134,16 @@ public class RunNetBeansMojo
 
         boolean windows = Os.isFamily( "windows" );
         Commandline cmdLine = new Commandline();
-        File exec = windows ? new File( netbeansInstallation, "bin\\nb.exe" ) : new File(
-                netbeansInstallation, "bin/netbeans" );
+        File exec;
+        if (windows) {
+            exec = new File( netbeansInstallation, "bin\\nb.exe" );
+            if (!exec.exists()) {
+                // in 6.7 and onward, there's no nb.exe file.
+                exec = new File( netbeansInstallation, "bin\\netbeans.exe" );
+            }
+        } else {
+            exec = new File(netbeansInstallation, "bin/netbeans" );
+        }
         cmdLine.setExecutable( exec.getAbsolutePath() );
 
         try
