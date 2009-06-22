@@ -35,8 +35,6 @@ import java.util.zip.ZipEntry;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -46,7 +44,6 @@ import org.apache.tools.ant.taskdefs.Chmod;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Create the Netbeans module clusters/application for the 'nbm-application' packaging
@@ -433,7 +430,6 @@ public class CreateClusterAppMojo
             File harnessDir = new File( buildDir, "harness" );
             if ( harnessDir.exists() )
             {
-                getLog().debug( "Using fallback executables shipping with the nbm-maven-plugin." );
                 binDir = new File(
                     harnessDir.getAbsolutePath() + File.separator + "launchers" );
                 File exe = new File( binDir, "app.exe" );
@@ -445,6 +441,7 @@ public class CreateClusterAppMojo
             }
             else
             {
+                getLog().debug( "Using fallback executables shipping with the nbm-maven-plugin." );
                 writeFile( "/launchers/app.sh", destSh );
                 writeFile( "/launchers/app.exe", destExe );
                 writeFile( "/launchers/app_w.exe", destExeW );
