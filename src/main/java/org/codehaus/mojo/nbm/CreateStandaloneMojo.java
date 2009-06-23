@@ -86,7 +86,7 @@ public class CreateStandaloneMojo
             archiver.addFileSet( fs);
             File bins = new File(nbmBuildDirFile, "bin");
             for (File bin : bins.listFiles()) {
-                archiver.addFile( bin, brandingToken + "/bin/" + bin.getName(), 775);
+                archiver.addFile( bin, brandingToken + "/bin/" + bin.getName(), 0755);
             }
             File zipFile = new File( outputDirectory, finalName + ".zip" );
             //TODO - somehow check for last modified content to see if we shall be
