@@ -99,19 +99,20 @@ public class CreateNbmMojo
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        if ( !"nbm".equals( project.getPackaging() ) )
-        {
-            getLog().debug(
-                    "Skipping " + project.getId() + " skipped, not NBM packaging" );
-            return;
-        }
-        super.execute();
-
         if ( skipNbm )
         {
             getLog().info( "Skipping generation of NBM file.");
             return;
         }
+
+        if ( "pom".equals( project.getPackaging() ) )
+        {
+            getLog().info(
+                    "Skipping " + project.getId() + ", no nbm:nbm execution for 'pom' packaging" );
+            return;
+        }
+        super.execute();
+
 
         // 3. generate nbm
         File nbmFile = new File( nbmBuildDir, finalName + ".nbm" );

@@ -165,12 +165,6 @@ public abstract class CreateNetbeansFileStructure
     public void execute()
             throws MojoExecutionException, MojoFailureException
     {
-        if ( !"nbm".equals( project.getPackaging() ) )
-        {
-            getLog().debug(
-                    "Skipping " + project.getId() + " skipped, not NBM packaging" );
-            return;
-        }
         antProject = registerNbmAntTasks();
         if ( descriptor != null && descriptor.exists() )
         {
