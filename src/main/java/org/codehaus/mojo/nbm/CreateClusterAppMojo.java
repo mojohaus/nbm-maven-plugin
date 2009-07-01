@@ -403,7 +403,7 @@ public class CreateClusterAppMojo
             {
                 String name = fl.getName();
                 File dest = null;
-                if ( name.endsWith( "_w.exe" ) )
+                if ( name.endsWith( "_w.exe" ) ) 
                 {
                     dest = destExeW;
                 }
@@ -415,7 +415,7 @@ public class CreateClusterAppMojo
                 {
                     dest = destSh;
                 }
-                if ( dest != null )
+                if ( dest != null  && fl.exists() ) //in 6.7 the _w.exe file is no more.
                 {
                     FileUtils.copyFile( fl, dest );
                 }
@@ -435,13 +435,16 @@ public class CreateClusterAppMojo
                 File exe = new File( binDir, "app.exe" );
                 FileUtils.copyFile( exe, destExe );
                 File exew = new File( binDir, "app_w.exe" );
-                FileUtils.copyFile( exew, destExeW );
+                if ( exew.exists() ) //in 6.7 the _w.exe file is no more.
+                {
+                    FileUtils.copyFile( exew, destExeW );
+                }
                 File sh = new File( binDir, "app.sh" );
                 FileUtils.copyFile( sh, destSh );
             }
             else
             {
-                getLog().debug( "Using fallback executables shipping with the nbm-maven-plugin." );
+                getLog().debug( "Using fallback executables shipping with the nbm-maven-plugin. (from 6.5 NetBeans Platform)" );
                 writeFile( "/launchers/app.sh", destSh );
                 writeFile( "/launchers/app.exe", destExe );
                 writeFile( "/launchers/app_w.exe", destExeW );
