@@ -11,9 +11,4 @@
   <name>Maven NetBeans Module Archetype</name>
   <description>Archetype for development of NetBeans modules in Maven.</description>
 
-  <scm>
-    <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nbm-archetype-1.1</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-archetype-1.1</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-archetype-1.1</url>
-  </scm>
 </project>
