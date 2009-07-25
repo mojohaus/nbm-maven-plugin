@@ -92,6 +92,9 @@ public class RunNetBeansMojo
         netbeansUserdir.mkdirs();
 
         List clusters = new ArrayList();
+        if (!clusterBuildDir.exists() || clusterBuildDir.listFiles() == null) {
+            throw new MojoExecutionException("No clusters to include in execution found. Please run the nbm:cluster or nbm:cluster-app goals before this one.");
+        }
         File[] fls = clusterBuildDir.listFiles();
         for ( int i = 0; i < fls.length; i++ )
         {
