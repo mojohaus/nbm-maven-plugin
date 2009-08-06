@@ -105,8 +105,8 @@ public class CreateClusterMojo
                 {
                     if ( "nbm".equals( proj.getPackaging() ) )
                     {
-                        String error = "Since 2.7, the nbm:nbm goal is not part of the lifecycle. \nTherefore the NetBeans binary directory structure for " + proj.getId() + " is not created yet." +
-                                "\n Please execute 'mvn install nbm:directory nbm:cluster' to get the same results as in earlier versions.";
+                        String error = "The NetBeans binary directory structure for " + proj.getId() + " is not created yet." +
+                                "\n Please execute 'mvn install nbm:cluster' to build all relevant projects in the reactor.";
                         throw new MojoFailureException( error );
                     }
                 }
