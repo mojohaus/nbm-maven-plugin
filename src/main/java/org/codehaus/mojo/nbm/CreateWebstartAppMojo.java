@@ -152,6 +152,18 @@ public class CreateWebstartAppMojo
     private String keystorealias;
 
     /**
+     * If set true, build-jnlp target creates versioning info in jnlp descriptors and version.xml files.
+     * This allows for incremental updates of Webstart applications, but requires download via
+     * JnlpDownloadServlet
+     * Defaults to false, which means versioning
+     * info is not generated (see
+     * http://java.sun.com/j2se/1.5.0/docs/guide/javaws/developersguide/downloadservletguide.html#resources).
+     *
+     * @parameter expression="${nbm.webstart.versions}" default-value="false"
+     */
+    private boolean processJarVersions;
+
+    /**
      * 
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
@@ -239,6 +251,7 @@ public class CreateWebstartAppMojo
             jnlpTask.setAlias( keystorealias );
             jnlpTask.setKeystore( keystore );
             jnlpTask.setStorePass( keystorepassword );
+            jnlpTask.setProcessJarVersions( processJarVersions );
 
             FileSet fs = jnlpTask.createModules();
             fs.setDir( nbmBuildDirFile );
