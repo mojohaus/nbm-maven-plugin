@@ -142,6 +142,7 @@ public class CreateNbmMojo
                 sig.setKeystore( ks );
                 sig.setAlias( keystorealias );
                 sig.setStorepass( keystorepassword );
+                getLog().debug( "Setup the Ant task to sign the NBM file.");
             }
         } else if ( keystore != null || keystorepassword != null || keystorealias != null )
         {
