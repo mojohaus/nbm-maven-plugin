@@ -38,9 +38,8 @@
                 <field>
                     <name>cluster</name>
                     <version>1.0.0+</version>
-                    <description>Each modules should belong to a cluster. A cluster is a group of related modules. For individual modules it's not that important. Refer to netbeans.org documentation for more details.</description>
+                    <description>DEPRECATED, use the plugin configuration instead. Each modules should belong to a cluster. A cluster is a group of related modules. For individual modules it's not that important. Refer to netbeans.org documentation for more details.</description>
                     <type>String</type>
-                    <defaultValue>maven1</defaultValue>
                 </field>
                 <field>
                     <name>requiresRestart</name>
