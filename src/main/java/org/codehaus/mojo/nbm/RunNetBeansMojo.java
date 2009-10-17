@@ -129,7 +129,6 @@ public class RunNetBeansMojo
             for ( File f : execs )
             {
                 String name = f.getName();
-                System.out.println( "filename=" + name );
                 if ( name.contains( "_w.exe" ) ) {
                     continue;
                 }
