@@ -118,10 +118,48 @@ public class RunNetBeansMojo
         buff.append( "\"" );
         StringReader sr = new StringReader( buff.toString() );
 
-        // write netbeans.conf file with cluster information...
+
+        //now check what the exec names are to figure the right XXX.clusters name
+        File binDir = new File( netbeansInstallation, "bin" );
+        File[] execs = binDir.listFiles();
+        String clust = null;
+        if ( execs != null )
+        {
+            for ( File f : execs )
+            {
+                String name = f.getName();
+                System.out.println( "filename=" + name );
+                if ( name.contains( "_w.exe" ) ) {
+                    continue;
+                }
+                if ( name.contains( ".exe" ) )
+                {
+                    name = name.substring( 0, name.length() - ".exe".length() );
+                }
+                if ( !name.contains( "." ) )
+                {
+                    if ( clust == null )
+                    {
+                        clust = name;
+                    }
+                    else
+                    {
+                        if ( !clust.equals( name ) )
+                        {
+                            getLog().debug( "When examining executable names, found clashing results " + f.getName() + " " + clust);
+                        }
+                    }
+                }
+            }
+        }
+        if ( clust == null) {
+            clust = "netbeans";
+        }
+
+        // write XXX.conf file with cluster information...
         File etc = new File( netbeansUserdir, "etc" );
         etc.mkdirs();
-        File confFile = new File( etc, "netbeans.conf" );
+        File confFile = new File( etc, clust + ".conf" );
         FileOutputStream conf = null;
         try
         {
@@ -142,10 +180,10 @@ public class RunNetBeansMojo
             exec = new File( netbeansInstallation, "bin\\nb.exe" );
             if (!exec.exists()) {
                 // in 6.7 and onward, there's no nb.exe file.
-                exec = new File( netbeansInstallation, "bin\\netbeans.exe" );
+               exec = new File( netbeansInstallation, "bin\\" + clust + ".exe" );
             }
         } else {
-            exec = new File(netbeansInstallation, "bin/netbeans" );
+            exec = new File(netbeansInstallation, "bin/" + clust );
         }
         cmdLine.setExecutable( exec.getAbsolutePath() );
 
