@@ -104,7 +104,6 @@ public class RunNetBeansMojo
             }
         }
         StringBuffer buff = new StringBuffer();
-        buff.append( "netbeans_extraclusters=\"" );
         Iterator it = clusters.iterator();
         while ( it.hasNext() )
         {
@@ -115,8 +114,10 @@ public class RunNetBeansMojo
         if (buff.lastIndexOf( ":") > -1) {
             buff.deleteCharAt( buff.lastIndexOf( ":" ) );
         }
-        buff.append( "\"" );
-        StringReader sr = new StringReader( buff.toString() );
+        //http://www.netbeans.org/issues/show_bug.cgi?id=174819
+        StringReader sr = new StringReader( "netbeans_extraclusters=\"" + buff.toString() + "\"\n" +
+                                             "extraclusters=\"" + buff.toString() + "\"\n" +
+                                             "extra_clusters=\"" + buff.toString() + "\"");
 
 
         //now check what the exec names are to figure the right XXX.clusters name
