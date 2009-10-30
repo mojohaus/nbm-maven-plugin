@@ -96,8 +96,16 @@ public class RunPlatformAppMojo
         boolean windows = Os.isFamily( "windows" );
 
         Commandline cmdLine = new Commandline();
-        File exec = windows ? new File( appbasedir, "bin\\" + brandingToken + "_w.exe" )
-                            : new File( appbasedir, "bin/" + brandingToken );
+        File exec;
+        if (windows) {
+            exec = new File(appbasedir, "bin" + brandingToken + "_w.exe");
+            if (!exec.exists()) { // Was removed as of nb 6.7
+                exec = new File(appbasedir, "bin\\" + brandingToken + ".exe");
+            }
+        } else {
+            exec = new File(appbasedir, "bin/" + brandingToken);
+        }
+
         cmdLine.setExecutable( exec.getAbsolutePath() );
 
         try
