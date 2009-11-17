@@ -222,10 +222,10 @@ to give the application it's unique touch.
  This goal can be attached to one of the nbm module projects that will be part of the
 NetBeans platform based application.
 
- For more detailed tutorial, check the {{{http://www.netbeans.org/download/magazine/04/nbmag4-modulesmaven.pdf}NetBeans Platform Development with Maven2}}
-article written by Emilian Bold. (Please note that the article works with nbm-plugin version 2.6.x and might not represent the latest state of the tool)
+ For more detailed tutorial, check the {{{http://netbeans.dzone.com/videos/screencast-maven-and-netbeans}Screencast: Maven and the NetBeans Platform}}
+video recorded by Fabrizio Giudici. It describes to Fabrizio's open source project {{{http://kenai.com/projects/forceten}ForceTen}} which can be used as reference setup for Maven NetBeans Platform based apps.
 
- Please note that in 3.x version, the branding shall be included as part of a regular nbm subproject and cannto be attached to a "pom" packaged root project.
+ Please note that in 3.x version, the branding shall be included as part of a regular nbm subproject and cannot be attached to a "pom" packaged root project.
 
 +-------------------------------------------------------------------------------+
 mvn nbm:run-ide nbm:run-platform
