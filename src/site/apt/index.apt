@@ -265,3 +265,8 @@ IDE support
 contains additional support for working with Netbeans module projects. The support includes file templates,
 important nodes in projects view, running module(s) in IDE or platform.
 Please note that support for projects with nbm-application packaging might be limited in current (NetBeans 6.5) released version.
+
+Sample real life application
+
+ Check the {{{http://netbeans.dzone.com/videos/screencast-maven-and-netbeans}Screencast: Maven and the NetBeans Platform}}
+video recorded by Fabrizio Giudici. It describes to Fabrizio's open source project {{{http://kenai.com/projects/forceten}ForceTen}} which can be used as reference setup for Maven NetBeans Platform based apps.
