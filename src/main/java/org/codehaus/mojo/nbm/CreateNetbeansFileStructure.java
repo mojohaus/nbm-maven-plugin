@@ -297,15 +297,15 @@ public abstract class CreateNetbeansFileStructure
         if ( module != null )
         {
             // copy libraries to the designated place..            
-            List librList = new ArrayList();
+            List<String> librList = new ArrayList<String>();
             if ( module.getLibraries() != null )
             {
                 librList.addAll( module.getLibraries() );
             }
-            List artifacts = project.getRuntimeArtifacts();
-            for ( Iterator iter = artifacts.iterator(); iter.hasNext();)
+            @SuppressWarnings("unchecked")
+            List<Artifact> artifacts = project.getRuntimeArtifacts();
+            for ( Artifact artifact : artifacts )
             {
-                Artifact artifact = (Artifact) iter.next();
                 File source = artifact.getFile();
                 if ( classpathValue.contains( "ext/" + source.getName() ) )
                 {
@@ -436,37 +436,30 @@ public abstract class CreateNetbeansFileStructure
 
     private void copyDeprecatedNbmResources() throws BuildException, MojoExecutionException {
         // copy additional resources..
-        List ress = module.getNbmResources();
+        List<NbmResource> ress = module.getNbmResources();
         if (ress.size() > 0) {
             getLog().warn("NBM resources defined in module descriptor are deprecated. Please configure NBM resources in plugin configuration.");
             Copy cp = (Copy) antProject.createTask( "copy" );
             cp.setTodir(clusterDir);
-            HashMap customPaths = new HashMap();
-            Iterator it = ress.iterator();
+            HashMap<File, Collection<FileSet>> customPaths = new HashMap<File, Collection<FileSet>>();
             boolean hasStandard = false;
-            while (it.hasNext()) {
-                NbmResource res = (NbmResource) it.next();
+            for (NbmResource res : ress) {
                 if (res.getBaseDirectory() != null) {
                     File base = new File(project.getBasedir(), res.getBaseDirectory());
                     FileSet set = new FileSet();
                     set.setDir(base);
-                    if (res.getIncludes().size() > 0) {
-                        Iterator it2 = res.getIncludes().iterator();
-                        while (it2.hasNext()) {
-                            set.createInclude().setName((String) it2.next());
-                        }
+                    for (String inc : res.getIncludes()) {
+                        set.createInclude().setName(inc);
                     }
-                    if (res.getExcludes().size() > 0) {
-                        Iterator it2 = res.getExcludes().iterator();
-                        while (it2.hasNext()) {
-                            set.createExclude().setName((String) it2.next());
-                        }
+                    for (String exc : res.getExcludes()) {
+                        set.createExclude().setName(exc);
                     }
+
                     if (res.getRelativeClusterPath() != null) {
                         File path = new File(clusterDir, res.getRelativeClusterPath());
-                        Collection col = (Collection) customPaths.get( path );
+                        Collection<FileSet> col = customPaths.get( path );
                         if (col == null) {
-                            col = new ArrayList();
+                            col = new ArrayList<FileSet>();
                             customPaths.put(path, col);
                         }
                         col.add(set);
@@ -481,15 +474,10 @@ public abstract class CreateNetbeansFileStructure
                     cp.execute();
                 }
                 if (customPaths.size() > 0) {
-                    Iterator itx = customPaths.entrySet().iterator();
-                    while (itx.hasNext()) {
-                        Map.Entry ent = (Map.Entry) itx.next();
-                        Collection elem = (Collection) ent.getValue();
+                    for (Map.Entry<File, Collection<FileSet>> ent : customPaths.entrySet()) {
                         cp = (Copy) antProject.createTask( "copy" );
-                        cp.setTodir((File) ent.getKey());
-                        Iterator itz = elem.iterator();
-                        while (itz.hasNext()) {
-                            FileSet set = (FileSet) itz.next();
+                        cp.setTodir(ent.getKey());
+                        for (FileSet set : ent.getValue()) {
                             cp.addFileset(set);
                         }
                         cp.execute();
