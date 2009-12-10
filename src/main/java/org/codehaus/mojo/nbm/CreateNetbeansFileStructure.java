@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -30,10 +32,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.artifact.Artifact;
 //import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.shared.filtering.MavenFilteringException;
 import org.codehaus.mojo.nbm.model.NbmResource;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.filtering.MavenResourcesExecution;
+import org.apache.maven.shared.filtering.MavenResourcesFiltering;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Copy;
@@ -46,6 +53,8 @@ import org.apache.tools.ant.util.FileUtils;
 import org.netbeans.nbbuild.CreateModuleXML;
 import org.netbeans.nbbuild.MakeListOfNBM;
 import org.codehaus.mojo.nbm.model.NetbeansModule;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.StringUtils;
 import org.netbeans.nbbuild.JHIndexer;
 
 /**
@@ -102,18 +111,18 @@ public abstract class CreateNetbeansFileStructure
      * of any NetBeans installation. <br/>
     <code>
     &lt;plugin&gt;<br/>
-    &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;<br/>
-    &lt;artifactId&gt;nbm-maven-plugin&lt;/artifactId&gt;<br/>
-    &lt;extensions&gt;true&lt;/extensions&gt;<br/>
-    &lt;dependencies&gt;<br/>
-    &lt;dependency&gt;<br/>
-    &lt;groupId&gt;javax.help&lt;/groupId&gt;<br/>
-    &lt;artifactId&gt;search&lt;/artifactId&gt;<br/>
-    &lt;version&gt;2.0&lt;/version&gt;<br/>
-    &lt;!--scope&gt;system&lt;/scope&gt;<br/>
-    &lt;systemPath&gt;/home/mkleint/netbeans/harness/jsearch-2.0_04.jar&lt;/systemPath--&gt;<br/>
-    &lt;/dependency&gt;<br/>
-    &lt;/dependencies&gt;<br/>
+    &nbsp;&nbsp;&lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;<br/>
+    &nbsp;&nbsp;&lt;artifactId&gt;nbm-maven-plugin&lt;/artifactId&gt;<br/>
+    &nbsp;&nbsp;&lt;extensions&gt;true&lt;/extensions&gt;<br/>
+    &nbsp;&nbsp;&lt;dependencies&gt;<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;dependency&gt;<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;javax.help&lt;/groupId&gt;<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;search&lt;/artifactId&gt;<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;2.0&lt;/version&gt;<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--scope&gt;system&lt;/scope&gt;<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;systemPath&gt;/home/mkleint/netbeans/harness/jsearch-2.0_04.jar&lt;/systemPath--&gt;<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;/dependency&gt;<br/>
+    &nbsp;&nbsp;&lt;/dependencies&gt;<br/>
     &lt;/plugin&gt;<br/>
     <br/>
     </code>
@@ -154,6 +163,50 @@ public abstract class CreateNetbeansFileStructure
      * @parameter expression="${maven.nbm.distributionURL}"
      */
     private String distributionUrl;
+
+    /**
+     * The list of nbmResources we want to include in the nbm file (not in module jar,
+     * but as external content within the nbm. Replaces the same configuration in the module
+     * descriptor file. For example to include external dll files in the nbm:
+     *
+     <code>
+            &lt;nbmResource&gt;<br/>
+            &nbsp;&nbsp;&lt;directory&gt;src/main/libs&lt;/directory&gt;<br/>
+            &nbsp;&nbsp;&lt;targetPath&gt;lib&lt;/targetPath&gt;<br/>
+            &nbsp;&nbsp;&lt;includes&gt;<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.dll&lt;/include&gt;<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.so&lt;/include&gt;<br/>
+            &nbsp;&nbsp;&lt;/includes&gt;<br/>
+            &lt;/nbmResource&gt;<br/>
+     </code>
+     *
+     * @parameter
+     * @since 3.2
+     */
+    protected Resource[] nbmResources;
+
+    /**
+     * The character encoding scheme to be applied when filtering nbm resources.
+     *
+     * @parameter expression="${encoding}" default-value="${project.build.sourceEncoding}"
+     * @since 3.2
+     */
+    protected String encoding;
+
+    /**
+     *
+     * @component role="org.apache.maven.shared.filtering.MavenResourcesFiltering" role-hint="default"
+     * @required
+     */
+    protected MavenResourcesFiltering mavenResourcesFiltering;
+
+    /**
+     * @parameter default-value="${session}"
+     * @readonly
+     * @required
+     */
+    protected MavenSession session;
+
 
     //items used by the CreateNBMMojo.
     protected Project antProject;
@@ -272,89 +325,10 @@ public abstract class CreateNetbeansFileStructure
                     }
                 }
             }
-            // copy additional resources..
-            List nbmResources = module.getNbmResources();
-            if ( nbmResources.size() > 0 )
-            {
-                Copy cp = (Copy) antProject.createTask( "copy" );
-                cp.setTodir( clusterDir );
-                HashMap customPaths = new HashMap();
-                Iterator it = nbmResources.iterator();
-                boolean hasStandard = false;
-                while ( it.hasNext() )
-                {
-                    NbmResource res = (NbmResource) it.next();
-                    if ( res.getBaseDirectory() != null )
-                    {
-                        File base = new File( project.getBasedir(),
-                                res.getBaseDirectory() );
-                        FileSet set = new FileSet();
-                        set.setDir( base );
-                        if ( res.getIncludes().size() > 0 )
-                        {
-                            Iterator it2 = res.getIncludes().iterator();
-                            while ( it2.hasNext() )
-                            {
-                                set.createInclude().setName( (String) it2.next() );
-                            }
-                        }
-                        if ( res.getExcludes().size() > 0 )
-                        {
-                            Iterator it2 = res.getExcludes().iterator();
-                            while ( it2.hasNext() )
-                            {
-                                set.createExclude().setName( (String) it2.next() );
-                            }
-                        }
-                        if ( res.getRelativeClusterPath() != null )
-                        {
-                            File path = new File( clusterDir,
-                                    res.getRelativeClusterPath() );
-                            Collection col = (Collection) customPaths.get( path );
-                            if ( col == null )
-                            {
-                                col = new ArrayList();
-                                customPaths.put( path, col );
-                            }
-                            col.add( set );
-                        } else
-                        {
-                            cp.addFileset( set );
-                            hasStandard = true;
-                        }
-                    }
-                }
-                try
-                {
-                    if ( hasStandard )
-                    {
-                        cp.execute();
-                    }
-                    if ( customPaths.size() > 0 )
-                    {
-                        Iterator itx = customPaths.entrySet().iterator();
-                        while ( itx.hasNext() )
-                        {
-                            Map.Entry ent = (Map.Entry) itx.next();
-                            Collection elem = (Collection) ent.getValue();
-                            cp = (Copy) antProject.createTask( "copy" );
-                            cp.setTodir( (File) ent.getKey() );
-                            Iterator itz = elem.iterator();
-                            while ( itz.hasNext() )
-                            {
-                                FileSet set = (FileSet) itz.next();
-                                cp.addFileset( set );
-                            }
-                            cp.execute();
-                        }
-                    }
-                } catch ( BuildException e )
-                {
-                    getLog().error(
-                            "Cannot copy additional resources into the nbm file" );
-                    throw new MojoExecutionException( e.getMessage(), e );
-                }
+            if (nbmResources != null) {
+                copyNbmResources();
             }
+            copyDeprecatedNbmResources();
         }
 
         //javahelp stuff.
@@ -460,6 +434,74 @@ public abstract class CreateNetbeansFileStructure
 
     }
 
+    private void copyDeprecatedNbmResources() throws BuildException, MojoExecutionException {
+        // copy additional resources..
+        List ress = module.getNbmResources();
+        if (ress.size() > 0) {
+            getLog().warn("NBM resources defined in module descriptor are deprecated. Please configure NBM resources in plugin configuration.");
+            Copy cp = (Copy) antProject.createTask( "copy" );
+            cp.setTodir(clusterDir);
+            HashMap customPaths = new HashMap();
+            Iterator it = ress.iterator();
+            boolean hasStandard = false;
+            while (it.hasNext()) {
+                NbmResource res = (NbmResource) it.next();
+                if (res.getBaseDirectory() != null) {
+                    File base = new File(project.getBasedir(), res.getBaseDirectory());
+                    FileSet set = new FileSet();
+                    set.setDir(base);
+                    if (res.getIncludes().size() > 0) {
+                        Iterator it2 = res.getIncludes().iterator();
+                        while (it2.hasNext()) {
+                            set.createInclude().setName((String) it2.next());
+                        }
+                    }
+                    if (res.getExcludes().size() > 0) {
+                        Iterator it2 = res.getExcludes().iterator();
+                        while (it2.hasNext()) {
+                            set.createExclude().setName((String) it2.next());
+                        }
+                    }
+                    if (res.getRelativeClusterPath() != null) {
+                        File path = new File(clusterDir, res.getRelativeClusterPath());
+                        Collection col = (Collection) customPaths.get( path );
+                        if (col == null) {
+                            col = new ArrayList();
+                            customPaths.put(path, col);
+                        }
+                        col.add(set);
+                    } else {
+                        cp.addFileset(set);
+                        hasStandard = true;
+                    }
+                }
+            }
+            try {
+                if (hasStandard) {
+                    cp.execute();
+                }
+                if (customPaths.size() > 0) {
+                    Iterator itx = customPaths.entrySet().iterator();
+                    while (itx.hasNext()) {
+                        Map.Entry ent = (Map.Entry) itx.next();
+                        Collection elem = (Collection) ent.getValue();
+                        cp = (Copy) antProject.createTask( "copy" );
+                        cp.setTodir((File) ent.getKey());
+                        Iterator itz = elem.iterator();
+                        while (itz.hasNext()) {
+                            FileSet set = (FileSet) itz.next();
+                            cp.addFileset(set);
+                        }
+                        cp.execute();
+                    }
+                }
+            } catch (BuildException e) {
+                getLog().error("Cannot copy additional resources into the nbm file");
+                throw new MojoExecutionException(e.getMessage(), e);
+            }
+        }
+    }
+
     // repeated invokation of the javahelp indexer (possibly via multiple classloaders)
     // is causing trouble, residue from previous invokations seems to cause errors
     // this is a nasty workaround for the problem.
@@ -504,4 +546,36 @@ public abstract class CreateNetbeansFileStructure
             Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
         }
     }
+
+    private void copyNbmResources() throws MojoExecutionException {
+        try {
+            if (StringUtils.isEmpty(encoding) && isFilteringEnabled(nbmResources)) {
+                getLog().warn("File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING + ", i.e. build is platform dependent!");
+            }
+            MavenResourcesExecution mavenResourcesExecution = new MavenResourcesExecution(Arrays.asList(nbmResources), clusterDir, project, encoding, Collections.EMPTY_LIST, Collections.EMPTY_LIST, session);
+            mavenResourcesExecution.setEscapeWindowsPaths(true);
+            mavenResourcesFiltering.filterResources(mavenResourcesExecution);
+        } catch (MavenFilteringException ex) {
+            throw new MojoExecutionException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Determines whether filtering has been enabled for any resource.
+     *
+     * @param resources The set of resources to check for filtering.
+     * @return <code>true</code> if at least one resource uses filtering, <code>false</code> otherwise.
+     */
+    private boolean isFilteringEnabled( Resource[] resources )
+    {
+        for ( Resource resource : resources )
+        {
+            if ( resource.isFiltering() )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
