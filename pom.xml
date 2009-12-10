@@ -66,7 +66,7 @@
             <plugin>
                 <groupId>org.codehaus.modello</groupId>
                 <artifactId>modello-maven-plugin</artifactId>
-                <version>1.0-alpha-10</version>
+                <version>1.1</version>
                 <executions>
                     <execution>
                         <id>build</id>
@@ -74,8 +74,8 @@
                         <goals>
                             <goal>xpp3-reader</goal>
                             <goal>java</goal>
-                            <goal>xdoc</goal>
-                            <goal>xsd</goal>
+                            <!--goal>xdoc</goal-->
+                            <!--goal>xsd</goal-->
                         </goals>
                     </execution>
                     <execution>
@@ -83,13 +83,16 @@
                         <phase>site-generate</phase>
                         <goals>
                             <goal>xdoc</goal>
-                            <goal>xsd</goal>
+                            <!--goal>xsd</goal-->
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <model>src/main/mdo/descriptor.mdo</model>
+                    <models>
+                        <model>src/main/mdo/descriptor.mdo</model>
+                    </models>
                     <version>1.0.0</version>
+                    <useJava5>true</useJava5>
                 </configuration>
             </plugin>
             <plugin>
