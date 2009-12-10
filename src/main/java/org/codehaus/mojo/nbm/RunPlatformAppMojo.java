@@ -121,7 +121,7 @@ public class RunPlatformAppMojo
                 brandingToken
             };
             cmdLine.addArguments( args );
-            cmdLine.addArguments( Commandline.translateCommandline(
+            cmdLine.addArguments( CommandLineUtils.translateCommandline(
                     additionalArguments ) );
             getLog().info( "Executing: " + cmdLine.toString() );
             StreamConsumer out = new StreamConsumer()

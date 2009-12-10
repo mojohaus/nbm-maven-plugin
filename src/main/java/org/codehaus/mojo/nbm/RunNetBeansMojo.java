@@ -91,7 +91,7 @@ public class RunNetBeansMojo
     {
         netbeansUserdir.mkdirs();
 
-        List clusters = new ArrayList();
+        List<File> clusters = new ArrayList<File>();
         if (!clusterBuildDir.exists() || clusterBuildDir.listFiles() == null) {
             throw new MojoExecutionException("No clusters to include in execution found. Please run the nbm:cluster or nbm:cluster-app goals before this one.");
         }
@@ -104,10 +104,8 @@ public class RunNetBeansMojo
             }
         }
         StringBuffer buff = new StringBuffer();
-        Iterator it = clusters.iterator();
-        while ( it.hasNext() )
+        for ( File cluster : clusters )
         {
-            File cluster = (File) it.next();
             buff.append( cluster.getAbsolutePath() );
             buff.append( ":" );
         }
@@ -199,7 +197,7 @@ public class RunNetBeansMojo
             };
             cmdLine.addArguments( args );
             getLog().info( "Additional arguments=" + additionalArguments );
-            cmdLine.addArguments( cmdLine.translateCommandline(
+            cmdLine.addArguments( CommandLineUtils.translateCommandline(
                     additionalArguments ) );
             for ( int i = 0; i < cmdLine.getArguments().length; i++ )
             {

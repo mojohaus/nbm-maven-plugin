@@ -171,11 +171,10 @@ public class CreateUpdateSiteMojo
 
         if ( "nbm-application".equals( project.getPackaging() ) )
         {
-            Set artifacts = project.getArtifacts();
-            Iterator it = artifacts.iterator();
-            while ( it.hasNext() )
+            @SuppressWarnings( "unchecked" )
+            Set<Artifact> artifacts = project.getArtifacts();
+            for ( Artifact art : artifacts )
             {
-                Artifact art = (Artifact) it.next();
                 Artifact nbmArt = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
                 if (nbmArt != null) {
                     art = nbmArt;

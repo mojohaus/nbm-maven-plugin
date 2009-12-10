@@ -21,7 +21,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.maven.artifact.Artifact;
@@ -260,11 +259,11 @@ public abstract class AbstractNbmMojo
         List<ModuleWrapper> include = new ArrayList<ModuleWrapper>();
         if ( module != null )
         {
-            List deps = module.getDependencies();
-            List artifacts = project.getCompileArtifacts();
-            for ( Iterator iter = artifacts.iterator(); iter.hasNext(); )
+            List<Dependency> deps = module.getDependencies();
+            @SuppressWarnings( "unchecked" )
+            List<Artifact> artifacts = project.getCompileArtifacts();
+            for ( Artifact artifact : artifacts )
             {
-                Artifact artifact = (Artifact) iter.next();
                 if ( libraryArtifacts.contains( artifact ) )
                 {
                     continue;

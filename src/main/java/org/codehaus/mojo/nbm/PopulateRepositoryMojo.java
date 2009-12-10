@@ -273,8 +273,8 @@ public class PopulateRepositoryMojo
 
         String prop = antProject.getProperty( "netbeansincludes" );
         StringTokenizer tok = new StringTokenizer( prop, "," );
-        HashMap moduleDefinitions = new HashMap();
-        HashMap clusters = new HashMap();
+        HashMap<ModuleWrapper, Artifact> moduleDefinitions = new HashMap<ModuleWrapper, Artifact>();
+        HashMap<String, Collection<ModuleWrapper>> clusters = new HashMap<String, Collection<ModuleWrapper>>();
         while ( tok.hasMoreTokens() )
         {
             String token = tok.nextToken();
@@ -314,19 +314,18 @@ public class PopulateRepositoryMojo
                     examinator, module );
                 wr.setCluster( clust );
                 moduleDefinitions.put( wr, art );
-                Collection col = (Collection) clusters.get( clust );
+                Collection<ModuleWrapper> col = clusters.get( clust );
                 if ( col == null )
                 {
-                    col = new ArrayList();
+                    col = new ArrayList<ModuleWrapper>();
                     clusters.put( clust, col );
                 }
                 col.add( wr );
             }
         }
-        List wrapperList = new ArrayList( moduleDefinitions.keySet() );
+        List<ModuleWrapper> wrapperList = new ArrayList<ModuleWrapper>( moduleDefinitions.keySet() );
         int count = wrapperList.size() + 1;
         int index = 0;
-        Iterator it = moduleDefinitions.entrySet().iterator();
         File javadocRoot = null;
         if ( netbeansJavadocDirectory != null )
         {
@@ -362,7 +361,7 @@ public class PopulateRepositoryMojo
             }
         }
 
-        List externals = new ArrayList();
+        List<ExternalsWrapper> externals = new ArrayList<ExternalsWrapper>();
         IndexReader nexusReader = null;
         IndexSearcher searcher = null;
         if ( nexusIndexDirectory != null && nexusIndexDirectory.exists() )
@@ -381,11 +380,10 @@ public class PopulateRepositoryMojo
         }
         try
         {
-            while ( it.hasNext() )
+            for ( Map.Entry<ModuleWrapper, Artifact> elem : moduleDefinitions.entrySet())
             {
-                Map.Entry elem = (Map.Entry) it.next();
-                ModuleWrapper man = (ModuleWrapper) elem.getKey();
-                Artifact art = (Artifact) elem.getValue();
+                ModuleWrapper man = elem.getKey();
+                Artifact art = elem.getValue();
                 index = index + 1;
                 getLog().info( "Processing " + index + "/" + count );
                 File pom = createMavenProject( man, wrapperList, externals, searcher );
@@ -517,10 +515,8 @@ public class PopulateRepositoryMojo
         {
             index = 0;
             count = externals.size();
-            it = externals.iterator();
-            while ( it.hasNext() )
+            for (ExternalsWrapper ex : externals)
             {
-                ExternalsWrapper ex = (ExternalsWrapper) it.next();
                 Artifact art = createArtifact( ex.getArtifact(), ex.getVersion(), ex.getGroupid() );
                 index = index + 1;
                 getLog().info( "Processing external " + index + "/" + count );
@@ -560,12 +556,10 @@ public class PopulateRepositoryMojo
         }
         else
         {
-            it = clusters.entrySet().iterator();
-            while ( it.hasNext() )
+            for ( Map.Entry<String, Collection<ModuleWrapper>> elem : clusters.entrySet())
             {
-                Map.Entry elem = (Map.Entry) it.next();
-                String cluster = (String) elem.getKey();
-                Collection modules = (Collection) elem.getValue();
+                String cluster = elem.getKey();
+                Collection<ModuleWrapper> modules = elem.getValue();
                 getLog().info( "Processing cluster " + cluster );
                 Artifact art = createClusterArtifact( cluster, forcedVersion );
                 File pom = createClusterProject( art, modules );
@@ -603,7 +597,8 @@ public class PopulateRepositoryMojo
         }
     }
 
-    private File createMavenProject( ModuleWrapper wrapper, List wrapperList, List externalsList, IndexSearcher searcher )
+    private File createMavenProject( ModuleWrapper wrapper, List<ModuleWrapper> wrapperList,
+                                     List<ExternalsWrapper> externalsList, IndexSearcher searcher )
     {
         Model mavenModel = new Model();
 
@@ -613,19 +608,17 @@ public class PopulateRepositoryMojo
         mavenModel.setPackaging( "jar" );
         mavenModel.setModelVersion( "4.0.0" );
         ExamineManifest man = wrapper.getModuleManifest();
-        List deps = new ArrayList();
+        List<Dependency> deps = new ArrayList<Dependency>();
         if ( !man.getDependencyTokens().isEmpty() )
         {
-            Iterator it = man.getDependencyTokens().iterator();
-            while ( it.hasNext() )
+            for ( String elem : man.getDependencyTokens() )
             {
-                String elem = (String) it.next();
                 // create pseudo wrapper
                 ModuleWrapper wr = new ModuleWrapper( elem );
                 int index = wrapperList.indexOf( wr );
                 if ( index > -1 )
                 {
-                    wr = (ModuleWrapper) wrapperList.get( index );
+                    wr = wrapperList.get( index );
                     //we don't want the API modules to depend on non-api ones..
                     // otherwise the transitive dependency mechanism pollutes your classpath..
                     if ( ( wr.getModuleManifest().hasPublicPackages() && wrapper.getModuleManifest().hasPublicPackages() ) || !wrapper.getModuleManifest().hasPublicPackages() )
@@ -805,7 +798,7 @@ public class PopulateRepositoryMojo
 
     }
 
-    private File createClusterProject( Artifact cluster, Collection mods )
+    private File createClusterProject( Artifact cluster, Collection<ModuleWrapper> mods )
     {
         Model mavenModel = new Model();
 
@@ -815,11 +808,9 @@ public class PopulateRepositoryMojo
 //        mavenModel.setPackaging("nbm-application");
         mavenModel.setPackaging( "pom" );
         mavenModel.setModelVersion( "4.0.0" );
-        List deps = new ArrayList();
-        Iterator it = mods.iterator();
-        while ( it.hasNext() )
+        List<Dependency> deps = new ArrayList<Dependency>();
+        for ( ModuleWrapper wr : mods )
         {
-            ModuleWrapper wr = (ModuleWrapper) it.next();
             Dependency dep = new Dependency();
             dep.setArtifactId( wr.getArtifact() );
             dep.setGroupId( wr.getGroup() );
@@ -855,17 +846,7 @@ public class PopulateRepositoryMojo
         }
         finally
         {
-            if ( writer != null )
-            {
-                try
-                {
-                    writer.close();
-                }
-                catch ( IOException io )
-                {
-                    io.printStackTrace();
-                }
-            }
+            IOUtil.close( writer );
         }
         return fil;
     }

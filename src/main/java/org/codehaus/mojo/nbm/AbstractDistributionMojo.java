@@ -90,11 +90,11 @@ public abstract class AbstractDistributionMojo
         }
 
         // make sure the final cluster list is numbered. (???)
-        Map matchers = new HashMap();
+        Map<String, Pattern> matchers = new HashMap<String, Pattern>();
         if ( enabledClusters == null )
         {
             // fallback default.
-            enabledClusters = new ArrayList();
+            enabledClusters = new ArrayList<String>();
         }
 
         // a matcher for each cluster

@@ -162,7 +162,7 @@ public class CreateNbmMojo
             {
                 Blurb lb = nbmTask.createLicense();
                 lb.setFile( lf );
-                lb.setName( licenseName );
+                lb.addText( licenseName );
             }
         } else if ( licenseName != null || licenseFile != null )
         {
@@ -172,7 +172,7 @@ public class CreateNbmMojo
         {
             Blurb lb = nbmTask.createLicense();
             lb.addText( "<Here comes the license>" );
-            lb.setName( "Unknown license agreement" );
+            lb.addText( "Unknown license agreement" );
         }
         String homePageUrl = module.getHomepageUrl();
         if ( homePageUrl == null )

@@ -26,8 +26,8 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -141,13 +141,11 @@ public class CreateClusterAppMojo
 
         if ( "nbm-application".equals( project.getPackaging() ) )
         {
-            Set knownClusters = new HashSet();
-            Set artifacts = project.getArtifacts();
-            Iterator it = artifacts.iterator();
-            while ( it.hasNext() )
+            Set<String> knownClusters = new HashSet<String>();
+            @SuppressWarnings( "unchecked" )
+            Set<Artifact> artifacts = project.getArtifacts();
+            for ( Artifact art : artifacts )
             {
-                Artifact art = (Artifact) it.next();
-
                 Artifact nbmArt = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
                 if (nbmArt != null) {
                     art = nbmArt;
@@ -185,10 +183,10 @@ public class CreateClusterAppMojo
                         {
                             getLog().debug(
                                 "Copying " + art.getId() + " to cluster " + cluster );
-                            Enumeration enu = jf.entries();
+                            Enumeration<JarEntry> enu = jf.entries();
                             while ( enu.hasMoreElements() )
                             {
-                                ZipEntry ent = (ZipEntry) enu.nextElement();
+                                JarEntry ent = enu.nextElement();
                                 String name = ent.getName();
                                 if ( name.startsWith( "netbeans/" ) )
                                 { //ignore everything else.

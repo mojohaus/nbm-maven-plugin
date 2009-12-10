@@ -361,6 +361,7 @@ public class NetbeansManifestUpdateMojo
             DependencyNode treeroot = createDependencyTree( project, dependencyTreeBuilder, localRepository,
                 artifactFactory, artifactMetadataSource, artifactCollector, "compile" );
             Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
+            @SuppressWarnings( "unchecked" )
             List<Artifact> libArtifacts = getLibraryArtifacts( treeroot, module, project.getRuntimeArtifacts(),
                 examinerCache, getLog() );
             List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts( treeroot, module, project, examinerCache,
@@ -608,10 +609,11 @@ public class NetbeansManifestUpdateMojo
         return dependencyClasses;
     }
 
+    @SuppressWarnings( "unchecked" )
     private Set<String> projectModuleOwnClasses( MavenProject project, List<Artifact> libraries )
         throws IOException
     {
-        Set projectClasses = new HashSet();
+        Set<String> projectClasses = new HashSet<String>();
         DefaultClassAnalyzer analyzer = new DefaultClassAnalyzer();
 
         String outputDirectory = project.getBuild().getOutputDirectory();
@@ -634,10 +636,11 @@ public class NetbeansManifestUpdateMojo
      * @return
      * @throws java.io.IOException
      */
+    @SuppressWarnings( "unchecked" )
     private Set<String> allProjectClasses( MavenProject project )
         throws IOException
     {
-        Set projectClasses = new HashSet();
+        Set<String> projectClasses = new HashSet<String>();
         DefaultClassAnalyzer analyzer = new DefaultClassAnalyzer();
 
         String outputDirectory = project.getBuild().getOutputDirectory();
@@ -747,6 +750,7 @@ public class NetbeansManifestUpdateMojo
         return toRet;
     }
 
+    @SuppressWarnings( "unchecked" )
     private Set<String> buildDependencyClasses( String path )
         throws IOException
     {

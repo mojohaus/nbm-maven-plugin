@@ -53,7 +53,7 @@ public class ExamineManifest
     private String classpath;
     private boolean publicPackages;
     private boolean populateDependencies = false;
-    private List dependencyTokens = Collections.EMPTY_LIST;
+    private List<String> dependencyTokens = Collections.<String>emptyList();
 
     private boolean friendPackages = false;
     private List<String> friends = Collections.<String>emptyList();
@@ -187,7 +187,7 @@ public class ExamineManifest
                 if ( deps != null )
                 {
                     StringTokenizer tokens = new StringTokenizer( deps, "," );
-                    List depList = new ArrayList();
+                    List<String> depList = new ArrayList<String>();
                     while ( tokens.hasMoreTokens() )
                     {
                         String tok = tokens.nextToken();
@@ -372,12 +372,12 @@ public class ExamineManifest
         this.populateDependencies = populateDependencies;
     }
 
-    public List getDependencyTokens()
+    public List<String> getDependencyTokens()
     {
         return dependencyTokens;
     }
 
-    public void setDependencyTokens( List dependencyTokens )
+    public void setDependencyTokens( List<String> dependencyTokens )
     {
         this.dependencyTokens = dependencyTokens;
     }
