@@ -39,11 +39,13 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Chmod;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.netbeans.nbbuild.MakeListOfNBM;
 
 /**
  * Create the Netbeans module clusters/application for the 'nbm-application' packaging
@@ -141,6 +143,8 @@ public class CreateClusterAppMojo
 
         if ( "nbm-application".equals( project.getPackaging() ) )
         {
+            Project antProject = registerNbmAntTasks();
+
             Set<String> knownClusters = new HashSet<String>();
             @SuppressWarnings( "unchecked" )
             Set<Artifact> artifacts = project.getArtifacts();
@@ -184,6 +188,17 @@ public class CreateClusterAppMojo
                             getLog().debug(
                                 "Copying " + art.getId() + " to cluster " + cluster );
                             Enumeration<JarEntry> enu = jf.entries();
+
+                            //we need to trigger this ant task to generate the update_tracking file.
+                            MakeListOfNBM makeTask = (MakeListOfNBM) antProject.createTask(
+                                    "genlist" );
+                            antProject.setNewProperty( "module.name", art.getFile().getName() ); //TODO
+                            antProject.setProperty( "cluster.dir", cluster );
+                            FileSet set = makeTask.createFileSet();
+                            set.setDir( new File(nbmBuildDirFile, cluster) );
+                            makeTask.setOutputfiledir( clusterFile );
+
+
                             while ( enu.hasMoreElements() )
                             {
                                 JarEntry ent = enu.nextElement();
@@ -200,6 +215,17 @@ public class CreateClusterAppMojo
                                     }
                                     else
                                     {
+                                        String part = name.replace( "netbeans/", "" );
+                                        set.appendIncludes( new String[] { part });
+                                        //TODO how to figure the module jar within the nbm??
+                                        if ( path.endsWith( ".jar" ) &&
+                                            !path.contains( "ext/" ) &&
+                                            !path.contains( "locale/" ) &&
+                                            !path.contains( "docs/" ) )
+                                        {
+                                            makeTask.setModule( part );
+                                        }
+
                                         fl.getParentFile().mkdirs();
                                         fl.createNewFile();
                                         BufferedOutputStream outstream = null;
@@ -218,6 +244,18 @@ public class CreateClusterAppMojo
                                     }
                                 }
                             }
+
+  
+                            try
+                            {
+                                makeTask.execute();
+                            } catch ( BuildException e )
+                            {
+                                getLog().error( "Cannot Generate update_tracking xml file" );
+                                throw new MojoExecutionException( e.getMessage(), e );
+                            }
+
+
                         }
                     }
                     catch ( IOException ex )
