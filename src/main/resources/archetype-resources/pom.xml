@@ -16,6 +16,19 @@
             <name>repository hosting netbeans.org api artifacts</name>
             <url>http://bits.netbeans.org/maven2</url>
         </repository>
+
+        <repository>
+            <!-- Allows usage of annotations within netbeans modules
+                 this section is necessary until http://jira.codehaus.org/browse/MCOMPILER-98
+                 gets integrated into a released version of maven-compiler-plugin.
+                 Afterwards this should be be deleted.
+                 -->
+            <id>plexus-snapshot</id>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <url>http://oss.repository.sonatype.org/content/repositories/plexus-snapshots/</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -26,8 +39,6 @@
         </dependency>
     </dependencies>
     <build>
-        <plugins>
-        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -42,15 +53,32 @@
                     </configuration>
                 </plugin>
                 
-                <!-- netbeans modules in 5.5+ are 1.5 compatible -->
+                <!-- netbeans modules in 6.9+ are 1.6 compatible -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.0.2</version>
+                    <version>2.1</version>
                     <configuration>
-                        <source>1.5</source>
-                        <target>1.5</target>
+                        <source>1.6</source>
+                        <target>1.6</target>
                     </configuration>
+                    <dependencies>
+                    <!-- Allows usage of annotations within netbeans modules
+                         this section is necessary until http://jira.codehaus.org/browse/MCOMPILER-98
+                         gets integrated into a released version of maven-compiler-plugin.
+                         Afterwards this should be be deleted.
+                         -->
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-compiler-javac</artifactId>
+                            <version>1.7-SNAPSHOT</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-compiler-api</artifactId>
+                            <version>1.7-SNAPSHOT</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
