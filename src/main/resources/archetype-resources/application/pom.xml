@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>org.netbeans.cluster</groupId>
-            <artifactId>platform10</artifactId>
+            <artifactId>platform11</artifactId>
             <version>${netbeans.version}</version>
             <type>pom</type>
         </dependency>
