@@ -326,7 +326,7 @@ public class CreateClusterAppMojo
         Matcher m = patt.matcher( str );
         if ( !m.matches() )
         {
-            getLog().error( "Cannot find cluster for " + jf.getName() );
+            getLog().warn( "Cannot find cluster for " + jf.getName() + " Falling back to 'extra' as default value.");
         }
         else
         {
