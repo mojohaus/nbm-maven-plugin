@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
@@ -141,7 +143,8 @@ public class PopulateRepositoryMojo
     /**
      * Optional parameter, when specified, will force all modules to have the designated version.
      * Good when depending on releases. Then you would for example specify RELEASE50 in this parameter and
-     * all modules get this version in the repository.
+     * all modules get this version in the repository. If not defined, the maven version is
+     * derived from the OpenIDE-Module-Specification-Version manifest attribute.
      * <p/>
      * Highly Recommended!
      * @parameter expression="${forcedVersion}"
@@ -558,7 +561,7 @@ public class PopulateRepositoryMojo
         {
             for ( Map.Entry<String, Collection<ModuleWrapper>> elem : clusters.entrySet())
             {
-                String cluster = elem.getKey();
+                String cluster = stripClusterName(elem.getKey());
                 Collection<ModuleWrapper> modules = elem.getValue();
                 getLog().info( "Processing cluster " + cluster );
                 Artifact art = createClusterArtifact( cluster, forcedVersion );
@@ -861,6 +864,17 @@ public class PopulateRepositoryMojo
     {
         return artifactFactory.createBuildArtifact( "org.netbeans.cluster",
             artifact, version, "pom" );
+    }
+
+    private static Pattern PATTERN_CLUSTER = Pattern.compile( "([a-zA-Z]+)[0-9\\.]*" );
+    static String stripClusterName( String key )
+    {
+        Matcher m = PATTERN_CLUSTER.matcher( key );
+        if ( m.matches() )
+        {
+            return m.group( 1 );
+        }
+        return key;
     }
 
     private class ExternalsWrapper
