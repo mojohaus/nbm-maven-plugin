@@ -107,6 +107,15 @@ public class CreateClusterAppMojo
      */
     private File binDirectory;
 
+    /**
+     * If the depending NBM file doesn't contain any application cluster information,
+     * use this value as default location for such module NBMs.
+     * @parameter default-value="extra"
+     * @since 3.2
+     */
+    private String defaultCluster;
+
+
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
     /**
      * @component
@@ -326,13 +335,13 @@ public class CreateClusterAppMojo
         Matcher m = patt.matcher( str );
         if ( !m.matches() )
         {
-            getLog().warn( "Cannot find cluster for " + jf.getName() + " Falling back to 'extra' as default value.");
+            getLog().warn( "Cannot find cluster for " + jf.getName() + " Falling back to default value - '" +defaultCluster +  "'.");
+            return defaultCluster;
         }
         else
         {
             return m.group( 1 );
         }
-        return "extra";
     }
 
     /**
