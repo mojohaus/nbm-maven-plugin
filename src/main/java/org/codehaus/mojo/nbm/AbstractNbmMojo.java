@@ -358,7 +358,7 @@ public abstract class AbstractNbmMojo
         return filter;
     }
 
-    protected final Artifact turnJarToNbmFile( Artifact art, ArtifactFactory artifactFactory,
+    protected final ArtifactResult turnJarToNbmFile( Artifact art, ArtifactFactory artifactFactory,
         ArtifactResolver artifactResolver, MavenProject project, ArtifactRepository localRepository ) throws MojoExecutionException
     {
         if ( "jar".equals( art.getType() ) || "nbm".equals( art.getType() ) )
@@ -400,10 +400,36 @@ public abstract class AbstractNbmMojo
                         throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
                     }
                 }
-                return nbmArt;
+                return new ArtifactResult(nbmArt, false);
+            }
+            if ( mnf.isOsgiBundle() )
+            {
+                return new ArtifactResult(art, true);
             }
         }
-        return null;
+        return new ArtifactResult(null, false);
+    }
+
+    protected final class ArtifactResult {
+        private Artifact converted;
+        private boolean isOsgi;
+
+        ArtifactResult(Artifact conv, boolean isOSGi) {
+            isOsgi = isOSGi;
+            converted = conv;
+        }
+
+        boolean hasConvertedArtifact() {
+            return converted != null;
+        }
+
+        Artifact getConvertedArtifact() {
+            return converted;
+        }
+
+        public boolean isOSGiBundle() {
+            return isOsgi;
+        }
     }
 
     private void checkReactor( Artifact art, Artifact nbmArt )

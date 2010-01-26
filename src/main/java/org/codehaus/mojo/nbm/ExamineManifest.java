@@ -44,6 +44,8 @@ public class ExamineManifest
     private File jarFile;
     private File manifestFile;
     private boolean netbeansModule;
+    private boolean osgiBundle;
+
     private boolean localized;
     private String specVersion;
     private String implVersion;
@@ -213,21 +215,32 @@ public class ExamineManifest
 
         } else
         {
-            // for non-netbeans jars.
-            setSpecVersion( attrs.getValue( "Specification-Version" ) );
-            setImplVersion( attrs.getValue( "Implementation-Version" ) );
-            setModule( attrs.getValue( "Package" ) );
-            setPublicPackages( false );
-            setClasspath( "" );
-            /*    if (module != null) {
-            // now we have the package to make it a module definition, add the version there..
-            module = module + "/1";
-            }
-             */
-            if ( getModule() == null )
-            {
-                // do we want to do that?
-                setModule( attrs.getValue( "Extension-Name" ) );
+        
+            //check osgi headers first, let nb stuff override it, making nb default
+            String bndName = attrs.getValue("Bundle-SymbolicName");
+            if (bndName != null) {
+                setOsgiBundle(true);
+                setModule( bndName );
+                setSpecVersion( attrs.getValue("Bundle-Version") );
+                String exp = attrs.getValue("Export-Package");
+                setPublicPackages(exp != null);
+            } else {
+
+                // for non-netbeans, non-osgi jars.
+                setSpecVersion(attrs.getValue("Specification-Version"));
+                setImplVersion(attrs.getValue("Implementation-Version"));
+                setModule(attrs.getValue("Package"));
+                setPublicPackages(false);
+                setClasspath("");
+                /*    if (module != null) {
+                // now we have the package to make it a module definition, add the version there..
+                module = module + "/1";
+                }
+                 */
+                if (getModule() == null) {
+                    // do we want to do that?
+                    setModule(attrs.getValue("Extension-Name"));
+                }
             }
         }
 
@@ -417,4 +430,13 @@ public class ExamineManifest
     {
         return packages;
     }
+
+    public boolean isOsgiBundle() {
+        return osgiBundle;
+    }
+
+    public void setOsgiBundle(boolean osgiBundle) {
+        this.osgiBundle = osgiBundle;
+    }
+
 }

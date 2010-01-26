@@ -175,9 +175,9 @@ public class CreateUpdateSiteMojo
             Set<Artifact> artifacts = project.getArtifacts();
             for ( Artifact art : artifacts )
             {
-                Artifact nbmArt = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
-                if (nbmArt != null) {
-                    art = nbmArt;
+                ArtifactResult res = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
+                if (res.hasConvertedArtifact()) {
+                    art = res.getConvertedArtifact();
                 }
 
                 if ( art.getType().equals( "nbm-file" ) )
@@ -206,6 +206,9 @@ public class CreateUpdateSiteMojo
                                 ex );
                     }
 
+                }
+                if (res.isOSGiBundle()) {
+                    //check for bundles
                 }
             }
             getLog().info(

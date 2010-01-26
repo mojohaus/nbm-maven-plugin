@@ -159,9 +159,9 @@ public class CreateClusterAppMojo
             Set<Artifact> artifacts = project.getArtifacts();
             for ( Artifact art : artifacts )
             {
-                Artifact nbmArt = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
-                if (nbmArt != null) {
-                    art = nbmArt;
+                ArtifactResult res = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
+                if (res.hasConvertedArtifact()) {
+                    art = res.getConvertedArtifact();
                 }
 
                 if ( art.getType().equals( "nbm-file" ) )
@@ -282,6 +282,9 @@ public class CreateClusterAppMojo
                             getLog().error( ex );
                         }
                     }
+                }
+                if (res.isOSGiBundle()) {
+                    //TODO
                 }
             }
             getLog().info(
