@@ -19,6 +19,8 @@ package org.codehaus.mojo.nbm;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +31,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -41,10 +46,12 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.tools.ant.taskdefs.Chmod;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.io.InputStreamFacade;
 import org.netbeans.nbbuild.MakeListOfNBM;
 
 /**
@@ -170,43 +177,22 @@ public class CreateClusterAppMojo
                     try
                     {
                         jf = new JarFile( art.getFile() );
-                        String cluster = findCluster( jf );
-                        if ( !knownClusters.contains( cluster ) )
-                        {
-                            getLog().info(
-                                "Processing cluster '" + cluster + "'" );
-                            knownClusters.add( cluster );
-                        }
-                        File clusterFile = new File( nbmBuildDirFile, cluster );
-                        boolean newer = false;
-                        if ( !clusterFile.exists() )
-                        {
-                            clusterFile.mkdir();
-                            newer = true;
-                        }
-                        else
-                        {
-                            File stamp = new File( clusterFile, ".lastModified" );
-                            if ( stamp.lastModified() < art.getFile().lastModified() )
-                            {
-                                newer = true;
-                            }
-                        }
-                        if ( newer )
+                        String clusterName = findCluster( jf );
+                        ClusterTuple cluster = processCluster( clusterName, knownClusters, nbmBuildDirFile, art );
+                        if ( cluster.newer )
                         {
                             getLog().debug(
-                                "Copying " + art.getId() + " to cluster " + cluster );
+                                "Copying " + art.getId() + " to cluster " + clusterName );
                             Enumeration<JarEntry> enu = jf.entries();
 
                             //we need to trigger this ant task to generate the update_tracking file.
                             MakeListOfNBM makeTask = (MakeListOfNBM) antProject.createTask(
                                     "genlist" );
                             antProject.setNewProperty( "module.name", art.getFile().getName() ); //TODO
-                            antProject.setProperty( "cluster.dir", cluster );
+                            antProject.setProperty( "cluster.dir", clusterName );
                             FileSet set = makeTask.createFileSet();
-                            set.setDir( new File(nbmBuildDirFile, cluster) );
-                            makeTask.setOutputfiledir( clusterFile );
-
+                            set.setDir( cluster.location );
+                            makeTask.setOutputfiledir( cluster.location );
 
                             while ( enu.hasMoreElements() )
                             {
@@ -215,7 +201,7 @@ public class CreateClusterAppMojo
                                 if ( name.startsWith( "netbeans/" ) )
                                 { //ignore everything else.
                                     String path = name.replace( "netbeans/",
-                                        cluster + "/" );
+                                        clusterName + "/" );
                                     File fl = new File( nbmBuildDirFile,
                                         path.replace( "/", File.separator ) );
                                     if ( ent.isDirectory() )
@@ -284,7 +270,43 @@ public class CreateClusterAppMojo
                     }
                 }
                 if (res.isOSGiBundle()) {
-                    //TODO
+                    ClusterTuple cluster = processCluster( defaultCluster, knownClusters, nbmBuildDirFile, art );
+                    if ( cluster.newer )
+                    {
+                        getLog().debug( "Copying " + art.getId() + " to cluster " + defaultCluster );
+                        File modules = new File(cluster.location, "modules");
+                        modules.mkdirs();
+                        File config = new File(cluster.location, "config");
+                        File confModules = new File(config, "Modules");
+                        confModules.mkdirs();
+                        File updateTracting = new File(cluster.location, "update_tracking");
+                        updateTracting.mkdirs();
+                        final String cnb = res.getExaminedManifest().getModule();
+                        final String cnbDashed = cnb.replace( ".", "-");
+                        final File moduleArt = new File(modules, cnbDashed + ".jar" ); //do we need the file in some canotical name pattern?
+                        final String specVer = res.getExaminedManifest().getSpecVersion();
+                        try
+                        {
+                            FileUtils.copyFile( art.getFile(), moduleArt );
+                            final File moduleConf = new File(confModules, cnbDashed + ".xml");
+                            FileUtils.copyStreamToFile( new InputStreamFacade() {
+                                public InputStream getInputStream() throws IOException
+                                {
+                                    return new StringInputStream( createBundleConfigFile(cnb), "UTF-8");
+                                }
+                            }, moduleConf);
+                            FileUtils.copyStreamToFile( new InputStreamFacade() {
+                                public InputStream getInputStream() throws IOException
+                                {
+                                    return new StringInputStream( createBundleUpdateTracking(cnb, moduleArt, moduleConf, specVer), "UTF-8");
+                                }
+                            }, new File(updateTracting, cnbDashed + ".xml"));
+                        }
+                        catch ( IOException ex )
+                        {
+                            getLog().error( ex );
+                        }
+                    }
                 }
             }
             getLog().info(
@@ -528,4 +550,89 @@ public class CreateClusterAppMojo
             IOUtil.close( output );
         }
     }
+
+    private ClusterTuple processCluster( String cluster, Set<String> knownClusters, File nbmBuildDirFile, Artifact art )
+    {
+        if ( !knownClusters.contains( cluster ) )
+        {
+            getLog().info(
+                    "Processing cluster '" + cluster + "'" );
+            knownClusters.add( cluster );
+        }
+        File clusterFile = new File( nbmBuildDirFile, cluster );
+        boolean newer = false;
+        if ( !clusterFile.exists() )
+        {
+            clusterFile.mkdir();
+            newer = true;
+        }
+        else
+        {
+            File stamp = new File( clusterFile, ".lastModified" );
+            if ( stamp.lastModified() < art.getFile().lastModified() )
+            {
+                newer = true;
+            }
+        }
+        return new ClusterTuple( clusterFile, newer );
+    }
+
+    private class ClusterTuple {
+        final File location;
+        final boolean newer;
+
+        private ClusterTuple( File clusterFile, boolean newer )
+        {
+            location = clusterFile;
+            this.newer = newer;
+        }
+    }
+
+    private String createBundleConfigFile( String cnb )
+    {
+        return
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+"<!DOCTYPE module PUBLIC \"-//NetBeans//DTD Module Status 1.0//EN\"\n" +
+"                        \"http://www.netbeans.org/dtds/module-status-1_0.dtd\">\n" +
+"<module name=\"" + cnb +"\">\n" +
+"    <param name=\"autoload\">true</param>\n" +
+"    <param name=\"eager\">false</param>\n" +
+"    <param name=\"enabled\">true</param>\n" +
+"    <param name=\"jar\">modules/" + cnb.replace( ".", "-") + ".jar</param>\n" +
+"    <param name=\"reloadable\">false</param>\n" +
+"</module>";
+    }
+
+    private String createBundleUpdateTracking( String cnb, File moduleArt, File moduleConf, String specVersion ) throws FileNotFoundException, IOException
+    {
+
+        return
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+"<module codename=\"" + cnb + "\">\n" +
+"    <module_version install_time=\"" + System.currentTimeMillis() + "\" last=\"true\" origin=\"installer\" specification_version=\"" + specVersion + "\">\n" +
+"        <file crc=\"" + crcForFile(moduleConf).getValue() + "\" name=\"config/Modules/" + cnb.replace( ".", "-") + ".xml\"/>\n" +
+"        <file crc=\"" + crcForFile(moduleArt).getValue() + "\" name=\"modules/" + cnb.replace( ".", "-") + ".xml\"/>\n" +
+"    </module_version>\n" +
+"</module>";
+
+    }
+
+    static CRC32 crcForFile(File inFile) throws FileNotFoundException, IOException {
+        FileInputStream inFileStream = null;
+        CRC32 crc = new CRC32();
+        try {
+        inFileStream = new FileInputStream(inFile);
+        byte[] array = new byte[(int) inFile.length()];
+        int len = inFileStream.read(array);
+        if (len != array.length) {
+            throw new IOException("Cannot fully read " + inFile);
+        }
+        crc.update(array);
+        } finally {
+            inFileStream.close();
+        }
+
+        return crc;
+    }
+
 }

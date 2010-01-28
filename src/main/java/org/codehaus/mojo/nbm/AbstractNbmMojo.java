@@ -400,23 +400,23 @@ public abstract class AbstractNbmMojo
                         throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
                     }
                 }
-                return new ArtifactResult(nbmArt, false);
+                return new ArtifactResult(nbmArt, mnf);
             }
             if ( mnf.isOsgiBundle() )
             {
-                return new ArtifactResult(art, true);
+                return new ArtifactResult(art, mnf);
             }
         }
-        return new ArtifactResult(null, false);
+        return new ArtifactResult(null, null);
     }
 
     protected final class ArtifactResult {
-        private Artifact converted;
-        private boolean isOsgi;
+        private final Artifact converted;
+        private final ExamineManifest manifest;
 
-        ArtifactResult(Artifact conv, boolean isOSGi) {
-            isOsgi = isOSGi;
+        ArtifactResult(Artifact conv, ExamineManifest manifest) {
             converted = conv;
+            this.manifest = manifest;
         }
 
         boolean hasConvertedArtifact() {
@@ -428,7 +428,11 @@ public abstract class AbstractNbmMojo
         }
 
         public boolean isOSGiBundle() {
-            return isOsgi;
+            return manifest != null && manifest.isOsgiBundle();
+        }
+
+        public ExamineManifest getExaminedManifest() {
+            return manifest;
         }
     }
 
