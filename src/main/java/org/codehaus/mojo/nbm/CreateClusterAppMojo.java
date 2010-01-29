@@ -598,7 +598,7 @@ public class CreateClusterAppMojo
 "<module name=\"" + cnb +"\">\n" +
 "    <param name=\"autoload\">true</param>\n" +
 "    <param name=\"eager\">false</param>\n" +
-"    <param name=\"enabled\">true</param>\n" +
+//"    <param name=\"enabled\">true</param>\n" +
 "    <param name=\"jar\">modules/" + cnb.replace( ".", "-") + ".jar</param>\n" +
 "    <param name=\"reloadable\">false</param>\n" +
 "</module>";
