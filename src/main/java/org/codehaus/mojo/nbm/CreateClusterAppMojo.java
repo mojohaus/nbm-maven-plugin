@@ -216,7 +216,8 @@ public class CreateClusterAppMojo
                                         if ( path.endsWith( ".jar" ) &&
                                             !path.contains( "ext/" ) &&
                                             !path.contains( "locale/" ) &&
-                                            !path.contains( "docs/" ) )
+                                            !path.contains( "docs/" ) &&
+                                            !path.contains( "core/org.apache.felix.framework"))
                                         {
                                             makeTask.setModule( part );
                                         }
