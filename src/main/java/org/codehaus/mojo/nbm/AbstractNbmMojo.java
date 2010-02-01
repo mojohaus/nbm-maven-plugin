@@ -109,8 +109,10 @@ public abstract class AbstractNbmMojo
         {
             return false;
         }
-        if ( depExaminator.isNetbeansModule() )
+        if ( depExaminator.isNetbeansModule()  || depExaminator.isOsgiBundle() )
         {
+            //TODO I can see how someone might want to include an osgi bundle as library, not dependency.
+            // I guess it won't matter much in 6.9+, in older versions it could be a problem.
             return false;
         }
         log.debug(
@@ -293,6 +295,39 @@ public abstract class AbstractNbmMojo
 
                     }
                     include.add( wr );
+                } else {
+                    if (depExaminator.isOsgiBundle()) {
+                        ModuleWrapper wr = new ModuleWrapper();
+                        String id = artifact.getGroupId() + ":" + artifact.getArtifactId();
+                        for ( Dependency depe : deps )
+                        {
+                            if ( id.equals( depe.getId() ) )
+                            {
+                                wr.dependency = depe;
+                            }
+                        }
+                        if ( wr.dependency == null)
+                        {
+                            Dependency depe = new Dependency();
+                            depe.setId( id );
+                            depe.setType( "spec" );
+                            log.debug( "Adding OSGi bundle dependency - " + id );
+                            wr.dependency = depe;
+                        }
+
+                        wr.artifact = artifact;
+                        wr.transitive = false;
+                        //only direct deps matter to us..
+                        if ( artifact.getDependencyTrail().size() > 2 )
+                        {
+                            log.debug(
+                                artifact.getId() + " omitted as NetBeans module OSGi dependency, not a direct one. Declare it in the pom for inclusion." );
+                            wr.transitive = true;
+
+                        }
+
+                        include.add( wr );
+                    }
                 }
             }
         }
@@ -404,7 +439,7 @@ public abstract class AbstractNbmMojo
             }
             if ( mnf.isOsgiBundle() )
             {
-                return new ArtifactResult(art, mnf);
+                return new ArtifactResult(null, mnf);
             }
         }
         return new ArtifactResult(null, null);

@@ -26,6 +26,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -701,11 +702,16 @@ public class NetbeansManifestUpdateMojo
                 }
             }
             List<Pattern> compiled = createCompiledPatternList( manifest.getPackages() );
+            if ( manifest.isOsgiBundle() )
+            {
+                // TODO how to extract the public packages in osgi bundles easily..
+                compiled = Collections.singletonList( Pattern.compile( "(.+)" ) );
+            }
             for ( String clazz : moduleClasses )
             {
                 for ( Pattern patt : compiled )
                 {
-                    if ( patt.matcher( clazz ).matches() )
+                    if ( patt.matcher( clazz ).matches() ) 
                     {
                         visibleModuleClasses.add( clazz );
                         break;

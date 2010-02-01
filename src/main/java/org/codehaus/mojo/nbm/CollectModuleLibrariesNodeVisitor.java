@@ -117,7 +117,7 @@ public class CollectModuleLibrariesNodeVisitor
                 depExaminator.checkFile();
                 examinerCache.put( artifact, depExaminator );
             }
-            if ( depExaminator.isNetbeansModule() )
+            if ( depExaminator.isNetbeansModule()  || depExaminator.isOsgiBundle() )
             {
                 currentModule.push( artifact.getDependencyConflictId() );
                 ArrayList<Artifact> arts = new ArrayList<Artifact>();
