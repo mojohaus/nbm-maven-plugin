@@ -47,6 +47,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -58,6 +60,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.artifact.AttachedArtifact;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -198,6 +201,13 @@ public class PopulateRepositoryMojo
      * @component
      */
     private ArtifactDeployer artifactDeployer;
+
+    /**
+     * Maven ArtifactHandlerManager
+     *
+     * @component
+     */
+    private ArtifactHandlerManager artifactHandlerManager;
 
     /**
      * Maven ArtifactRepositoryFactory.
@@ -400,11 +410,7 @@ public class PopulateRepositoryMojo
                     if ( zip.exists() )
                     {
                         javadoc = zip;
-                        javadocArt = artifactFactory.createArtifactWithClassifier(
-                            art.getGroupId(),
-                            art.getArtifactId(),
-                            art.getVersion(),
-                            "jar", "javadoc" );
+                        javadocArt = createAttachedArtifact(art, javadoc, null, "javadoc");
                     }
                 }
                 File source = null;
@@ -415,11 +421,7 @@ public class PopulateRepositoryMojo
                     if ( zip.exists() )
                     {
                         source = zip;
-                        sourceArt = artifactFactory.createArtifactWithClassifier(
-                            art.getGroupId(),
-                            art.getArtifactId(),
-                            art.getVersion(),
-                            "jar", "sources" );
+                        sourceArt = createAttachedArtifact(art, source, null, "sources");
                     }
                 }
                 File nbm = null;
@@ -436,16 +438,14 @@ public class PopulateRepositoryMojo
                     if ( zip.exists() )
                     {
                         nbm = zip;
-                        nbmArt = artifactFactory.createArtifact( art.getGroupId(),
-                            art.getArtifactId(),
-                            art.getVersion(),
-                            "compile", "nbm" );
+                        nbmArt = createAttachedArtifact(art, nbm, "nbm", null);
                     }
                 }
                 if ( !skipLocalInstall )
                 {
                     try
                     {
+                        artifactInstaller.install( man.getFile(), art, localRepository );
                         if ( javadoc != null )
                         {
                             artifactInstaller.install( javadoc, javadocArt,
@@ -460,7 +460,6 @@ public class PopulateRepositoryMojo
                         {
                             artifactInstaller.install( nbm, nbmArt, localRepository );
                         }
-                        artifactInstaller.install( man.getFile(), art, localRepository );
                     }
                     catch ( ArtifactInstallationException e )
                     {
@@ -472,6 +471,8 @@ public class PopulateRepositoryMojo
                 {
                     if ( deploymentRepository != null )
                     {
+                        artifactDeployer.deploy( man.getFile(), art,
+                            deploymentRepository, localRepository );
                         if ( javadoc != null )
                         {
                             artifactDeployer.deploy( javadoc, javadocArt,
@@ -487,8 +488,6 @@ public class PopulateRepositoryMojo
                             artifactDeployer.deploy( nbm, nbmArt,
                                 deploymentRepository, localRepository );
                         }
-                        artifactDeployer.deploy( man.getFile(), art,
-                            deploymentRepository, localRepository );
                     }
                 }
                 catch ( ArtifactDeploymentException ex )
@@ -598,6 +597,28 @@ public class PopulateRepositoryMojo
             }
 
         }
+    }
+
+    //performs the same tasks as the MavenProjectHelper
+    private Artifact createAttachedArtifact(Artifact primary, File file, String type, String classifier) {
+
+        ArtifactHandler handler = null;
+
+        if ( type != null )
+        {
+            handler = artifactHandlerManager.getArtifactHandler( type );
+        }
+
+        if ( handler == null )
+        {
+            handler = artifactHandlerManager.getArtifactHandler( "jar" );
+        }
+
+        Artifact artifact = new AttachedArtifact( primary, type, classifier, handler );
+
+        artifact.setFile( file );
+        artifact.setResolved( true );
+        return artifact;
     }
 
     private File createMavenProject( ModuleWrapper wrapper, List<ModuleWrapper> wrapperList,
