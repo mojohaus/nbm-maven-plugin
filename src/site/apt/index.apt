@@ -134,7 +134,28 @@ use the special module descriptor file to define the runtime dependencies and li
  In nbm-maven-plugin version 2.5 and 2.6.x, we tried to simplify setting the dependencies and remove redundancies. A few rules had
 to be introduced in terms of declaring maven dependencies though.
 
- 
+Using OSGi bundles in NetBeans platform based applications
+
+ Starting with version 3.2, it's possible for the NetBeans modules to depend on OSGi bundles. A proper module dependency section will be generated.
+To include the bundle in the application, add dependency on the bundle from nbm-application.
+There are a few prerequisites.
+
+    * works only in NetBeans 6.9 and later which support the embedding of bundles at runtime
+
+    * a dependency on netigso module from netbeans platform needs to be added to every nb module using bundles.
+
+----------------
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-core-netigso</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+-----------------
+
+   * in the distribution, all bundles will be included in the default cluster ("extra" if not configured otherwise)
+
+   * all bundles will be autoload, thus requiring at least one depending regular module to enable them.
+
 
 Multi module setup
 
