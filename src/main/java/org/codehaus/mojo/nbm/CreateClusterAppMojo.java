@@ -212,15 +212,6 @@ public class CreateClusterAppMojo
                                     {
                                         String part = name.replace( "netbeans/", "" );
                                         set.appendIncludes( new String[] { part });
-                                        //TODO how to figure the module jar within the nbm??
-                                        if ( path.endsWith( ".jar" ) &&
-                                            !path.contains( "ext/" ) &&
-                                            !path.contains( "locale/" ) &&
-                                            !path.contains( "docs/" ) &&
-                                            !path.contains( "core/org.apache.felix.framework"))
-                                        {
-                                            makeTask.setModule( part );
-                                        }
 
                                         fl.getParentFile().mkdirs();
                                         fl.createNewFile();
@@ -236,6 +227,20 @@ public class CreateClusterAppMojo
                                         finally
                                         {
                                             IOUtil.close( outstream );
+                                        }
+                                        //now figure which one of the jars is the module jar..
+                                        if ( path.endsWith( ".jar" ) &&
+                                            !path.contains( "ext/" ) &&
+                                            !path.contains( "locale/" ) &&
+                                            !path.contains( "docs/" ))
+                                        {
+                                            ExamineManifest ex  = new ExamineManifest( getLog() );
+                                            ex.setJarFile( fl );
+                                            ex.checkFile();
+                                            if ( ex.isNetbeansModule() )
+                                            {
+                                                makeTask.setModule( part );
+                                            }
                                         }
                                     }
                                 }
