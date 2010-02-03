@@ -22,7 +22,8 @@
             <url>http://bits.netbeans.org/netbeans/trunk/maven-snapshot</url>
             <releases>
                 <enabled>false</enabled>
-        </releases>
+            </releases>
+        </repository>
 
         <repository>
             <!-- Allows usage of annotations within netbeans modules
@@ -31,10 +32,10 @@
                  Afterwards this should be be deleted.
                  -->
             <id>plexus-snapshot</id>
+            <url>http://oss.repository.sonatype.org/content/repositories/plexus-snapshots/</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
-            <url>http://oss.repository.sonatype.org/content/repositories/plexus-snapshots/</url>
         </repository>
     </repositories>
 
