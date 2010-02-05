@@ -37,6 +37,15 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
+
+        <repository>
+            <id>codehaus.snapshot</id>
+            <name>repository hosting snapshot of the nbm-maven-plugin</name>
+            <url>http://snapshots.repository.codehaus.org</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
     </repositories>
 
     <pluginRepositories>
