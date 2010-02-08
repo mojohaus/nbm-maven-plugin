@@ -23,13 +23,11 @@
             <groupId>${groupId}</groupId>
             <artifactId>module1</artifactId>
             <version>${version}</version>
-            <type>nbm</type>
         </dependency>
         <dependency>
             <groupId>${groupId}</groupId>
             <artifactId>branding</artifactId>
             <version>${version}</version>
-            <type>nbm</type>
         </dependency>
     </dependencies>
     <build>
