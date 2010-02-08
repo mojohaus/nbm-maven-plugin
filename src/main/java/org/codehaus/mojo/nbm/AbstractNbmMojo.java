@@ -86,7 +86,7 @@ public abstract class AbstractNbmMojo
     }
 
     static final boolean matchesLibrary( Artifact artifact, List<String> libraries, ExamineManifest depExaminator,
-        Log log )
+        Log log, boolean useOsgiDependencies )
     {
         String artId = artifact.getArtifactId();
         String grId = artifact.getGroupId();
@@ -109,7 +109,7 @@ public abstract class AbstractNbmMojo
         {
             return false;
         }
-        if ( depExaminator.isNetbeansModule()  || depExaminator.isOsgiBundle() )
+        if ( depExaminator.isNetbeansModule()  || (useOsgiDependencies && depExaminator.isOsgiBundle()) )
         {
             //TODO I can see how someone might want to include an osgi bundle as library, not dependency.
             // I guess it won't matter much in 6.9+, in older versions it could be a problem.
@@ -120,7 +120,7 @@ public abstract class AbstractNbmMojo
         return true;
     }
 
-    static final Dependency resolveNetbeansDependency( Artifact artifact, List<Dependency> deps,
+    static Dependency resolveNetbeansDependency( Artifact artifact, List<Dependency> deps,
         ExamineManifest manifest, Log log )
     {
         String artId = artifact.getArtifactId();
@@ -236,7 +236,8 @@ public abstract class AbstractNbmMojo
     }
 
     static List<Artifact> getLibraryArtifacts( DependencyNode treeRoot, NetbeansModule module,
-        List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache, Log log ) throws MojoExecutionException
+        List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
+        Log log, boolean useOsgiDependencies ) throws MojoExecutionException
     {
         List<Artifact> include = new ArrayList<Artifact>();
         if ( module != null )
@@ -247,7 +248,7 @@ public abstract class AbstractNbmMojo
                 librList.addAll( module.getLibraries() );
             }
             CollectLibrariesNodeVisitor visitor = new CollectLibrariesNodeVisitor( librList,
-                runtimeArtifacts, examinerCache, log, treeRoot );
+                runtimeArtifacts, examinerCache, log, treeRoot, useOsgiDependencies );
             treeRoot.accept( visitor );
             include.addAll( visitor.getArtifacts() );
         }
@@ -256,7 +257,7 @@ public abstract class AbstractNbmMojo
 
     static List<ModuleWrapper> getModuleDependencyArtifacts( DependencyNode treeRoot, NetbeansModule module,
         MavenProject project, Map<Artifact, ExamineManifest> examinerCache,
-        List<Artifact> libraryArtifacts, Log log ) throws MojoExecutionException
+        List<Artifact> libraryArtifacts, Log log, boolean useOsgiDependencies ) throws MojoExecutionException
     {
         List<ModuleWrapper> include = new ArrayList<ModuleWrapper>();
         if ( module != null )
@@ -296,7 +297,8 @@ public abstract class AbstractNbmMojo
                     }
                     include.add( wr );
                 } else {
-                    if (depExaminator.isOsgiBundle()) {
+                    if ( useOsgiDependencies && depExaminator.isOsgiBundle() )
+                    {
                         ModuleWrapper wr = new ModuleWrapper();
                         String id = artifact.getGroupId() + ":" + artifact.getArtifactId();
                         for ( Dependency depe : deps )
@@ -306,13 +308,14 @@ public abstract class AbstractNbmMojo
                                 wr.dependency = depe;
                             }
                         }
+                        boolean print = false;
                         if ( wr.dependency == null)
                         {
                             Dependency depe = new Dependency();
                             depe.setId( id );
                             depe.setType( "spec" );
-                            log.debug( "Adding OSGi bundle dependency - " + id );
                             wr.dependency = depe;
+                            print = true;
                         }
 
                         wr.artifact = artifact;
@@ -324,6 +327,8 @@ public abstract class AbstractNbmMojo
                                 artifact.getId() + " omitted as NetBeans module OSGi dependency, not a direct one. Declare it in the pom for inclusion." );
                             wr.transitive = true;
 
+                        } else {
+                            if (print)  log.info( "Adding OSGi bundle dependency - " + id );
                         }
 
                         include.add( wr );

@@ -140,17 +140,13 @@ Using OSGi bundles in NetBeans platform based applications
 To include the bundle in the application, add dependency on the bundle from nbm-application.
 There are a few prerequisites.
 
-    * works only in NetBeans 6.9 and later which support the embedding of bundles at runtime
+   * It works only in NetBeans 6.9 and later which support the embedding of bundles at runtime
 
-    * a dependency on netigso module from netbeans platform needs to be added to every nb module using bundles.
-
-----------------
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-core-netigso</artifactId>
-            <version>${netbeans.version}</version>
-        </dependency>
------------------
+   * Add <useOSGiDependencies>true</useOSGiDependencies> configuration entry to all the modules depending on OSGi bundles.
+     Existing applications/modules need to check modules wrapping
+     external libraries for library jars that are also OSGi bundles. Such modules will no longer include the OSGi bundles
+     as part of the module NBM but will include a modular dependency reference on the bundle only. Modules depending on these old wrapper modules
+     shall depend directly on the bundle, eventually rendering the old library wrapper module obsolete.
 
    * in the distribution, all bundles will be included in the default cluster ("extra" if not configured otherwise)
 

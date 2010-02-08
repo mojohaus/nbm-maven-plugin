@@ -208,7 +208,7 @@ public class CreateUpdateSiteMojo
 
                 }
                 if (res.isOSGiBundle()) {
-                    //check for bundles
+                    //TODO check for bundles
                 }
             }
             getLog().info(

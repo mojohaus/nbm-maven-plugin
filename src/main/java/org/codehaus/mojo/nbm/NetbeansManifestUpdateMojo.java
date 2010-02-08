@@ -181,6 +181,22 @@ public class NetbeansManifestUpdateMojo
      */
     private List<String> publicPackages;
 
+    /**
+     * When encountering an OSGi bundle among dependencies, the plugin will generate a direct dependency
+     * on the bundle and will not include the bundle's jar into the nbm. Will only work with Netbeans 6.9+ runtime.
+     * Therefore it is off by default.
+     * WARNING: Additionally existing applications/modules need to check modules wrapping
+     * external libraries for library jars that are also OSGi bundles. Such modules will no longer include the OSGi bundles
+     * as part of the module but will include a modular dependency on the bundle. Modules depending on these old wrappers
+     * shall depend directly on the bundle, eventually rendering the old library wrapper module obsolete.
+     *
+     * @parameter default-value="false"
+     * @since 3.2
+     *
+     */
+
+    private boolean useOSGiDependencies;
+
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
     /**
@@ -364,9 +380,9 @@ public class NetbeansManifestUpdateMojo
             Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
             @SuppressWarnings( "unchecked" )
             List<Artifact> libArtifacts = getLibraryArtifacts( treeroot, module, project.getRuntimeArtifacts(),
-                examinerCache, getLog() );
+                examinerCache, getLog(), useOSGiDependencies );
             List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts( treeroot, module, project, examinerCache,
-                libArtifacts, getLog() );
+                libArtifacts, getLog(), useOSGiDependencies );
             String classPath = "";
             String dependencies = "";
             String depSeparator = " ";
@@ -532,7 +548,7 @@ public class NetbeansManifestUpdateMojo
         Set<String> own = projectModuleOwnClasses( project, libArtifacts );
         deps.removeAll( own );
         CollectModuleLibrariesNodeVisitor visitor = new CollectModuleLibrariesNodeVisitor(
-            project.getRuntimeArtifacts(), examinerCache, getLog(), treeroot );
+            project.getRuntimeArtifacts(), examinerCache, getLog(), treeroot, useOSGiDependencies );
         treeroot.accept( visitor );
         Map<String, List<Artifact>> modules = visitor.getDeclaredArtifacts();
         Map<Artifact, Set<String>> moduleAllClasses = new HashMap<Artifact, Set<String>>();
@@ -565,8 +581,16 @@ public class NetbeansManifestUpdateMojo
                     if ( classes[0].size() > 0 )
                     {
                         getLog().error(
-                            "Project uses classes from transtive module " + wr.artifact.getId() + " which will not be accessible at runtime." );
+                            "Project uses classes from transitive module " + wr.artifact.getId() + " which will not be accessible at runtime." );
                         deps.removeAll( classes[0] );
+                    }
+                    classes[1].retainAll( deps );
+                    if (classes[1].size() > 0)
+                    {
+                        getLog().info( "Private classes referenced in transitive module: " + Arrays.toString( classes[1].toArray() ) );
+                        getLog().error(
+                            "Project depends on packages not accessible at runtime in transitive module " + wr.artifact.getId() + " which will not be accessible at runtime." );
+                        deps.removeAll( classes[1] );
                     }
                 }
             }
@@ -576,7 +600,7 @@ public class NetbeansManifestUpdateMojo
                 if ( deps.removeAll( moduleAllClasses.get( a ) ) )
                 {
                     strs.retainAll( moduleAllClasses.get( a ) );
-                    getLog().info( "Private classes referenced from module: " + Arrays.toString( strs.toArray() ) );
+                    getLog().info( "Private classes referenced in module: " + Arrays.toString( strs.toArray() ) );
                     getLog().error( "Project depends on packages not accessible at runtime in module " + a.getId() );
                 }
             }
@@ -702,7 +726,7 @@ public class NetbeansManifestUpdateMojo
                 }
             }
             List<Pattern> compiled = createCompiledPatternList( manifest.getPackages() );
-            if ( manifest.isOsgiBundle() )
+            if ( useOSGiDependencies && manifest.isOsgiBundle() )
             {
                 // TODO how to extract the public packages in osgi bundles easily..
                 compiled = Collections.singletonList( Pattern.compile( "(.+)" ) );

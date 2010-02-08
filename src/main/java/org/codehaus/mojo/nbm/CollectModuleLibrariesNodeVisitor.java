@@ -56,12 +56,14 @@ public class CollectModuleLibrariesNodeVisitor
 
     private Stack<String> currentModule = new Stack<String>();
 
+    private final boolean useOSGiDependencies;
+
     /**
      * Creates a dependency node visitor that collects visited nodes for further processing.
      */
     public CollectModuleLibrariesNodeVisitor(
         List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
-        Log log, DependencyNode root )
+        Log log, DependencyNode root, boolean useOSGiDependencies )
     {
         directNodes = new HashMap<String, List<Artifact>>();
         transitiveNodes = new HashMap<String, List<Artifact>>();
@@ -73,6 +75,7 @@ public class CollectModuleLibrariesNodeVisitor
         this.examinerCache = examinerCache;
         this.log = log;
         this.root = root;
+        this.useOSGiDependencies = useOSGiDependencies;
     }
 
     /**
@@ -117,7 +120,7 @@ public class CollectModuleLibrariesNodeVisitor
                 depExaminator.checkFile();
                 examinerCache.put( artifact, depExaminator );
             }
-            if ( depExaminator.isNetbeansModule()  || depExaminator.isOsgiBundle() )
+            if ( depExaminator.isNetbeansModule()  || (useOSGiDependencies && depExaminator.isOsgiBundle()) )
             {
                 currentModule.push( artifact.getDependencyConflictId() );
                 ArrayList<Artifact> arts = new ArrayList<Artifact>();
@@ -134,7 +137,7 @@ public class CollectModuleLibrariesNodeVisitor
             }
             if ( currentModule.size() > 0 )
             {
-                if ( AbstractNbmMojo.matchesLibrary( artifact, Collections.<String>emptyList(), depExaminator, log ) )
+                if ( AbstractNbmMojo.matchesLibrary( artifact, Collections.<String>emptyList(), depExaminator, log, useOSGiDependencies ) )
                 {
                     if ( currentModule.size() == 1 )
                     {

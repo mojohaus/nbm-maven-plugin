@@ -60,12 +60,14 @@ public class CollectLibrariesNodeVisitor
 
     private Set<String> includes;
 
+    private final boolean useOsgiDependencies;
+
     /**
      * Creates a dependency node visitor that collects visited nodes for further processing.
      */
     public CollectLibrariesNodeVisitor( List<String> explicitLibraries,
         List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
-        Log log, DependencyNode root )
+        Log log, DependencyNode root, boolean useOsgiDependencies )
     {
         nodes = new ArrayList<Artifact>();
         artifacts = new HashMap<String, Artifact>();
@@ -77,6 +79,7 @@ public class CollectLibrariesNodeVisitor
         this.explicitLibs = explicitLibraries;
         this.log = log;
         this.root = root;
+        this.useOsgiDependencies = useOsgiDependencies;
         duplicates = new HashSet<String>();
         conflicts = new HashSet<String>();
         includes = new HashSet<String>();
@@ -126,7 +129,7 @@ public class CollectLibrariesNodeVisitor
                 depExaminator.checkFile();
                 examinerCache.put( artifact, depExaminator );
             }
-            if ( AbstractNbmMojo.matchesLibrary( artifact, explicitLibs, depExaminator, log ) )
+            if ( AbstractNbmMojo.matchesLibrary( artifact, explicitLibs, depExaminator, log, useOsgiDependencies ) )
             {
                 if ( depExaminator.isNetbeansModule() )
                 {

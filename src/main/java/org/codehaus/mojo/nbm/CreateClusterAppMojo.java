@@ -27,7 +27,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -162,6 +164,9 @@ public class CreateClusterAppMojo
             Project antProject = registerNbmAntTasks();
 
             Set<String> knownClusters = new HashSet<String>();
+            Set<String> wrappedBundleCNBs = new HashSet<String>();
+            Map<Artifact, ExamineManifest> bundles = new HashMap<Artifact, ExamineManifest>();
+
             @SuppressWarnings( "unchecked" )
             Set<Artifact> artifacts = project.getArtifacts();
             for ( Artifact art : artifacts )
@@ -230,7 +235,6 @@ public class CreateClusterAppMojo
                                         }
                                         //now figure which one of the jars is the module jar..
                                         if ( path.endsWith( ".jar" ) &&
-                                            !path.contains( "ext/" ) &&
                                             !path.contains( "locale/" ) &&
                                             !path.contains( "docs/" ))
                                         {
@@ -240,6 +244,10 @@ public class CreateClusterAppMojo
                                             if ( ex.isNetbeansModule() )
                                             {
                                                 makeTask.setModule( part );
+                                            }
+                                            else if ( ex.isOsgiBundle() )
+                                            {
+                                                wrappedBundleCNBs.add( ex.getModule() );
                                             }
                                         }
                                     }
@@ -276,45 +284,59 @@ public class CreateClusterAppMojo
                     }
                 }
                 if (res.isOSGiBundle()) {
-                    ClusterTuple cluster = processCluster( defaultCluster, knownClusters, nbmBuildDirFile, art );
-                    if ( cluster.newer )
+                    bundles.put( art, res.getExaminedManifest() );
+                }
+            }
+            for (Map.Entry<Artifact, ExamineManifest> ent : bundles.entrySet()) {
+                Artifact art = ent.getKey();
+                ExamineManifest ex = ent.getValue();
+                
+                String spec = ex.getModule();
+                if (wrappedBundleCNBs.contains( spec )) 
+                {
+                    //we already have this one as a wrapped module.
+                    getLog().debug( "Not including bundle " + art.getDependencyConflictId() + ". It is already included in a NetBeans module." );
+                    continue;
+                }
+                ClusterTuple cluster = processCluster( defaultCluster, knownClusters, nbmBuildDirFile, art );
+                if ( cluster.newer )
+                {
+                    getLog().debug( "Copying " + art.getId() + " to cluster " + defaultCluster );
+                    File modules = new File(cluster.location, "modules");
+                    modules.mkdirs();
+                    File config = new File(cluster.location, "config");
+                    File confModules = new File(config, "Modules");
+                    confModules.mkdirs();
+                    File updateTracting = new File(cluster.location, "update_tracking");
+                    updateTracting.mkdirs();
+                    final String cnb = ex.getModule();
+                    final String cnbDashed = cnb.replace( ".", "-");
+                    final File moduleArt = new File(modules, cnbDashed + ".jar" ); //do we need the file in some canotical name pattern?
+                    final String specVer = ex.getSpecVersion();
+                    try
                     {
-                        getLog().debug( "Copying " + art.getId() + " to cluster " + defaultCluster );
-                        File modules = new File(cluster.location, "modules");
-                        modules.mkdirs();
-                        File config = new File(cluster.location, "config");
-                        File confModules = new File(config, "Modules");
-                        confModules.mkdirs();
-                        File updateTracting = new File(cluster.location, "update_tracking");
-                        updateTracting.mkdirs();
-                        final String cnb = res.getExaminedManifest().getModule();
-                        final String cnbDashed = cnb.replace( ".", "-");
-                        final File moduleArt = new File(modules, cnbDashed + ".jar" ); //do we need the file in some canotical name pattern?
-                        final String specVer = res.getExaminedManifest().getSpecVersion();
-                        try
-                        {
-                            FileUtils.copyFile( art.getFile(), moduleArt );
-                            final File moduleConf = new File(confModules, cnbDashed + ".xml");
-                            FileUtils.copyStreamToFile( new InputStreamFacade() {
-                                public InputStream getInputStream() throws IOException
-                                {
-                                    return new StringInputStream( createBundleConfigFile(cnb), "UTF-8");
-                                }
-                            }, moduleConf);
-                            FileUtils.copyStreamToFile( new InputStreamFacade() {
-                                public InputStream getInputStream() throws IOException
-                                {
-                                    return new StringInputStream( createBundleUpdateTracking(cnb, moduleArt, moduleConf, specVer), "UTF-8");
-                                }
-                            }, new File(updateTracting, cnbDashed + ".xml"));
-                        }
-                        catch ( IOException ex )
-                        {
-                            getLog().error( ex );
-                        }
+                        FileUtils.copyFile( art.getFile(), moduleArt );
+                        final File moduleConf = new File(confModules, cnbDashed + ".xml");
+                        FileUtils.copyStreamToFile( new InputStreamFacade() {
+                            public InputStream getInputStream() throws IOException
+                            {
+                                return new StringInputStream( createBundleConfigFile(cnb), "UTF-8");
+                            }
+                        }, moduleConf);
+                        FileUtils.copyStreamToFile( new InputStreamFacade() {
+                            public InputStream getInputStream() throws IOException
+                            {
+                                return new StringInputStream( createBundleUpdateTracking(cnb, moduleArt, moduleConf, specVer), "UTF-8");
+                            }
+                        }, new File(updateTracting, cnbDashed + ".xml"));
+                    }
+                    catch ( IOException exc )
+                    {
+                        getLog().error( exc );
                     }
                 }
             }
+
             getLog().info(
                 "Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile() );
 
