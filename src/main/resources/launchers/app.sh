@@ -68,8 +68,8 @@ readClusters() {
 
 clusters=`(cat "$progdir/../etc/$APPNAME".clusters; echo) | readClusters | tr '\012' ':'`
 
-if [ ! -z "$extraclusters" ] ; then
-    clusters="$clusters:$extraclusters"
+if [ ! -z "$extra_clusters" ] ; then
+    clusters="$clusters:$extra_clusters"
 fi
 
 nbexec=`echo "$progdir"/../platform*/lib/nbexec`
@@ -81,7 +81,6 @@ case "`uname`" in
             -J-Dcom.apple.mrj.application.apple.menu.about.name='"$APPNAME"' \
             -J-Xdock:name='"$APPNAME"' \
             '"-J-Xdock:icon=$progdir/../../$APPNAME.icns"' \
-            --branding '"$APPNAME"' \
             --clusters '"$clusters"' \
             --userdir '"${userdir}"' \
             ${default_options} \
@@ -96,7 +95,6 @@ case "`uname`" in
        fi
        eval exec $sh '"$nbexec"' \
             --jdkhome '"$jdkhome"' \
-            --branding '"$APPNAME"' \
             --clusters '"$clusters"' \
             --userdir '"${userdir}"' \
             ${default_options} \
