@@ -615,7 +615,7 @@ public class CreateClusterAppMojo
         }
     }
 
-    private String createBundleConfigFile( String cnb )
+    static String createBundleConfigFile( String cnb )
     {
         return
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -630,7 +630,7 @@ public class CreateClusterAppMojo
 "</module>";
     }
 
-    private String createBundleUpdateTracking( String cnb, File moduleArt, File moduleConf, String specVersion ) throws FileNotFoundException, IOException
+    static String createBundleUpdateTracking( String cnb, File moduleArt, File moduleConf, String specVersion ) throws FileNotFoundException, IOException
     {
 
         return

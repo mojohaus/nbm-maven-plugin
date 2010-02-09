@@ -18,16 +18,21 @@ package org.codehaus.mojo.nbm;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.io.InputStreamFacade;
 
 /**
  * Create the Netbeans module clusters from reactor
@@ -47,6 +52,14 @@ public class CreateClusterMojo
      * @required
      */
     protected File nbmBuildDir;
+
+    /**
+     * default cluster value for reactor projects without cluster information,
+     * typically OSGi bundles
+     * @parameter default-value="extra"
+     * @since 3.2
+     */
+    private String defaultCluster;
     /**
      * The Maven Project.
      *
@@ -108,6 +121,57 @@ public class CreateClusterMojo
                         String error = "The NetBeans binary directory structure for " + proj.getId() + " is not created yet." +
                                 "\n Please execute 'mvn install nbm:cluster' to build all relevant projects in the reactor.";
                         throw new MojoFailureException( error );
+                    }
+                    if ("bundle".equals(  proj.getPackaging() ))
+                    {
+                        Artifact art = proj.getArtifact();
+                        ExamineManifest mnf = new ExamineManifest( getLog() );
+
+                        File jar = new File(proj.getBuild().getDirectory(), proj.getBuild().getFinalName() + ".jar");
+                        if ( !jar.exists() )
+                        {
+                            getLog().error( "Skipping " + proj.getId() + ". Cannot find the main artifact in output directory.");
+                            continue;
+                        }
+                        mnf.setJarFile( jar );
+                        mnf.checkFile();
+
+                        File cluster = new File(nbmBuildDir, defaultCluster);
+                        getLog().debug( "Copying " + art.getId() + " to cluster " + defaultCluster );
+                        File modules = new File(cluster, "modules");
+                        modules.mkdirs();
+                        File config = new File(cluster, "config");
+                        File confModules = new File(config, "Modules");
+                        confModules.mkdirs();
+                        File updateTracting = new File(cluster, "update_tracking");
+                        updateTracting.mkdirs();
+
+                        final String cnb = mnf.getModule();
+                        final String cnbDashed = cnb.replace( ".", "-");
+                        final File moduleArt = new File(modules, cnbDashed + ".jar" ); //do we need the file in some canotical name pattern?
+                        final String specVer = mnf.getSpecVersion();
+                        try
+                        {
+                            FileUtils.copyFile( jar, moduleArt );
+                            final File moduleConf = new File(confModules, cnbDashed + ".xml");
+                            FileUtils.copyStreamToFile( new InputStreamFacade() {
+                                public InputStream getInputStream() throws IOException
+                                {
+                                    return new StringInputStream( CreateClusterAppMojo.createBundleConfigFile(cnb), "UTF-8");
+                                }
+                            }, moduleConf);
+                            FileUtils.copyStreamToFile( new InputStreamFacade() {
+                                public InputStream getInputStream() throws IOException
+                                {
+                                    return new StringInputStream( CreateClusterAppMojo.createBundleUpdateTracking(cnb, moduleArt, moduleConf, specVer), "UTF-8");
+                                }
+                            }, new File(updateTracting, cnbDashed + ".xml"));
+                        }
+                        catch ( IOException exc )
+                        {
+                            getLog().error( exc );
+                        }
+
                     }
                 }
             }
