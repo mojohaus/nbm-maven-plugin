@@ -33,11 +33,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Pack200;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -207,6 +210,11 @@ public class CreateClusterAppMojo
                                 { //ignore everything else.
                                     String path = name.replace( "netbeans/",
                                         clusterName + "/" );
+                                    boolean ispack200 = path.endsWith( ".jar.pack.gz" );
+                                    if ( ispack200 )
+                                    {
+                                        path = path.replace( ".jar.pack.gz", ".jar" );
+                                    }
                                     File fl = new File( nbmBuildDirFile,
                                         path.replace( "/", File.separator ) );
                                     if ( ent.isDirectory() )
@@ -216,6 +224,10 @@ public class CreateClusterAppMojo
                                     else
                                     {
                                         String part = name.replace( "netbeans/", "" );
+                                        if ( ispack200 )
+                                        {
+                                            part = part.replace( ".jar.pack.gz", ".jar" );
+                                        }
                                         set.appendIncludes( new String[] { part });
 
                                         fl.getParentFile().mkdirs();
@@ -227,7 +239,19 @@ public class CreateClusterAppMojo
                                                 fl ) );
                                             InputStream instream = jf.getInputStream(
                                                 ent );
-                                            IOUtil.copy( instream, outstream );
+                                            if ( ispack200 )
+                                            {
+                                                Pack200.Unpacker unp = Pack200.newUnpacker();
+                                                JarOutputStream jos = new JarOutputStream( outstream );
+                                                GZIPInputStream gzip = new GZIPInputStream( instream );
+                                                try {
+                                                    unp.unpack( gzip, jos );
+                                                } finally {
+                                                    jos.close();
+                                                }
+                                            } else {
+                                                IOUtil.copy( instream, outstream );
+                                            }
                                         }
                                         finally
                                         {
