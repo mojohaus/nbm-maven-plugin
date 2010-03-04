@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor id="nbm-suite-root" partial="false" name="NetBeans module suite archetype">
+  <fileSets>
+    <fileSet filtered="true" packaged="false">
+      <directory></directory>
+      <includes>
+        <include>nbactions.xml</include>
+        <include>profiles.xml</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  <requiredProperties>
+    <requiredProperty key="netbeansInstallation">
+      <defaultValue>path-to-associated-netbeans-install</defaultValue>
+    </requiredProperty>
+  </requiredProperties>
+</archetype-descriptor>

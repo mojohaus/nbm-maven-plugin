@@ -1,0 +1,13 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>org.codehaus.mojo.archetypes</groupId>
+    <artifactId>mojo-archetypes</artifactId>
+    <version>2</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>nbm-suite-root</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>POM Root Archetype preconfigured to contain NetBeans module projects</name>
+  <description>Root project archetype for creating multi module projects developing netbeans ide modules. Approximately similar in functionality to module suites in NetBeans ant projects.</description>
+</project>
