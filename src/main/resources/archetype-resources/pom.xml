@@ -109,7 +109,6 @@
         </pluginManagement>
     </build>
     <modules>
-        <module>module1</module>
         <module>branding</module>
         <module>application</module>
     </modules>
