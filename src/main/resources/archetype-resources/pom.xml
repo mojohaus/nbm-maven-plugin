@@ -5,7 +5,7 @@
     <artifactId>${artifactId}</artifactId>
     <packaging>nbm</packaging>
     <version>${version}</version>
-    <name>Netbeans Module ${artifactId}</name>
+    <name>${artifactId} NetBeans Module</name>
     
     <repositories>
         <!-- this is a remote repository hosting the netbeans api artifacts.
