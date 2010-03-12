@@ -15,30 +15,6 @@
                 <include>**/*.gif</include>
             </includes>
         </fileSet>
-        <fileSet filtered="true" packaged="true">
-            <directory>module1/src/main/resources</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-        </fileSet>
-        <fileSet filtered="true">
-            <directory>module1/src/main/nbm</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-        </fileSet>
-        <fileSet filtered="true">
-            <directory>module1</directory>
-            <includes>
-                <include>pom.xml</include>
-            </includes>
-        </fileSet>
-        <fileSet filtered="true" packaged="true">
-            <directory>module1/src/main/java</directory>
-        </fileSet>
-        <fileSet filtered="true" packaged="true">
-            <directory>module1/src/test/java</directory>
-        </fileSet>
         
         <fileSet filtered="true">
             <directory>branding</directory>
