@@ -24,50 +24,7 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-
-        <repository>
-            <!-- Allows usage of annotations within netbeans modules
-                 this section is necessary until http://jira.codehaus.org/browse/MCOMPILER-98
-                 gets integrated into a released version of maven-compiler-plugin.
-                 Afterwards this should be be deleted.
-                 -->
-            <id>plexus-snapshot</id>
-            <url>http://oss.repository.sonatype.org/content/repositories/plexus-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-
-        <repository>
-            <id>codehaus.snapshot</id>
-            <name>repository hosting snapshot of the nbm-maven-plugin</name>
-            <url>http://snapshots.repository.codehaus.org</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>apache.snapshot</id>
-            <name>repository hosting snapshot of the maven-compiler-plugin</name>
-            <url>https://repository.apache.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
     </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>codehaus.snapshot</id>
-            <name>repository hosting snapshot of the nbm-maven-plugin</name>
-            <url>http://snapshots.repository.codehaus.org</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>apache.snapshot</id>
-            <name>repository hosting snapshot of the maven-compiler-plugin</name>
-            <url>https://repository.apache.org/content/repositories/snapshots</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <dependencies>
         <dependency>
@@ -84,7 +41,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>nbm-maven-plugin</artifactId>
-                    <version>3.2-SNAPSHOT</version>
+                    <version>3.2</version>
                     <extensions>true</extensions>
                     <configuration>
                         <brandingToken>${brandingToken}</brandingToken>
@@ -93,14 +50,10 @@
                 </plugin>
                 
                 <plugin>
-                    <!-- netbeans modules in 6.9+ are 1.6 compatible
-                     2.2-SNAPSHOT is required to have netbeans api annotations work properly,
-                     if you are not using these annotations, you can fallback to the latest released
-                     maven-compiler-plugin version.
-                    -->
+                    <!-- netbeans modules in 6.9+ are 1.6 compatible -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.2-SNAPSHOT</version>
+                    <version>2.2</version>
                     <configuration>
                         <source>1.6</source>
                         <target>1.6</target>
