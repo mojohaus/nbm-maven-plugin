@@ -219,6 +219,7 @@ public abstract class AbstractNbmMojo
         {
             getLog().info( "   Cluster:" + module.getCluster() );
         }
+        // same code in Nb IDE, keep it synchronized with MavenNbModuleImpl.getCodeNameBase()
         String codename = project.getGroupId() + "." + project.getArtifactId();
         codename = codename.replaceAll( "-", "." );
         module.setCodeNameBase( codename );
