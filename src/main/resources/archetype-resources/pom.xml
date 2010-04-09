@@ -20,22 +20,13 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-
-        <repository>
-            <id>netbeans.snapshot</id>
-            <name>repository hosting netbeans.org api snapshot artifacts</name>
-            <url>http://bits.netbeans.org/netbeans/trunk/maven-snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>SNAPSHOT</version>
+            <version>RELEASE69-BETA</version>
         </dependency>
     </dependencies>
     <build>
