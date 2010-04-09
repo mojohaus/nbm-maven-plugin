@@ -16,14 +16,6 @@
             <name>repository hosting netbeans.org api artifacts</name>
             <url>http://bits.netbeans.org/maven2</url>
         </repository>
-        <repository>
-            <id>netbeans.snapshot</id>
-            <name>repository hosting netbeans.org api snapshot artifacts</name>
-            <url>http://bits.netbeans.org/netbeans/trunk/maven-snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -87,6 +79,6 @@
     </profiles>
 
     <properties>
-        <netbeans.version>SNAPSHOT</netbeans.version>
+        <netbeans.version>RELEASE69-BETA</netbeans.version>
     </properties>
 </project>
