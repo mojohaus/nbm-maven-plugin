@@ -22,7 +22,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
+            <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -45,7 +45,7 @@
                     <!-- netbeans modules in 6.9+ are 1.6 compatible -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>2.3</version>
                     <configuration>
                         <source>1.6</source>
                         <target>1.6</target>
@@ -59,7 +59,7 @@
         <module>application</module>
     </modules>
     <properties>
-        <netbeans.version>RELEASE69-BETA</netbeans.version>
+        <netbeans.version>RELEASE69</netbeans.version>
         <brandingToken>foo</brandingToken>
     </properties>
 </project>
