@@ -208,8 +208,7 @@ public class CreateClusterAppMojo
                                 String name = ent.getName();
                                 if ( name.startsWith( "netbeans/" ) )
                                 { //ignore everything else.
-                                    String path = name.replace( "netbeans/",
-                                        clusterName + "/" );
+                                    String path = clusterName + name.substring( "netbeans".length() );
                                     boolean ispack200 = path.endsWith( ".jar.pack.gz" );
                                     if ( ispack200 )
                                     {
@@ -223,7 +222,7 @@ public class CreateClusterAppMojo
                                     }
                                     else
                                     {
-                                        String part = name.replace( "netbeans/", "" );
+                                        String part = name.substring( "netbeans/".length() );
                                         if ( ispack200 )
                                         {
                                             part = part.replace( ".jar.pack.gz", ".jar" );
