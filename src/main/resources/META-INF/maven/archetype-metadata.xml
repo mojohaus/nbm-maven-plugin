@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archetype-descriptor id="netbeans-platform-app-archetype" partial="false" name="NetBeans Platform Application Archetype">
+<archetype-descriptor xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
+  partial="false" name="NetBeans Platform Application Archetype">
     <fileSets>
         <fileSet filtered="true">
             <directory></directory>
@@ -15,7 +17,7 @@
                 <include>**/*.gif</include>
             </includes>
         </fileSet>
-        
+
         <fileSet filtered="true">
             <directory>branding</directory>
             <includes>
@@ -40,6 +42,6 @@
                 <include>pom.xml</include>
             </includes>
         </fileSet>
-        
+
     </fileSets>
 </archetype-descriptor>
