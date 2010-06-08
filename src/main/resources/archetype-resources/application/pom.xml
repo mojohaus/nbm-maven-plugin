@@ -1,16 +1,19 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>${groupId}</groupId>
         <artifactId>${artifactId}</artifactId>
         <version>${version}</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
+
     <artifactId>application</artifactId>
-    <packaging>nbm-application</packaging>
     <version>${version}</version>
+    <packaging>nbm-application</packaging>
+
     <name>${artifactId} - NetBeans Platform based application</name>
+
     <dependencies>
         <dependency>
             <groupId>org.netbeans.cluster</groupId>
@@ -18,13 +21,14 @@
             <version>${netbeans.version}</version>
             <type>pom</type>
         </dependency>
-      
+
         <dependency>
             <groupId>${groupId}</groupId>
             <artifactId>branding</artifactId>
             <version>${version}</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
