@@ -1,12 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
-    <packaging>nbm</packaging>
     <version>${version}</version>
+    <packaging>nbm</packaging>
+
     <name>${artifactId} NetBeans Module</name>
-    
+
     <repositories>
         <!-- this is a remote repository hosting the netbeans api artifacts.
          the versions of the artifacts are netbeans IDE release based, eg. RELEASE65.
@@ -29,6 +31,7 @@
             <version>RELEASE69</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -37,7 +40,7 @@
                 <version>3.2</version>
                 <extensions>true</extensions>
             </plugin>
-            
+
             <plugin>
                 <!-- netbeans modules in 6.9+ are 1.6 compatible -->
                 <groupId>org.apache.maven.plugins</groupId>
