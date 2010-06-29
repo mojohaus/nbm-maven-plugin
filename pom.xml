@@ -6,8 +6,14 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>nbm-suite-root</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <packaging>jar</packaging>
   <name>POM Root Archetype preconfigured to contain NetBeans module projects</name>
   <description>Root project archetype for creating multi module projects developing netbeans ide modules. Approximately similar in functionality to module suites in NetBeans ant projects.</description>
+
+  <scm>
+    <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nbm-suite-root-1.1</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-suite-root-1.1</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-suite-root-1.1</url>
+  </scm>
 </project>
