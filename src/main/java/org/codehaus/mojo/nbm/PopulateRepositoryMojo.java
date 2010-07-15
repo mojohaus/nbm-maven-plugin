@@ -410,7 +410,7 @@ public class PopulateRepositoryMojo
                     if ( zip.exists() )
                     {
                         javadoc = zip;
-                        javadocArt = createAttachedArtifact(art, javadoc, null, "javadoc");
+                        javadocArt = createAttachedArtifact(art, javadoc, "jar", "javadoc");
                     }
                 }
                 File source = null;
@@ -421,7 +421,7 @@ public class PopulateRepositoryMojo
                     if ( zip.exists() )
                     {
                         source = zip;
-                        sourceArt = createAttachedArtifact(art, source, null, "sources");
+                        sourceArt = createAttachedArtifact(art, source, "jar", "sources");
                     }
                 }
                 File nbm = null;
@@ -601,13 +601,11 @@ public class PopulateRepositoryMojo
 
     //performs the same tasks as the MavenProjectHelper
     private Artifact createAttachedArtifact(Artifact primary, File file, String type, String classifier) {
+        assert type != null;
 
         ArtifactHandler handler = null;
 
-        if ( type != null )
-        {
-            handler = artifactHandlerManager.getArtifactHandler( type );
-        }
+        handler = artifactHandlerManager.getArtifactHandler( type );
 
         if ( handler == null )
         {
