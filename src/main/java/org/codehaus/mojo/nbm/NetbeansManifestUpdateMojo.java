@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -327,9 +328,7 @@ public class NetbeansManifestUpdateMojo
             "OpenIDE-Module-Specification-Version", specVersion );
         conditionallyAddAttribute( mainSection,
             "OpenIDE-Module-Implementation-Version", implVersion );
-//     create a timestamp value for OpenIDE-Module-Build-Version: manifest entry
-        String timestamp = new SimpleDateFormat( "yyyyMMddhhmm" ).format(
-            new Date() );
+        final String timestamp = createTimestamp();
         conditionallyAddAttribute( mainSection, "OpenIDE-Module-Build-Version",
             timestamp );
         String projectCNB = conditionallyAddAttribute( mainSection, "OpenIDE-Module", moduleName );
@@ -499,6 +498,23 @@ public class NetbeansManifestUpdateMojo
         {
             IOUtil.close( writer );
         }
+    }
+
+    /**
+     * Create a timestamp for <code>OpenIDE-Module-Build-Version</code> manifest
+     * entry.
+     *
+     * It's created from the current time and formatted using a UTC timezone
+     * explicitly which makes created timestamp timezone-independent.
+     *
+     * @return timestamp represented as <code>201012292045</code>
+     */
+    private String createTimestamp()
+    {
+        final SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyyMMddHHmm" );
+        dateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+        final String timestamp = dateFormat.format( new Date() );
+        return timestamp;
     }
 
     private String stripVersionFromCodebaseName( String cnb )
