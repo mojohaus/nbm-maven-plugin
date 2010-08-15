@@ -202,14 +202,18 @@ public class CreateWebstartAppMojo
         }
         else
         {
-            getLog().warn( "Keystore related parameters not set, generating a default keystore." );
-            GenerateKey genTask = (GenerateKey) antProject.createTask( "genkey" );
-            genTask.setAlias( "jnlp" );
-            genTask.setStorepass( "netbeans" );
-            genTask.setDname( "CN=" + System.getProperty( "user.name" ) );
-            genTask.setKeystore( new File( outputDirectory, "generated.keystore" ).getAbsolutePath() );
-            genTask.execute();
-            keystore = new File( outputDirectory, "generated.keystore" ).getAbsolutePath();
+            File generatedKeystore = new File( outputDirectory, "generated.keystore" );
+            if ( ! generatedKeystore.exists() )
+            {
+                getLog().warn( "Keystore related parameters not set, generating a default keystore." );
+                GenerateKey genTask = (GenerateKey) antProject.createTask( "genkey" );
+                genTask.setAlias( "jnlp" );
+                genTask.setStorepass( "netbeans" );
+                genTask.setDname( "CN=" + System.getProperty( "user.name" ) );
+                genTask.setKeystore( generatedKeystore.getAbsolutePath() );
+                genTask.execute();
+            }
+            keystore = generatedKeystore.getAbsolutePath();
             keystorepassword = "netbeans";
             keystorealias = "jnlp";
         }
