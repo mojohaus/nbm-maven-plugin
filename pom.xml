@@ -67,6 +67,14 @@
                 <role>Patch Contributor</role>
             </roles>
         </contributor>
+        <contributor>
+            <name>Jesse Glick</name>
+            <email>protected</email>
+            <roles>
+                <role>Patch Contributor</role>
+            </roles>
+        </contributor>
+
     </contributors>
     <build>
         <plugins>
