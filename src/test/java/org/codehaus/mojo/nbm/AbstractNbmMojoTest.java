@@ -165,7 +165,7 @@ public class AbstractNbmMojoTest extends TestCase {
         assertEquals(1, result.size());
     }
 
-
+    
     /**
      * transitive dependency gets included as well.
      */

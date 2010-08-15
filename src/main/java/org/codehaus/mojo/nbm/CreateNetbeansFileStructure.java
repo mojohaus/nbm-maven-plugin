@@ -307,9 +307,9 @@ public abstract class CreateNetbeansFileStructure
             for ( Artifact artifact : artifacts )
             {
                 File source = artifact.getFile();
-                if ( classpathValue.contains( "ext/" + source.getName() ) )
+                if ( classpathValue.contains( "ext/" + artifact.getGroupId() + "/" + source.getName() ) )
                 {
-                    File targetDir = new File( moduleJarLocation, "ext" );
+                    File targetDir = new File( moduleJarLocation, "ext/" + artifact.getGroupId() );
                     targetDir.mkdirs();
                     File target = new File( targetDir, source.getName() );
 

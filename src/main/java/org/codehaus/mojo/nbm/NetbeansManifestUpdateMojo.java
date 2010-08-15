@@ -388,7 +388,7 @@ public class NetbeansManifestUpdateMojo
 
             for ( Artifact a : libArtifacts )
             {
-                classPath = classPath + " ext/" + a.getFile().getName();
+                classPath = classPath + " ext/" + a.getGroupId() + "/" + a.getFile().getName();
             }
 
             for ( ModuleWrapper wr : moduleArtifacts )
