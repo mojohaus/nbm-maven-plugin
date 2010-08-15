@@ -256,6 +256,35 @@ the IDE or NetBeans platform.
  For more information on plugin configuration and customization, see {{{plugin-info.html}goal documentation}}. 
 
 
+Public packages declaration
+
+ By default all your module's packages (and classes) and private to the given module. If you want to expose
+any API to other modules, you will need to declare those public packages in your pom.xml. This includes
+not only your own classes but also any other 3rd party library classes that are packaged with your module
+and are to be exposed for reuse by other modules.
+
+ For example,
+
+------
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <version>3.2</version>
+                <extensions>true</extensions>
+                <configuration>
+                   <publicPackages>
+                       <publicPackage>org.foo.api</publicPackage>
+                       <publicPackage>org.apache.commons.*</publicPackage>
+                   </publicPackages>
+                </configuration>
+            </plugin>
+------
+
+ there is a package org.foo.api made public (but not org.foo.api.impl package) and
+any package starting with org.apache.commons, so both org.apache.commons.io and org.apache.commons.exec packages are exposed to the outside
+
+
+
 Archetypes anyone?
  
  There are 2 basic archetypes:
