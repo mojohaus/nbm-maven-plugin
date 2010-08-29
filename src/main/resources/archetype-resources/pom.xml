@@ -40,7 +40,7 @@
                     <extensions>true</extensions>
                     <configuration>
                         <brandingToken>${brandingToken}</brandingToken>
-                        <cluster>${project.parent.artifactId}</cluster>
+                        <cluster>foobar</cluster>
                     </configuration>
                 </plugin>
 
@@ -65,6 +65,6 @@
 
     <properties>
         <netbeans.version>RELEASE691</netbeans.version>
-        <brandingToken>${project.parent.artifactId}</brandingToken>
+        <brandingToken>foo</brandingToken>
     </properties>
 </project>
