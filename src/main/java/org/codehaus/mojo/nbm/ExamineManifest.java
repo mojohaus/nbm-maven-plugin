@@ -220,7 +220,7 @@ public class ExamineManifest
             String bndName = attrs.getValue("Bundle-SymbolicName");
             if (bndName != null) {
                 setOsgiBundle(true);
-                setModule( bndName );
+                setModule( bndName.replace('-', '_') ); //MNBMODULE-96
                 setSpecVersion( attrs.getValue("Bundle-Version") );
                 String exp = attrs.getValue("Export-Package");
                 setPublicPackages(exp != null);
