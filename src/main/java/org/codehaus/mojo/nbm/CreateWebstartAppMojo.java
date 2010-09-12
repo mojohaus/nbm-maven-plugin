@@ -352,17 +352,16 @@ public class CreateWebstartAppMojo
                     FileUtils.copyFile( source, dest );
                     brandRefs.append( "    <jar href=\'branding/" + dest.getName() + "\'/>\n" );
                 }
-            //signing of branding items doens't work for some reason.
-            // -> branding.jnlp with <security/>
-//                signTask = (SignJar)antProject.createTask("signjar");
-//                signTask.setKeystore(keystore);
-//                signTask.setStorepass(keystorepassword);
-//                signTask.setAlias(keystorealias);
-//                FileSet set = new FileSet();
-//                set.setDir(brandingDir);
-//                set.setIncludes("*.jar");
-//                signTask.addFileset(fs);
-//                signTask.execute();
+
+                signTask = (SignJar)antProject.createTask("signjar");
+                signTask.setKeystore(keystore);
+                signTask.setStorepass(keystorepassword);
+                signTask.setAlias(keystorealias);
+                FileSet set = new FileSet();
+                set.setDir(brandingDir);
+                set.setIncludes("*.jar");
+                signTask.addFileset(set);
+                signTask.execute();
             }
 
             File brandingJnlp = new File(
