@@ -581,7 +581,7 @@ public class NetbeansManifestUpdateMojo
             }
         }
 
-        //now we have the classes that are not in publick packages of declared modules,
+        //now we have the classes that are not in public packages of declared modules,
         //but are being used
         if ( deps.size() > 0 )
         {
@@ -608,7 +608,7 @@ public class NetbeansManifestUpdateMojo
                             "Project depends on packages not accessible at runtime in transitive module " + wr.artifact.getId() + " which will not be accessible at runtime." );
                         deps.removeAll( classes[1] );
                     }
-                }
+            }
             }
             for ( Artifact a : moduleAllClasses.keySet() )
             {
@@ -622,7 +622,7 @@ public class NetbeansManifestUpdateMojo
             }
             if ( verifyRuntime.equalsIgnoreCase( FAIL ) )
             {
-                throw new MojoFailureException( "See above for failures in runtime NebBeans dependencies verification." );
+                throw new MojoFailureException( "See above for failures in runtime NetBeans dependencies verification." );
             }
         }
     }

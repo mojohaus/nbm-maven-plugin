@@ -55,6 +55,7 @@ public class CollectModuleLibrariesNodeVisitor
     private DependencyNode root;
 
     private Stack<String> currentModule = new Stack<String>();
+    private final String LIB_ID = "!@#$%^&ROOT";
 
     private final boolean useOSGiDependencies;
 
@@ -137,7 +138,9 @@ public class CollectModuleLibrariesNodeVisitor
             }
             if ( currentModule.size() > 0 )
             {
-                if ( AbstractNbmMojo.matchesLibrary( artifact, Collections.<String>emptyList(), depExaminator, log, useOSGiDependencies ) )
+                ////MNBMODULE-95 we are only interested in the module owned libraries
+                if ( !currentModule.peek().startsWith( LIB_ID ) &&
+                        AbstractNbmMojo.matchesLibrary( artifact, Collections.<String>emptyList(), depExaminator, log, useOSGiDependencies ) )
                 {
                     if ( currentModule.size() == 1 )
                     {
@@ -150,15 +153,19 @@ public class CollectModuleLibrariesNodeVisitor
                     // if a library, iterate to it's child nodes.
                     return true;
                 }
+            } else {
+                //MNBMODULE-95 we check the non-module dependencies to see if they
+                // depend on modules/bundles. these bundles are transitive, so
+                // we add the root module as the first currentModule to keep
+                //any bundle/module underneath it as transitive
+                currentModule.push( LIB_ID  + artifact.getDependencyConflictId());
             }
-
         }
         catch ( MojoExecutionException mojoExecutionException )
         {
             throwable = mojoExecutionException;
         }
-        //don't bother iterating to childs if the current node is not a library in module dependency.
-        return false;
+        return true;
     }
 
     /**
@@ -170,7 +177,8 @@ public class CollectModuleLibrariesNodeVisitor
         {
             return false;
         }
-        if ( !currentModule.empty() && currentModule.peek().equals( node.getArtifact().getDependencyConflictId() ) )
+        if ( !currentModule.empty() && (currentModule.peek().equals( node.getArtifact().getDependencyConflictId()) ||
+                currentModule.peek().equals( LIB_ID + node.getArtifact().getDependencyConflictId()) ))
         {
             currentModule.pop();
         }
