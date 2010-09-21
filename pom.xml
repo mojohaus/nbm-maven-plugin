@@ -13,7 +13,7 @@
         It defines custom lifecycle called "nbm". During packaging, the module's jar artifact will be enhanced with Netbeans specific manifest entries and along with other required files packed into a nbm file, ready for distribution.
         Additionally the plugin provides agregator goals to create autoupdate centers or module cluster for your module projects.
     </description>
-    <version>3.3</version>
+    <version>3.4-SNAPSHOT</version>
     <inceptionYear>2005</inceptionYear>
     <url>http://mojo.codehaus.org/nbm-maven-plugin</url>
     <issueManagement>
@@ -35,9 +35,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nbm-maven-plugin-3.3</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-maven-plugin-3.3</developerConnection>
-        <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-maven-plugin-3.3</url>
+        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven-plugin</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven-plugin</developerConnection>
+        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven-plugin</url>
     </scm>
 
     <developers>
