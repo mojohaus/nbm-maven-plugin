@@ -330,8 +330,8 @@ public class CreateClusterAppMojo
                     File config = new File(cluster.location, "config");
                     File confModules = new File(config, "Modules");
                     confModules.mkdirs();
-                    File updateTracting = new File(cluster.location, "update_tracking");
-                    updateTracting.mkdirs();
+                    File updateTracking = new File(cluster.location, "update_tracking");
+                    updateTracking.mkdirs();
                     final String cnb = ex.getModule();
                     final String cnbDashed = cnb.replace( ".", "-");
                     final File moduleArt = new File(modules, cnbDashed + ".jar" ); //do we need the file in some canotical name pattern?
@@ -351,7 +351,7 @@ public class CreateClusterAppMojo
                             {
                                 return new StringInputStream( createBundleUpdateTracking(cnb, moduleArt, moduleConf, specVer), "UTF-8");
                             }
-                        }, new File(updateTracting, cnbDashed + ".xml"));
+                        }, new File(updateTracking, cnbDashed + ".xml"));
                     }
                     catch ( IOException exc )
                     {
