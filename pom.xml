@@ -8,6 +8,6 @@
   <artifactId>nbm-suite-root</artifactId>
   <version>1.2-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>POM Root Archetype preconfigured to contain NetBeans module projects</name>
-  <description>Root project archetype for creating multi module projects developing netbeans ide modules. Approximately similar in functionality to module suites in NetBeans ant projects.</description>
+  <name>NetBeans Module Suite Archetype</name>
+  <description>Root project archetype for creating multi module projects developing NetBeans IDE modules. Approximately similar in functionality to module suites in NetBeans Ant projects.</description>
 </project>
