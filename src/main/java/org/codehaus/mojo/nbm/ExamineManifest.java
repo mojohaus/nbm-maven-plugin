@@ -82,7 +82,7 @@ public class ExamineManifest
                 mf = jar.getManifest();
             } catch ( Exception exc )
             {
-                throw new MojoExecutionException( exc.getMessage(), exc );
+                throw new MojoExecutionException( "Could not open " + jarFile + ": " + exc.getMessage(), exc );
             } finally
             {
                 if ( jar != null )
