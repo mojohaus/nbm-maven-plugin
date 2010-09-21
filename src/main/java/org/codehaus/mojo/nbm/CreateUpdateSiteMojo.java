@@ -67,13 +67,13 @@ public class CreateUpdateSiteMojo
     protected File outputDirectory;
     /**
      * autoupdate site xml file name.
-     * @parameter expression="${maven.nbm.updatesitexml}" default-value="Autoupdate_Site.xml"
+     * @parameter expression="${maven.nbm.updatesitexml}" default-value="updates.xml"
      */
     protected String fileName;
     /**
      * A custom distribution base for the nbms in the update site.
-     * If NOT defined, the update site will use the distribution URLs as
-     * defined in the nbm files.
+     * If NOT defined, the update site will use a simple relative URL, which is generally what you want.
+     * Defining it as "auto" will pick up the distribution URL from each NBM, which is generally wrong.
      * <p/>
      * The value is either a direct http protocol based URL that points to
      * the location under which all nbm files are located, or
@@ -89,7 +89,7 @@ public class CreateUpdateSiteMojo
      * If the value doesn't contain :: characters,
      * it's assumed to be the flat structure and the value is just the URL.
      * 
-     * @parameter expression="${maven.nbm.customDistBase}"
+     * @parameter expression="${maven.nbm.customDistBase}" default-value="."
      * @since 3.0 it's also possible to add remote repository as base
      */
     private String distBase;
@@ -156,6 +156,9 @@ public class CreateUpdateSiteMojo
         }
 
         boolean isRepository = false;
+        if ("auto".equals(distBase)) {
+            distBase = null;
+        }
         ArtifactRepository distRepository = getDeploymentRepository(distBase, container, getLog());
         String oldDistBase = null;
         if ( distRepository != null )
@@ -286,7 +289,6 @@ public class CreateUpdateSiteMojo
                 "updatedist" );
         File xmlFile = new File( nbmBuildDirFile, fileName );
         descTask.setDesc( xmlFile );
-        descTask.setAutomaticgrouping( true );
         if ( oldDistBase != null )
         {
             descTask.setDistBase( oldDistBase );

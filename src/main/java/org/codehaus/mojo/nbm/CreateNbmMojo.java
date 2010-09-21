@@ -208,12 +208,7 @@ public class CreateNbmMojo
             nbmTask.setDistribution( dist );
         } else
         {
-            getLog().warn(
-                    "You don't define distributionUrl parameter in the nbm-maven-plugin configuration. That's ok for local installation but f you want to create an autoupdate site, you have to define this property." );
-            nbmTask.setDistribution( project.getUrl() + (project.getUrl() != null && project.getUrl().endsWith(
-                    "/" ) ? "" : "/") + nbmFile.getName() );
-            getLog().warn(
-                    "  Using default value for distribution URL: " + nbmTask.getDescription() );
+            nbmTask.setDistribution(nbmFile.getName() );
         }
         nbmTask.setTargetcluster( cluster );
         try
