@@ -649,7 +649,7 @@ public class CreateClusterAppMojo
 //"    <param name=\"enabled\">true</param>\n" +
 "    <param name=\"jar\">modules/" + cnb.replace( ".", "-") + ".jar</param>\n" +
 "    <param name=\"reloadable\">false</param>\n" +
-"</module>";
+"</module>\n";
     }
 
     static String createBundleUpdateTracking( String cnb, File moduleArt, File moduleConf, String specVersion ) throws FileNotFoundException, IOException
