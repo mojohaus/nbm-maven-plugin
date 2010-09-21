@@ -316,7 +316,7 @@ public class CreateWebstartAppMojo
             props.setProperty( "netbeans.jnlp.fixPolicy", "true" );
             File masterJnlp = new File(
                 webstartBuildDir.getAbsolutePath() + File.separator + "master.jnlp" );
-            filterCopy( masterJnlpFile, "/master.jnlp", masterJnlp, props );
+            filterCopy( masterJnlpFile, "master.jnlp", masterJnlp, props );
 
 
             File startup = copyLauncher( outputDirectory, nbmBuildDirFile );
@@ -367,7 +367,7 @@ public class CreateWebstartAppMojo
             File brandingJnlp = new File(
                 webstartBuildDir.getAbsolutePath() + File.separator + "branding.jnlp" );
             props.setProperty( "jnlp.branding.jars", brandRefs.toString() );
-            filterCopy( null, "/branding.jnlp", brandingJnlp, props );
+            filterCopy( null, "branding.jnlp", brandingJnlp, props );
 
 // somehow expects a give folder/file format that we don't have..            
 //            getLog().info( "Verifying generated webstartable content." );
