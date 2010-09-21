@@ -17,6 +17,8 @@
 package org.codehaus.mojo.nbm;
 
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -110,17 +112,22 @@ public class RunPlatformAppMojo
 
         try
         {
-            String[] args = new String[]
-            {
-                //TODO --jdkhome
-                "--userdir",
-                Commandline.quoteArgument( netbeansUserdir.getAbsolutePath() ),
-                "-J-Dnetbeans.logger.console=true",
-                "-J-ea",
-                "--branding",
-                brandingToken
-            };
-            cmdLine.addArguments( args );
+
+            List<String> args = new ArrayList<String>();
+            args.add("--userdir");
+            args.add(Commandline.quoteArgument( netbeansUserdir.getAbsolutePath()));
+            args.add("-J-Dnetbeans.logger.console=true");
+            args.add("-J-ea");
+            args.add("--branding");
+            args.add(brandingToken);
+
+            // use JAVA_HOME if set
+            if (System.getenv("JAVA_HOME") != null) {
+                args.add("--jdkhome");
+                args.add(System.getenv("JAVA_HOME"));
+            }
+
+            cmdLine.addArguments( args.toArray(new String[0]) );
             cmdLine.addArguments( CommandLineUtils.translateCommandline(
                     additionalArguments ) );
             getLog().info( "Executing: " + cmdLine.toString() );
