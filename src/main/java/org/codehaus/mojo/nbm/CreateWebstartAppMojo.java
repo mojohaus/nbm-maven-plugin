@@ -1,5 +1,5 @@
 /*
- *  Copyright 2008 Johan AndrÃ©n.
+ *  Copyright 2008 Johan Andrén.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ import org.netbeans.nbbuild.ModuleSelector;
 
 /**
  * Create webstartable binaries for a 'nbm-application'.
- * @author <a href="mailto:johan.andren@databyran.se">Johan Andren</a>
+ * @author <a href="mailto:johan.andren@databyran.se">Johan Andrén</a>
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal webstart-app
  * @phase packaging

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2008 Johan AndrÃ©n.
+ *  Copyright 2008 Johan Andrén.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
 /**
  * Create a standalone application out of the composed clusters of nbm-application
  *
- * @author <a href="mailto:johan.andren@databyran.se">Johan Andren</a>
+ * @author <a href="mailto:johan.andren@databyran.se">Johan Andrén</a>
  * @author Milos Kleint
  * @goal standalone-zip
  * @requiresProject
