@@ -8,6 +8,6 @@
   <artifactId>netbeans-platform-app-archetype</artifactId>
   <version>1.6-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>Netbeans Platform Application Archetype</name>
-  <description>Archetype for sample application based on NetBeans platform. Creates parent pom with branding and empty NBM project.</description>
+  <name>NetBeans Platform Application Archetype</name>
+  <description>Archetype for sample application based on NetBeans Platform. Creates parent POM with branding and empty NBM project.</description>
 </project>
