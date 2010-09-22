@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>mojo-parent</artifactId>
-        <version>22</version>
+        <version>25</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nbm-maven-plugin</artifactId>
@@ -20,10 +20,6 @@
         <system>jira</system>
         <url>http://jira.codehaus.org/browse/MNBMODULE</url>
     </issueManagement>
-    <ciManagement>
-        <system>hudson</system>
-        <url>https://grid.sonatype.org/ci/job/Mojo-Trunk/</url>
-    </ciManagement>
     <prerequisites>
         <maven>2.0.6</maven>
     </prerequisites>
