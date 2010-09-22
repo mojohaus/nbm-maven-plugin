@@ -3,27 +3,21 @@
     <parent>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>mojo-parent</artifactId>
-        <version>22</version>
+        <version>25</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nbm-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <name>NBM Maven Plugin</name>
-    <description>Maven plugin for creating Netbeans Modules.
-        It defines custom lifecycle called "nbm". During packaging, the module's jar artifact will be enhanced with Netbeans specific manifest entries and along with other required files packed into a nbm file, ready for distribution.
-        Additionally the plugin provides agregator goals to create autoupdate centers or module cluster for your module projects.
+    <description>Maven plugin for creating NetBeans modules. It defines a custom lifecycle called "nbm". During packaging, the module JAR is enhanced with NetBeans-specific manifest entries and, along with other required files, packed into a *.nbm file, ready for distribution. Additionally the plugin provides aggregator goals to create an update site or cluster for your module projects.
     </description>
     <version>3.3</version>
     <inceptionYear>2005</inceptionYear>
-    <url>http://mojo.codehaus.org/nbm-maven-plugin</url>
+    <url>http://mojo.codehaus.org/nbm-maven-plugin/</url>
     <issueManagement>
         <system>jira</system>
         <url>http://jira.codehaus.org/browse/MNBMODULE</url>
     </issueManagement>
-    <ciManagement>
-        <system>hudson</system>
-        <url>https://grid.sonatype.org/ci/job/Mojo-Trunk/</url>
-    </ciManagement>
     <prerequisites>
         <maven>2.0.6</maven>
     </prerequisites>
@@ -39,12 +33,20 @@
         <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-maven-plugin-3.3</developerConnection>
         <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-maven-plugin-3.3</url>
     </scm>
-
     <developers>
         <developer>
             <id>mkleint</id>
             <name>Milos Kleint</name>
             <email>mkleint@codehaus.org</email>
+            <organization>Codehaus</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>jglick</id>
+            <name>Jesse Glick</name>
+            <email>jglick@codehaus.org</email>
             <organization>Codehaus</organization>
             <roles>
                 <role>Developer</role>
@@ -67,14 +69,6 @@
                 <role>Patch Contributor</role>
             </roles>
         </contributor>
-        <contributor>
-            <name>Jesse Glick</name>
-            <email>protected</email>
-            <roles>
-                <role>Patch Contributor</role>
-            </roles>
-        </contributor>
-
     </contributors>
     <build>
         <plugins>
@@ -209,7 +203,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -284,6 +277,6 @@
         </plugins>
     </reporting>
     <properties>
-        <project.build.java.target>1.5</project.build.java.target>
+        <mojo.java.target>1.5</mojo.java.target>
     </properties>
 </project>
