@@ -9,13 +9,11 @@
     <artifactId>nbm-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <name>NBM Maven Plugin</name>
-    <description>Maven plugin for creating Netbeans Modules.
-        It defines custom lifecycle called "nbm". During packaging, the module's jar artifact will be enhanced with Netbeans specific manifest entries and along with other required files packed into a nbm file, ready for distribution.
-        Additionally the plugin provides agregator goals to create autoupdate centers or module cluster for your module projects.
+    <description>Maven plugin for creating NetBeans modules. It defines a custom lifecycle called "nbm". During packaging, the module JAR is enhanced with NetBeans-specific manifest entries and, along with other required files, packed into a *.nbm file, ready for distribution. Additionally the plugin provides aggregator goals to create an update site or cluster for your module projects.
     </description>
     <version>3.3-SNAPSHOT</version>
     <inceptionYear>2005</inceptionYear>
-    <url>http://mojo.codehaus.org/nbm-maven-plugin</url>
+    <url>http://mojo.codehaus.org/nbm-maven-plugin/</url>
     <issueManagement>
         <system>jira</system>
         <url>http://jira.codehaus.org/browse/MNBMODULE</url>
@@ -35,12 +33,20 @@
         <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven-plugin</developerConnection>
         <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven-plugin</url>
     </scm>
-
     <developers>
         <developer>
             <id>mkleint</id>
             <name>Milos Kleint</name>
             <email>mkleint@codehaus.org</email>
+            <organization>Codehaus</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>jglick</id>
+            <name>Jesse Glick</name>
+            <email>jglick@codehaus.org</email>
             <organization>Codehaus</organization>
             <roles>
                 <role>Developer</role>
@@ -63,14 +69,6 @@
                 <role>Patch Contributor</role>
             </roles>
         </contributor>
-        <contributor>
-            <name>Jesse Glick</name>
-            <email>protected</email>
-            <roles>
-                <role>Patch Contributor</role>
-            </roles>
-        </contributor>
-
     </contributors>
     <build>
         <plugins>
