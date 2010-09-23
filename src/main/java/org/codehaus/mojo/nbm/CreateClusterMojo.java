@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -61,21 +60,13 @@ public class CreateClusterMojo
      */
     private String defaultCluster;
     /**
-     * The Maven Project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    private MavenProject project;
-    /**
      * If the executed project is a reactor project, this will contains the full list of projects in the reactor.
      *
      * @parameter expression="${reactorProjects}"
      * @required
      * @readonly
      */
-    private List reactorProjects;
+    private List<MavenProject> reactorProjects;
 
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -88,10 +79,8 @@ public class CreateClusterMojo
 
         if ( reactorProjects != null && reactorProjects.size() > 0 )
         {
-            Iterator it = reactorProjects.iterator();
-            while ( it.hasNext() )
+            for ( MavenProject proj : reactorProjects )
             {
-                MavenProject proj = (MavenProject) it.next();
                 //TODO how to figure where the the buildDir/nbm directory is
                 File nbmDir = new File( proj.getBasedir(),
                         "target" + File.separator + "nbm" + File.separator + "netbeans" );

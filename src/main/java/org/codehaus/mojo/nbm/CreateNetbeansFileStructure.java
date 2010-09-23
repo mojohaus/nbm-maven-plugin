@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -281,7 +280,7 @@ public abstract class CreateNetbeansFileStructure
         getLog().info( "Copying module jar to " + moduleJarLocation );
         try
         {
-            FileUtils.newFileUtils().copyFile( jarFile, moduleFile, null, true,
+            FileUtils.getFileUtils().copyFile( jarFile, moduleFile, null, true,
                     false );
         } catch ( IOException ex )
         {
@@ -315,7 +314,7 @@ public abstract class CreateNetbeansFileStructure
 
                     try
                     {
-                        FileUtils.newFileUtils().copyFile( source, target, null,
+                        FileUtils.getFileUtils().copyFile( source, target, null,
                                 true, false );
                     } catch ( IOException ex )
                     {

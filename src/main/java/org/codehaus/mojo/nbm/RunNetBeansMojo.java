@@ -21,12 +21,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -73,14 +71,6 @@ public class RunNetBeansMojo
      * @parameter expression="${netbeans.run.params}"
      */
     protected String additionalArguments;
-    /**
-     * The Maven Project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    private MavenProject project;
 
     /**
      * 
@@ -103,7 +93,7 @@ public class RunNetBeansMojo
                 clusters.add( fls[i] );
             }
         }
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for ( File cluster : clusters )
         {
             buff.append( cluster.getAbsolutePath() );
@@ -191,7 +181,7 @@ public class RunNetBeansMojo
             {
                 //TODO --jdkhome
                 "--userdir",
-                Commandline.quoteArgument( netbeansUserdir.getAbsolutePath() ),
+                CommandLineUtils.quote( netbeansUserdir.getAbsolutePath() ),
                 "-J-Dnetbeans.logger.console=true",
                 "-J-ea",
             };

@@ -19,7 +19,6 @@ package org.codehaus.mojo.nbm;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +49,7 @@ public class AbstractNbmMojoTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         log = new SystemStreamLog();
-        treeRoot = createNode("root", "root", "1.0", "jar", "", true, new ArrayList(), new HashMap());
+        treeRoot = createNode("root", "root", "1.0", "jar", "", true, new ArrayList<Artifact>(), new HashMap<Artifact,ExamineManifest>());
     }
 
     @Override
@@ -64,35 +63,35 @@ public class AbstractNbmMojoTest extends TestCase {
     public void testMatchesLibrary() {
         System.out.println("matchesLibrary");
         Artifact artifact = createArtifact("group", "artifact", "1.0", "jar", "compile");
-        List libraries = new ArrayList();
+        List<String> libraries = new ArrayList<String>();
         libraries.add("group:artifact");
         ExamineManifest depExaminator = createNonModule();
         boolean result = AbstractNbmMojo.matchesLibrary(artifact, libraries, depExaminator, log, false);
         assertTrue("explicitly defined libraries in descriptor are included", result);
 
         artifact = createArtifact("group", "artifact", "1.0", "jar", "provided");
-        libraries = new ArrayList();
+        libraries = new ArrayList<String>();
         result = AbstractNbmMojo.matchesLibrary(artifact, libraries, depExaminator, log, false);
         assertFalse("provided artifacts are not included", result);
 
         artifact = createArtifact("group", "artifact", "1.0", "jar", "system");
-        libraries = new ArrayList();
+        libraries = new ArrayList<String>();
         result = AbstractNbmMojo.matchesLibrary(artifact, libraries, depExaminator, log, false);
         assertFalse("system artifacts are not included", result);
 
         artifact = createArtifact("group", "artifact", "1.0", "jar", "compile");
-        libraries = new ArrayList();
+        libraries = new ArrayList<String>();
         libraries.add("group:artifact");
         depExaminator = createModule();
         result = AbstractNbmMojo.matchesLibrary(artifact, libraries, depExaminator, log, false);
         assertTrue("netbeans modules are included if explicitly marked in descriptor", result);
 
-        libraries = new ArrayList();
+        libraries = new ArrayList<String>();
         result = AbstractNbmMojo.matchesLibrary(artifact, libraries, depExaminator, log, false);
         assertFalse("netbeans modules are omitted", result);
 
         artifact = createArtifact("group", "artifact", "1.0", "nbm", "compile");
-        libraries = new ArrayList();
+        libraries = new ArrayList<String>();
         result = AbstractNbmMojo.matchesLibrary(artifact, libraries, depExaminator, log, false);
         assertFalse("netbeans modules are omitted", result);
 
@@ -103,7 +102,7 @@ public class AbstractNbmMojoTest extends TestCase {
      */
     public void testResolveNetbeansDependency() {
         Artifact artifact = createArtifact("group", "artifact", "1.0", "jar", "compile");
-        List deps = new ArrayList();
+        List<Dependency> deps = new ArrayList<Dependency>();
         ExamineManifest manifest = createNonModule();
         Dependency result = AbstractNbmMojo.resolveNetbeansDependency(artifact, deps, manifest, log);
         assertNull("not a netbeans module", result);
@@ -119,7 +118,7 @@ public class AbstractNbmMojoTest extends TestCase {
 
 
         artifact = createArtifact("group", "artifact", "1.0", "jar", "compile");
-        deps = new ArrayList();
+        deps = new ArrayList<Dependency>();
         Dependency d = new Dependency();
         d.setId("group:artifact");
         deps.add(d);
