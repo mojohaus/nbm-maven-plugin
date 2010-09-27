@@ -6,9 +6,9 @@
  ------
  June 16, 2007
 
-Netbeans Module plugin
+NetBeans Module plugin
 
- This m2 plugin is able to create Netbeans module(plugin) artifacts. It registers a new packaging type "nbm". Any project with
+ This m2 plugin is able to create NetBeans module(plugin) artifacts. It registers a new packaging type "nbm". Any project with
 this packaging will be automatically turned into a netbeans module project. Additionally it allows to create clusters of modules, generate
 an autoupdate site content or build and assemble an application on top of NetBeans platform.
 
@@ -83,9 +83,9 @@ Maven Dependency vs NetBeans runtime dependency
 
  There are important differences between Maven's dependency mechanism and NetBeans runtime dependencies.
 Maven's dependencies are transitive, so at compile time you get not only direct dependencies you declared, but also
-dependencies of dependencies etc. In Netbeans, the module dependencies are non-transitive by nature, you have to explicitly declare all at runtime.
+dependencies of dependencies etc. In NetBeans, the module dependencies are non-transitive by nature, you have to explicitly declare all at runtime.
 Additionally next to module dependencies there are also library jars attached and shipped with the module's main artifact.
-In the Netbeans terminology there is a special sort of modules called "Library Wrappers". These library wrappers
+In the NetBeans terminology there is a special sort of modules called "Library Wrappers". These library wrappers
 add the libraries on the module's classpath and allow other modules to depend on the libraries within the IDE's runtime.
 
  The ways in which the nbm-maven-plugin tries to adress these issues has changed over time.
@@ -306,7 +306,7 @@ mvn -DarchetypeGroupId=org.codehaus.mojo.archetypes -DarchetypeArtifactId=netbea
 IDE support
 
  Since NetBeans IDE 6.0, Maven support available on the default update center. Among other features, it
-contains additional support for working with Netbeans module projects. The support includes file templates,
+contains additional support for working with NetBeans module projects. The support includes file templates,
 important nodes in projects view, running module(s) in IDE or platform.
 Please note that support for projects with nbm-application packaging might be limited in current (NetBeans 6.5) released version.
 
