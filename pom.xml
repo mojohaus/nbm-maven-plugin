@@ -10,4 +10,9 @@
   <packaging>jar</packaging>
   <name>NetBeans Module Archetype</name>
   <description>Archetype for development of NetBeans modules in Maven.</description>
+  <scm>
+    <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/mojo-archetypes/nbm-archetype</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/mojo-archetypes/nbm-archetype</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/mojo-archetypes/nbm-archetype</url>
+  </scm>
 </project>
