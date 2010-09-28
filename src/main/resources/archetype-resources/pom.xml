@@ -7,7 +7,7 @@
     <version>${version}</version>
     <packaging>pom</packaging>
 
-    <name>${artifactId} Netbeans Module Suite</name>
+    <name>${artifactId} NetBeans Module Suite</name>
 
     <repositories>
         <!-- this is a remote repository hosting the netbeans api artifacts.
@@ -70,10 +70,6 @@
                                 <goals>
                                     <goal>autoupdate</goal>
                                 </goals>
-                                <configuration>
-                                    <!-- <distBase>url where your nbm files are located, if not defined within the nbm files</distBase>
-                                     -->
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
