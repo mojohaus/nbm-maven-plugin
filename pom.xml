@@ -2,12 +2,12 @@
   <parent>
     <groupId>org.codehaus.mojo.archetypes</groupId>
     <artifactId>mojo-archetypes</artifactId>
-    <version>3</version>
+    <version>4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>nbm-suite-root</artifactId>
   <version>1.2-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>maven-archetype</packaging>
   <name>NetBeans Module Suite Archetype</name>
   <description>Root project archetype for creating multi module projects developing NetBeans IDE modules. Approximately similar in functionality to module suites in NetBeans Ant projects.</description>
   <scm>
