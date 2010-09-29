@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+#set( $D = '$' )
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -40,8 +42,8 @@
                     <version>3.3</version>
                     <extensions>true</extensions>
                     <configuration>
-                        <brandingToken>${brandingToken}</brandingToken>
-                        <cluster>foobar</cluster>
+                        <brandingToken>${D}{brandingToken}</brandingToken>
+                        <cluster>${D}{brandingToken}</cluster>
                     </configuration>
                 </plugin>
 
@@ -66,6 +68,8 @@
 
     <properties>
         <netbeans.version>RELEASE691</netbeans.version>
-        <brandingToken>foo</brandingToken>
+## XXX better to pass toLowerCase(java.util.Locale.ENGLISH), to fix Turkish problem, but Velocity rejects that syntax
+## XXX some other patterns are also rejected by NbBundle; it wants /[a-z][a-z0-9]*(_[a-z][a-z0-9]*)*/
+        <brandingToken>${artifactId.toLowerCase().replaceAll("[^a-z0-9_]+", "_")}</brandingToken>
     </properties>
 </project>
