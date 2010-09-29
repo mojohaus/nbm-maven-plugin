@@ -81,6 +81,6 @@
     </profiles>
 
     <properties>
-        <netbeans.version>RELEASE691</netbeans.version>
+        <netbeans.version>${netbeansVersion}</netbeans.version>
     </properties>
 </project>
