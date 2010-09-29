@@ -10,14 +10,15 @@
     <name>${artifactId} NetBeans Module Suite</name>
 
     <repositories>
-        <!-- this is a remote repository hosting the netbeans api artifacts.
-         the versions of the artifacts are netbeans IDE release based, eg. RELEASE65
-         You might want to use your own repository. To create one, use the nbm:populate-repository goal.
-          -->
+        <!--
+        Repository hosting NetBeans modules, especially APIs.
+        Versions are based on IDE releases, e.g.: RELEASE691
+        To create your own repository, use: nbm:populate-repository
+        -->
         <repository>
             <id>netbeans</id>
-            <name>repository hosting netbeans.org api artifacts</name>
-            <url>http://bits.netbeans.org/maven2</url>
+            <name>NetBeans</name>
+            <url>http://bits.netbeans.org/maven2/</url>
         </repository>
     </repositories>
 
