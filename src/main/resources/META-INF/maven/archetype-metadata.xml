@@ -17,7 +17,6 @@
                 <include>**/*.gif</include>
             </includes>
         </fileSet>
-
         <fileSet filtered="true">
             <directory>branding</directory>
             <includes>
@@ -42,6 +41,10 @@
                 <include>pom.xml</include>
             </includes>
         </fileSet>
-
     </fileSets>
+  <requiredProperties>
+    <requiredProperty key="netbeansVersion">
+      <defaultValue>RELEASE691</defaultValue>
+    </requiredProperty>
+  </requiredProperties>
 </archetype-descriptor>
