@@ -22,4 +22,9 @@
       <directory>src/test/java</directory>
     </fileSet>
   </fileSets>
+  <requiredProperties>
+    <requiredProperty key="netbeansVersion">
+      <defaultValue>RELEASE691</defaultValue>
+    </requiredProperty>
+  </requiredProperties>
 </archetype-descriptor>

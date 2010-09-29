@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
-            <version>RELEASE691</version> <!-- XXX set as archetype parameter! -->
+            <version>${netbeansVersion}</version>
         </dependency>
     </dependencies>
 
