@@ -18,7 +18,7 @@
   <dependencies>
     <dependency>
       <groupId>org.netbeans.api</groupId>
-      <artifactId>org-openide-util</artifactId>
+      <artifactId>org-netbeans-api-annotations-common</artifactId>
       <version>${D}{netbeans.version}</version>
     </dependency>
   </dependencies>
