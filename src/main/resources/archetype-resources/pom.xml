@@ -9,6 +9,10 @@
 
     <name>${artifactId} NetBeans Module</name>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <repositories>
         <!--
         Repository hosting NetBeans modules, especially APIs.
