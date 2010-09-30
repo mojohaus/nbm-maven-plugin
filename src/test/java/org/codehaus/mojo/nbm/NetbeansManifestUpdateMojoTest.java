@@ -19,6 +19,7 @@ package org.codehaus.mojo.nbm;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import junit.framework.TestCase;
 
@@ -69,6 +70,24 @@ public class NetbeansManifestUpdateMojoTest extends TestCase {
             }
         }
         return false;
+    }
+
+    public void testShorten()
+    {
+        Locale old = Locale.getDefault();
+        Locale.setDefault( Locale.US );
+        try
+        {
+            assertEquals( null, NetbeansManifestUpdateMojo.shorten ( null ) );
+            assertEquals( "I typed some description here", NetbeansManifestUpdateMojo.shorten ( "I typed some description here" ) );
+            assertEquals( "Now I'm trying to be serious.", NetbeansManifestUpdateMojo.shorten ( "Now I'm trying to be serious." ) );
+            assertEquals( "A meaningful description.", NetbeansManifestUpdateMojo.shorten ( "A meaningful description. But will it work?" ) );
+            assertEquals( "I have no idea what this module does, do you?", NetbeansManifestUpdateMojo.shorten ( "I have no idea what this module does, do you? No? Fine." ) );
+        }
+        finally
+        {
+            Locale.setDefault( old );
+        }
     }
 
 }

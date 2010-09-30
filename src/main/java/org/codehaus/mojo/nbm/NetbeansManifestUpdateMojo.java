@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.URL;
+import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -367,7 +368,7 @@ public class NetbeansManifestUpdateMojo
             conditionallyAddAttribute( mainSection, "OpenIDE-Module-Name",
                 project.getName() );
             conditionallyAddAttribute( mainSection,
-                "OpenIDE-Module-Short-Description", project.getDescription() );
+                "OpenIDE-Module-Short-Description", shorten( project.getDescription() ) );
             conditionallyAddAttribute( mainSection,
                 "OpenIDE-Module-Long-Description", project.getDescription() );
         }
@@ -536,7 +537,7 @@ public class NetbeansManifestUpdateMojo
         {
             attr = new Manifest.Attribute();
             attr.setName( key );
-            attr.setValue( value != null ? value : "To be set." );
+            attr.setValue( value != null ? value : "<undefined>" );
             try
             {
                 section.addConfiguredAttribute( attr );
@@ -548,6 +549,22 @@ public class NetbeansManifestUpdateMojo
             }
         }
         return attr.getValue();
+    }
+
+    /**
+     * Pick out the first sentence of a paragraph.
+     * @param paragraph some text (may be null)
+     * @return the first sentence (may be null)
+     */
+    static String shorten( String paragraph )
+    {
+        if ( paragraph == null )
+        {
+            return null;
+        }
+        BreakIterator breaker = BreakIterator.getSentenceInstance();
+        breaker.setText( paragraph );
+        return paragraph.substring( 0, breaker.following( 0 ) ).trim();
     }
 
 //----------------------------------------------------------------------------------
