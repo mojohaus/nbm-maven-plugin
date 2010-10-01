@@ -13,7 +13,7 @@
     <version>${version}</version>
     <packaging>nbm-application</packaging>
 
-    <name>${artifactId} - NetBeans Platform based application</name>
+    <name>${artifactId} - NB App</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

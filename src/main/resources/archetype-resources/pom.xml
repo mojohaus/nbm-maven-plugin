@@ -9,7 +9,7 @@
     <version>${version}</version>
     <packaging>pom</packaging>
 
-    <name>${artifactId} - NetBeans Platform Application</name>
+    <name>${artifactId} - NB App Parent</name>
 
     <repositories>
         <!--

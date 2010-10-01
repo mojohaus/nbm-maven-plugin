@@ -13,7 +13,7 @@
   <version>${version}</version>
   <packaging>nbm</packaging>
 
-  <name>${artifactId} - Platform application branding resources</name>
+  <name>${artifactId} - NB App Branding</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
