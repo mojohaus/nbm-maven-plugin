@@ -17,6 +17,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <netbeans.run.params.ide/>
     </properties>
 
     <dependencies>
@@ -39,6 +40,9 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
+                <configuration>
+                    <additionalArguments>${D}{netbeans.run.params.ide}</additionalArguments>
+                </configuration>
             </plugin>
         </plugins>
     </build>
