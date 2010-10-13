@@ -194,17 +194,17 @@ public class ExamineManifest
                     {
                         String tok = tokens.nextToken();
                         //we are just interested in specification and loose dependencies.
-                        int spec = tok.indexOf( ">" );
-                        if ( spec > 0 || (tok.indexOf( "=" ) == -1 && spec == -1) )
+                        int spec = tok.indexOf( '>' );
+                        if ( spec > 0 || (tok.indexOf( '=' ) == -1 && spec == -1) )
                         {
                             if ( spec > 0 )
                             {
-                                tok = tok.substring( 0, spec - 1 );
+                                tok = tok.substring( 0, spec );
                             }
-                            int slash = tok.indexOf( "/" );
+                            int slash = tok.indexOf( '/' );
                             if ( slash > 0 )
                             {
-                                tok = tok.substring( 0, slash - 1 );
+                                tok = tok.substring( 0, slash );
                             }
                             depList.add( tok.trim() );
                         }
@@ -330,7 +330,19 @@ public class ExamineManifest
         this.implVersion = implVersion;
     }
 
+    /**
+     * Code name base of the module only.
+     * Does not include any release version.
+     */
     public String getModule()
+    {
+        return module.replaceFirst( "/\\d+$", "" );
+    }
+
+    /**
+     * Full name of module: code name base, then optionally slash and major release version.
+     */
+    public String getModuleWithRelease()
     {
         return module;
     }

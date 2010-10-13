@@ -407,18 +407,18 @@ public class NetbeansManifestUpdateMojo
                 {
                     if ( "loose".equals( type ) )
                     {
-                        depToken = depExaminator.getModule();
+                        depToken = depExaminator.getModuleWithRelease();
                     }
                     else if ( "spec".equals( type ) )
                     {
-                        depToken = depExaminator.getModule() + " > " +
+                        depToken = depExaminator.getModuleWithRelease() + " > " +
                             ( depExaminator.isNetbeansModule() ? depExaminator.getSpecVersion() : AdaptNbVersion.adaptVersion(
                             depExaminator.getSpecVersion(),
                             AdaptNbVersion.TYPE_SPECIFICATION ) );
                     }
                     else if ( "impl".equals( type ) )
                     {
-                        depToken = depExaminator.getModule() + " = " +
+                        depToken = depExaminator.getModuleWithRelease() + " = " +
                             ( depExaminator.isNetbeansModule() ? depExaminator.getImplVersion() : AdaptNbVersion.adaptVersion(
                             depExaminator.getImplVersion(),
                             AdaptNbVersion.TYPE_IMPLEMENTATION ) );

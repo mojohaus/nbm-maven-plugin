@@ -313,14 +313,6 @@ public class PopulateRepositoryMojo
                 }
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
                 String group = "org.netbeans." + ( examinator.hasPublicPackages() ? "api" : "modules" );
-                String m = examinator.getModule();
-                int slash = m.indexOf( "/" );
-                if ( slash > 0 )
-                {
-                    m = m.substring( 0, slash - 1 );
-                }
-                m = m.trim();
-                examinator.setModule( m );
                 Artifact art = createArtifact( artifact, version, group );
                 ModuleWrapper wr = new ModuleWrapper( artifact, version, group,
                     examinator, module );
@@ -640,19 +632,18 @@ public class PopulateRepositoryMojo
                 if ( index > -1 )
                 {
                     wr = wrapperList.get( index );
+                    Dependency dep = new Dependency();
+                    dep.setArtifactId( wr.getArtifact() );
+                    dep.setGroupId( wr.getGroup() );
+                    dep.setVersion( wr.getVersion() );
+                    dep.setType( "jar" );
                     //we don't want the API modules to depend on non-api ones..
                     // otherwise the transitive dependency mechanism pollutes your classpath..
-                    if ( ( wr.getModuleManifest().hasPublicPackages() && wrapper.getModuleManifest().hasPublicPackages() ) || !wrapper.getModuleManifest().hasPublicPackages() )
+                    if ( wrapper.getModuleManifest().hasPublicPackages() && !wr.getModuleManifest().hasPublicPackages() )
                     {
-                        Dependency dep = new Dependency();
-                        dep.setArtifactId( wr.getArtifact() );
-                        dep.setGroupId( wr.getGroup() );
-                        dep.setVersion( wr.getVersion() );
-                        dep.setType( "jar" );
-//TODO possible solution to transitivity? 
-//                      dep.setOptional(true);
-                        deps.add( dep );
+                        dep.setScope( "runtime" );
                     }
+                    deps.add( dep );
                 }
                 else
                 {
