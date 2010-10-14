@@ -429,33 +429,28 @@ public class PopulateRepositoryMojo
                     if ( zip.exists() )
                     {
                         nbm = zip;
-                        nbmArt = createAttachedArtifact(art, nbm, "nbm", null);
+                        nbmArt = createAttachedArtifact(art, nbm, "nbm-file", null);
+                        if (nbmArt.getArtifactHandler().getExtension().equals("nbm-file")) {
+                            // Maven 2.x compatibility.
+                            nbmArt = createAttachedArtifact(art, nbm, "nbm", null);
+                        }
+                        assert nbmArt.getArtifactHandler().getExtension().equals( "nbm" );
                     }
                 }
                 if ( !skipLocalInstall )
                 {
-                    try
+                    install( man.getFile(), art );
+                    if ( javadoc != null )
                     {
-                        artifactInstaller.install( man.getFile(), art, localRepository );
-                        if ( javadoc != null )
-                        {
-                            artifactInstaller.install( javadoc, javadocArt,
-                                localRepository );
-                        }
-                        if ( source != null )
-                        {
-                            artifactInstaller.install( source, sourceArt,
-                                localRepository );
-                        }
-                        if ( nbm != null )
-                        {
-                            artifactInstaller.install( nbm, nbmArt, localRepository );
-                        }
+                        install( javadoc, javadocArt );
                     }
-                    catch ( ArtifactInstallationException e )
+                    if ( source != null )
                     {
-                        // TODO: install exception that does not give a trace
-                        throw new MojoExecutionException( "Error installing artifact", e );
+                        install( source, sourceArt );
+                    }
+                    if ( nbm != null )
+                    {
+                        install( nbm, nbmArt );
                     }
                 }
                 try
@@ -518,15 +513,7 @@ public class PopulateRepositoryMojo
                 art.addMetadata( metadata );
                 if ( !skipLocalInstall )
                 {
-                    try
-                    {
-                        artifactInstaller.install( ex.getFile(), art, localRepository );
-                    }
-                    catch ( ArtifactInstallationException e )
-                    {
-                        // TODO: install exception that does not give a trace
-                        throw new MojoExecutionException( "Error installing artifact", e );
-                    }
+                    install( ex.getFile(), art );
                 }
                 try
                 {
@@ -561,16 +548,7 @@ public class PopulateRepositoryMojo
                 art.addMetadata( metadata );
                 if ( !skipLocalInstall )
                 {
-                    try
-                    {
-                        artifactInstaller.install( pom, art, localRepository );
-                    }
-                    catch ( ArtifactInstallationException e )
-                    {
-                        // TODO: install exception that does not give a trace
-                        throw new MojoExecutionException(
-                            "Error installing artifact", e );
-                    }
+                    install( pom, art );
                 }
                 try
                 {
@@ -590,8 +568,22 @@ public class PopulateRepositoryMojo
         }
     }
 
+    void install( File file, Artifact art ) throws MojoExecutionException
+    {
+        assert localRepository != null;
+        try
+        {
+            artifactInstaller.install( file, art, localRepository );
+        }
+        catch ( ArtifactInstallationException e )
+        {
+            // TODO: install exception that does not give a trace
+            throw new MojoExecutionException( "Error installing artifact", e );
+        }
+    }
+
     //performs the same tasks as the MavenProjectHelper
-    private Artifact createAttachedArtifact(Artifact primary, File file, String type, String classifier) {
+    Artifact createAttachedArtifact(Artifact primary, File file, String type, String classifier) {
         assert type != null;
 
         ArtifactHandler handler = null;
@@ -600,6 +592,7 @@ public class PopulateRepositoryMojo
 
         if ( handler == null )
         {
+            getLog().warn( "No artifact handler for " + type );
             handler = artifactHandlerManager.getArtifactHandler( "jar" );
         }
 
@@ -863,7 +856,7 @@ public class PopulateRepositoryMojo
         return fil;
     }
 
-    private Artifact createArtifact( String artifact, String version, String group )
+    Artifact createArtifact( String artifact, String version, String group )
     {
         return artifactFactory.createBuildArtifact( group, artifact, version,
             "jar" );

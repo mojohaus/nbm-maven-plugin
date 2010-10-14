@@ -17,30 +17,37 @@
 
 package org.codehaus.mojo.nbm;
 
-import junit.framework.TestCase;
+import java.io.File;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.codehaus.plexus.util.FileUtils;
 
-/**
- *
- * @author mkleint
- */
-public class PopulateRepositoryMojoTest extends TestCase {
+public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
     
-    public PopulateRepositoryMojoTest(String testName) {
-        super(testName);
-    }
-
-
-
-    /**
-     * Test of stripClusterName method, of class PopulateRepositoryMojo.
-     */
     public void testStripClusterName()
     {
-        System.out.println( "stripClusterName" );
         assertEquals( "platform", PopulateRepositoryMojo.stripClusterName( "platform9" ) );
         assertEquals( "platform", PopulateRepositoryMojo.stripClusterName( "platform11" ) );
         assertEquals( "nb", PopulateRepositoryMojo.stripClusterName( "nb6.9" ) );
         assertEquals( "extra", PopulateRepositoryMojo.stripClusterName( "extra" ) );
+    }
+
+    public void testInstall() throws Exception
+    {
+        PopulateRepositoryMojo mojo = ( PopulateRepositoryMojo ) lookupMojo( "populate-repository", new File( getBasedir(), "src/test/resources/PopulateRepositoryMojoTest.xml" ) );
+        File repo = new File( System.getProperty( "java.io.tmpdir" ), "PopulateRepositoryMojoTest" );
+        FileUtils.deleteDirectory( repo );
+        mojo.localRepository = new DefaultArtifactRepository( "test", repo.toURI().toString(), new DefaultRepositoryLayout() );
+        Artifact art1 = mojo.createArtifact( "testarg", "1.0", "testgrp" );
+        File f = File.createTempFile( "PopulateRepositoryMojoTest", ".nbm" );
+        f.deleteOnExit();
+        Artifact art2 = mojo.createAttachedArtifact( art1, f, "nbm-file", null );
+        assertEquals( "nbm", art2.getArtifactHandler().getExtension() );
+        mojo.install( f, art2 );
+        assertTrue( new File( repo, "testgrp/testarg/1.0/testarg-1.0.nbm" ).isFile() );
+        assertFalse( new File( repo, "testgrp/testarg/1.0/testarg-1.0.jar" ).isFile() );
     }
 
 }
