@@ -47,6 +47,17 @@ public class ExamineManifestTest extends TestCase
         assertEquals( "[org.netbeans.insane, org.netbeans.libs.junit4]", em.getDependencyTokens().toString() );
         assertEquals( "org.netbeans.modules.nbjunit", em.getModule() );
         assertEquals( "org.netbeans.modules.nbjunit/1", em.getModuleWithRelease() );
+        em = new ExamineManifest( new SystemStreamLog() );
+        mf.delete();
+        w = new PrintWriter( mf );
+        w.println( "Manifest-Version: 1.0" );
+        w.flush();
+        w.close();
+        em.setManifestFile( mf );
+        em.setPopulateDependencies( true );
+        em.checkFile();
+        assertEquals( null, em.getModule() );
+        assertEquals( null, em.getModuleWithRelease() );
     }
 
 }

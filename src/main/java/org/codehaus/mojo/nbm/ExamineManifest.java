@@ -336,7 +336,7 @@ public class ExamineManifest
      */
     public String getModule()
     {
-        return module.replaceFirst( "/\\d+$", "" );
+        return module != null ? module.replaceFirst( "/\\d+$", "" ) : module;
     }
 
     /**
