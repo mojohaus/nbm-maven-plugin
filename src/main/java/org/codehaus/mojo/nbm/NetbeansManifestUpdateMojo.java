@@ -600,7 +600,7 @@ public class NetbeansManifestUpdateMojo
 
         //now we have the classes that are not in public packages of declared modules,
         //but are being used
-        if ( deps.size() > 0 )
+        if ( !deps.isEmpty() )
         {
             Map<String, List<Artifact>> transmodules = visitor.getTransitiveArtifacts();
             for ( ModuleWrapper wr : moduleArtifacts )
@@ -639,7 +639,14 @@ public class NetbeansManifestUpdateMojo
             }
             if ( verifyRuntime.equalsIgnoreCase( FAIL ) )
             {
-                throw new MojoFailureException( "See above for failures in runtime NetBeans dependencies verification." );
+                if ( !deps.isEmpty() )
+                {
+                    throw new MojoFailureException( "Uncategorized problems with NetBeans dependency verification: " + deps );
+                }
+                else
+                {
+                    throw new MojoFailureException( "See above for failures in runtime NetBeans dependencies verification." );
+                }
             }
         }
     }
