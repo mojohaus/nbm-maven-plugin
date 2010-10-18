@@ -335,7 +335,7 @@ public class NetbeansManifestUpdateMojo
         String projectCNB = conditionallyAddAttribute( mainSection, "OpenIDE-Module", moduleName );
         String packagesValue;
         if (publicPackages != null && publicPackages.size() > 0) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (String pub : publicPackages) {
                 if (pub.endsWith( ".**")) {
                     // well, just sort of wrong value but accept
@@ -625,7 +625,7 @@ public class NetbeansManifestUpdateMojo
                             "Project depends on packages not accessible at runtime in transitive module " + wr.artifact.getId() + " which will not be accessible at runtime." );
                         deps.removeAll( classes[1] );
                     }
-            }
+                }
             }
             for ( Artifact a : moduleAllClasses.keySet() )
             {
