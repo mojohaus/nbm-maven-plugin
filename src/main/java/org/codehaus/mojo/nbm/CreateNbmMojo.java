@@ -121,7 +121,7 @@ public class CreateNbmMojo
         nbmTask.setProductDir( clusterDir );
 
         nbmTask.setModule(
-                moduleLocation + File.separator + moduleJarName + ".jar" );
+                "modules" + File.separator + moduleJarName + ".jar" );
         nbmTask.setNeedsrestart( Boolean.toString( module.isRequiresRestart() ) );
         String moduleAuthor = module.getAuthor();
         if ( moduleAuthor == null )

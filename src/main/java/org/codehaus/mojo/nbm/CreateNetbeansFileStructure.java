@@ -212,7 +212,6 @@ public abstract class CreateNetbeansFileStructure
     protected NetbeansModule module;
     protected File clusterDir;
     protected String moduleJarName;
-    protected String moduleLocation;
 
     public void execute()
             throws MojoExecutionException, MojoFailureException
@@ -262,16 +261,7 @@ public abstract class CreateNetbeansFileStructure
         File jarFile = new File( buildDir, finalName + ".jar" );
         clusterDir = new File( nbmBuildDir,
                 "netbeans" + File.separator + cluster );
-        moduleLocation = "modules";
-        if ( eager )
-        {
-            moduleLocation = moduleLocation + File.separator + "eager";
-        }
-        if ( autoload )
-        {
-            moduleLocation = moduleLocation + File.separator + "autoload";
-        }
-        File moduleJarLocation = new File( clusterDir, moduleLocation );
+        File moduleJarLocation = new File( clusterDir, "modules" );
         moduleJarLocation.mkdirs();
 
         //2. create nbm resources
@@ -381,7 +371,7 @@ public abstract class CreateNetbeansFileStructure
         moduleXmlTask.setXmldir( configDir );
         FileSet fs = new FileSet();
         fs.setDir( clusterDir );
-        fs.setIncludes( moduleLocation + File.separator + moduleJarName + ".jar" );
+        fs.setIncludes( "modules" + File.separator + moduleJarName + ".jar" );
         if ( autoload )
         {
             moduleXmlTask.addAutoload( fs );
@@ -400,17 +390,6 @@ public abstract class CreateNetbeansFileStructure
             getLog().error( "Cannot generate config file." );
             throw new MojoExecutionException( e.getMessage(), e );
         }
-        LoadProperties loadTask = (LoadProperties) antProject.createTask(
-                "loadproperties" );
-        loadTask.setResource( "directories.properties" );
-        try
-        {
-            loadTask.execute();
-        } catch ( BuildException e )
-        {
-            getLog().error( "Cannot load properties." );
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
         MakeListOfNBM makeTask = (MakeListOfNBM) antProject.createTask(
                 "genlist" );
         antProject.setNewProperty( "module.name", finalName );
@@ -420,7 +399,7 @@ public abstract class CreateNetbeansFileStructure
         PatternSet pattern = set.createPatternSet();
         pattern.setIncludes( "**" );
         makeTask.setModule(
-                moduleLocation + File.separator + moduleJarName + ".jar" );
+                "modules" + File.separator + moduleJarName + ".jar" );
         makeTask.setOutputfiledir( clusterDir );
         try
         {

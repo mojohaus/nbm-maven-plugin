@@ -267,8 +267,6 @@ public class PopulateRepositoryMojo
         FileSet set = new FileSet();
         set.setDir( rootDir );
         set.createInclude().setName( "**/modules/*.jar" );
-        set.createInclude().setName( "**/modules/autoload/*.jar" );
-        set.createInclude().setName( "**/modules/eager/*.jar" );
         set.createInclude().setName( "*/core/*.jar" );
         set.createInclude().setName( "platform*/lib/*.jar" );
 
