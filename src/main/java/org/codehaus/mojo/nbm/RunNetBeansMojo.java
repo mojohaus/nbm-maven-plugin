@@ -168,7 +168,8 @@ public class RunNetBeansMojo
             exec = new File( netbeansInstallation, "bin\\nb.exe" );
             if (!exec.exists()) {
                 // in 6.7 and onward, there's no nb.exe file.
-               exec = new File( netbeansInstallation, "bin\\" + clust + ".exe" );
+                exec = new File( netbeansInstallation, "bin\\" + clust + ".exe" );
+                cmdLine.addArguments( new String[] { "--console", "suppress" } );
             }
         } else {
             exec = new File(netbeansInstallation, "bin/" + clust );

@@ -103,6 +103,7 @@ public class RunPlatformAppMojo
             exec = new File(appbasedir, "bin" + brandingToken + "_w.exe");
             if (!exec.exists()) { // Was removed as of nb 6.7
                 exec = new File(appbasedir, "bin\\" + brandingToken + ".exe");
+                cmdLine.addArguments( new String[] { "--console", "suppress" } );
             }
         } else {
             exec = new File(appbasedir, "bin/" + brandingToken);
