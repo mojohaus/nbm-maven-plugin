@@ -419,7 +419,7 @@ public class CreateWebstartAppMojo
             if ( !jnlpStarter.exists() )
             {
                 source = getClass().getClassLoader().getResourceAsStream(
-                    "webstart/jnlp-launcher.jar" );
+                    "harness/jnlp/jnlp-launcher.jar" );
             }
             else
             {

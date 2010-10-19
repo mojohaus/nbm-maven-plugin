@@ -475,7 +475,7 @@ public class CreateClusterAppMojo
                 InputStream instream = null;
                 try
                 {
-                    instream = getClass().getClassLoader().getResourceAsStream("app.conf" );
+                    instream = getClass().getClassLoader().getResourceAsStream( "harness/etc/app.conf" );
                     str = IOUtil.toString( instream, "UTF-8" );
                 }
                 finally
@@ -563,8 +563,8 @@ public class CreateClusterAppMojo
             else
             {
                 getLog().debug( "Using fallback executables shipping with the nbm-maven-plugin. (from 6.9main NetBeans Platform)" );
-                writeFile( "launchers/app.sh", destSh );
-                writeFile( "launchers/app.exe", destExe );
+                writeFile( "harness/launchers/app.sh", destSh );
+                writeFile( "harness/launchers/app.exe", destExe );
             }
         }
 

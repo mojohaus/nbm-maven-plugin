@@ -107,6 +107,44 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- Cannot use dependency:copy since that would require a custom repo definition, which enforcer barfs on. -->
+                                <get src="http://bits.netbeans.org/maven2/org/netbeans/modules/org-netbeans-modules-apisupport-harness/${harness.version}/org-netbeans-modules-apisupport-harness-${harness.version}.nbm" dest="${project.build.directory}/harness.nbm" skipexisting="true"/>
+                                <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}/classes">
+                                    <patternset>
+                                        <include name="netbeans/etc/app.conf"/>
+                                        <include name="netbeans/launchers/app.*"/>
+                                        <include name="netbeans/jnlp/"/>
+                                    </patternset>
+                                    <mapper type="glob" from="netbeans/*" to="harness/*"/>
+                                </unzip>
+                                <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}">
+                                    <patternset>
+                                        <include name="netbeans/tasks.jar"/>
+                                    </patternset>
+                                    <mapper type="glob" from="netbeans/*" to="*"/>
+                                </unzip>
+                                <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -193,7 +231,12 @@
         <dependency>
             <groupId>org.netbeans.nbbuild</groupId>
             <artifactId>tasks</artifactId>
+            <!-- XXX have to put something here, so that our source files will appear compilable to the IDE. -->
+            <!-- Cannot use system scope with systemPath=${project.build.directory}/tasks.jar because then running the plugin produces: -->
+            <!-- 'dependencies.dependency.systemPath' for org.netbeans.nbbuild:tasks:jar must specify an absolute path but is ${basedir}/target/tasks.jar -->
+            <!-- Note that target/classes is on CP before ~/.m2/repository/org/netbeans/nbbuild/tasks/6.7/tasks-6.7.jar so this is sort of safe. -->
             <version>6.7</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
@@ -283,6 +326,7 @@
         </plugins>
     </reporting>
     <properties>
-        <mojo.java.target>1.5</mojo.java.target>
+        <mojo.java.target>1.6</mojo.java.target>
+        <harness.version>RELEASE691</harness.version>
     </properties>
 </project>
