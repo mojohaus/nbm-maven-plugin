@@ -168,7 +168,7 @@ public class CreateWebstartAppMojo
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public @Override void execute() throws MojoExecutionException, MojoFailureException
     {
         if ("$codebase".equals(codebase)) {
             //MNBMODULE-47 maven core seems to strip one of the $ signs
@@ -340,7 +340,7 @@ public class CreateWebstartAppMojo
                 } );
             ds.scan();
             String[] includes = ds.getIncludedFiles();
-            StringBuffer brandRefs = new StringBuffer();
+            StringBuilder brandRefs = new StringBuilder();
             if ( includes != null && includes.length > 0 )
             {
                 File brandingDir = new File( webstartBuildDir, "branding" );
@@ -350,7 +350,7 @@ public class CreateWebstartAppMojo
                     File source = new File( nbmBuildDirFile, incBran );
                     File dest = new File( brandingDir, source.getName() );
                     FileUtils.copyFile( source, dest );
-                    brandRefs.append( "    <jar href=\'branding/" + dest.getName() + "\'/>\n" );
+                    brandRefs.append( "    <jar href=\'branding/" ).append( dest.getName() ).append( "\'/>\n" );
                 }
 
                 signTask = (SignJar)antProject.createTask("signjar");
@@ -486,7 +486,7 @@ public class CreateWebstartAppMojo
      */
     private String generateExtensions( FileSet files, Project antProject, String masterPrefix ) throws IOException
     {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for ( String nm : files.getDirectoryScanner( antProject ).getIncludedFiles() )
         {
             File jar = new File( files.getDir( antProject ), nm );
@@ -511,7 +511,7 @@ public class CreateWebstartAppMojo
             }
             String dashcnb = codenamebase.replace( '.', '-' );
 
-            buff.append( "    <extension name='" + codenamebase + "' href='" + masterPrefix + dashcnb + ".jnlp' />\n" );
+            buff.append( "    <extension name='" ).append( codenamebase ).append( "' href='" ).append( masterPrefix ).append( dashcnb ).append( ".jnlp' />\n");
             theJar.close();
         }
         return buff.toString();
