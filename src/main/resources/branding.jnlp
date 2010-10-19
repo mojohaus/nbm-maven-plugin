@@ -7,7 +7,7 @@
       <description>${app.description}</description>
       <icon href="${app.icon}"/>
   </information>
-  <security/>
+  <security><all-permissions/></security>
   <resources>
     ${jnlp.branding.jars}
   </resources>
