@@ -313,7 +313,7 @@ public class CreateWebstartAppMojo
             String description = project.getDescription() != null ? project.getDescription() : "No Project Description";
             props.setProperty( "app.description", description );
             props.setProperty( "branding.token", brandingToken );
-            props.setProperty( "netbeans.jnlp.fixPolicy", "true" );
+            props.setProperty( "netbeans.jnlp.fixPolicy", "false" );
             File masterJnlp = new File(
                 webstartBuildDir.getAbsolutePath() + File.separator + "master.jnlp" );
             filterCopy( masterJnlpFile, "master.jnlp", masterJnlp, props );
