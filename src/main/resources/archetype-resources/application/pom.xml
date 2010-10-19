@@ -68,7 +68,7 @@
                                     <goal>webstart-app</goal>
                                 </goals>
                                 <configuration>
-                                    <codebase>${D}project.build.directory}/webstart/${D}brandingToken}</codebase>
+                                    <codebase>${D}{project.build.directory}/webstart/${D}{brandingToken}</codebase>
                                 </configuration>
                             </execution>
                         </executions>
