@@ -28,12 +28,19 @@
             <version>${D}{netbeans.version}</version>
             <type>pom</type>
         </dependency>
-
         <dependency>
             <groupId>${groupId}</groupId>
             <artifactId>branding</artifactId>
             <version>${version}</version>
         </dependency>
+        <!-- To run NbModuleSuite functional tests in src/test/java, use nbjunit (assumes RELEASE70 or later):
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-nbjunit</artifactId>
+            <version>${D}{netbeans.version}</version>
+            <scope>test</scope>
+        </dependency>
+        -->
     </dependencies>
 
     <build>
@@ -42,6 +49,21 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
             </plugin>
+            <!-- To run NbModuleSuite (assumes nbm-maven-plugin 3.4 or later):
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>cluster.path.final</name>
+                            <value>${D}{project.build.directory}/${D}{brandingToken}/${D}{brandingToken}:${D}{project.build.directory}/${D}{brandingToken}/platform</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+            -->
         </plugins>
     </build>
 
