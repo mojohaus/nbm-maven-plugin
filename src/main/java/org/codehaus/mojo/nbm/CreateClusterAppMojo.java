@@ -658,7 +658,7 @@ public class CreateClusterAppMojo
 "<module codename=\"" + cnb + "\">\n" +
 "    <module_version install_time=\"" + System.currentTimeMillis() + "\" last=\"true\" origin=\"installer\" specification_version=\"" + specVersion + "\">\n" +
 "        <file crc=\"" + crcForFile(moduleConf).getValue() + "\" name=\"config/Modules/" + cnb.replace( ".", "-") + ".xml\"/>\n" +
-"        <file crc=\"" + crcForFile(moduleArt).getValue() + "\" name=\"modules/" + cnb.replace( ".", "-") + ".xml\"/>\n" +
+"        <file crc=\"" + crcForFile(moduleArt).getValue() + "\" name=\"modules/" + cnb.replace( ".", "-") + ".jar\"/>\n" +
 "    </module_version>\n" +
 "</module>";
 
