@@ -18,8 +18,10 @@ package org.codehaus.mojo.nbm;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
@@ -29,6 +31,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -435,9 +442,64 @@ public class PopulateRepositoryMojo
                         assert nbmArt.getArtifactHandler().getExtension().equals( "nbm" );
                     }
                 }
+                File moduleJar = man.getFile();
+                File moduleJarMinusCP = null;
+                if ( ! man.getModuleManifest().getClasspath().isEmpty() )
+                {
+                    try
+                    {
+                        moduleJarMinusCP = File.createTempFile( man.getArtifact(), ".jar");
+                        moduleJarMinusCP.deleteOnExit();
+                        InputStream is = new FileInputStream( moduleJar );
+                        try
+                        {
+                            OutputStream os = new FileOutputStream( moduleJarMinusCP );
+                            try
+                            {
+                                JarInputStream jis = new JarInputStream( is );
+                                Manifest mani = new Manifest(jis.getManifest());
+                                mani.getMainAttributes().remove( Attributes.Name.CLASS_PATH );
+                                JarOutputStream jos = new JarOutputStream( os, mani );
+                                JarEntry entry;
+                                while ( ( entry = jis.getNextJarEntry() ) != null)
+                                {
+                                    if ( entry.getName().matches( "META-INF/.+[.]SF" ) )
+                                    {
+                                        throw new IOException( "cannot handle signed JARs" );
+                                    }
+                                    jos.putNextEntry( entry );
+                                    byte[] buf = new byte[ (int) entry.getSize() ];
+                                    int read = jis.read( buf, 0, buf.length );
+                                    if ( read != buf.length )
+                                    {
+                                        throw new IOException( "read wrong amount" );
+                                    }
+                                    jos.write( buf );
+                                }
+                                jos.close();
+                            }
+                            finally
+                            {
+                                os.close();
+                            }
+                        }
+                        finally
+                        {
+                            is.close();
+                        }
+                    }
+                    catch ( IOException x )
+                    {
+                        getLog().warn( "Could not process " + moduleJar + ": " + x, x );
+                        moduleJarMinusCP.delete();
+                        moduleJarMinusCP = null;
+                    }
+                }
+                try
+                {
                 if ( !skipLocalInstall )
                 {
-                    install( man.getFile(), art );
+                    install( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar, art );
                     if ( javadoc != null )
                     {
                         install( javadoc, javadocArt );
@@ -455,7 +517,7 @@ public class PopulateRepositoryMojo
                 {
                     if ( deploymentRepository != null )
                     {
-                        artifactDeployer.deploy( man.getFile(), art,
+                        artifactDeployer.deploy( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar, art,
                             deploymentRepository, localRepository );
                         if ( javadoc != null )
                         {
@@ -478,7 +540,14 @@ public class PopulateRepositoryMojo
                 {
                     throw new MojoExecutionException( "Error Deploying artifact", ex );
                 }
-
+                }
+                finally
+                {
+                    if ( moduleJarMinusCP != null )
+                    {
+                        moduleJarMinusCP.delete();
+                    }
+                }
             }
         }
         finally
@@ -646,7 +715,7 @@ public class PopulateRepositoryMojo
         //need some generic way to handle Classpath: items.
         //how to figure the right version?
         String cp = wrapper.getModuleManifest().getClasspath();
-        if ( cp != null )
+        if ( !cp.isEmpty() )
         {
             StringTokenizer tok = new StringTokenizer( cp );
             while ( tok.hasMoreTokens() )
