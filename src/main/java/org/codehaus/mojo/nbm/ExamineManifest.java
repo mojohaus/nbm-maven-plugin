@@ -164,8 +164,8 @@ public class ExamineManifest
                     "OpenIDE-Module-Implementation-Version" ) );
             setModuleDeps(
                     attrs.getValue( "OpenIDE-Module-Module-Dependencies" ) );
-            setClasspath( attrs.getValue( "Class-Path" ) == null ? "" : attrs.getValue(
-                    "Class-Path" ) );
+            String cp = attrs.getValue( Attributes.Name.CLASS_PATH );
+            setClasspath( cp == null ? "" : cp );
             String value = attrs.getValue( "OpenIDE-Module-Public-Packages" );
             String frList = attrs.getValue( "OpenIDE-Module-Friends" );
             if (value == null || value.trim().equals( "-" ) ) {
