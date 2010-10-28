@@ -108,29 +108,6 @@ public class NetbeansManifestUpdateMojo
      * itself is expected to be in the directory structure based on codenamebase of the module.
      * eg. if your codenamebase is "org.netbeans.modules.apisupport", the the actual docs
      * files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs
-     * <br/>
-
-     * Additionally if you provide docs, you will need to place the JavaHelp jar on the classpath 
-     * of the nbm-plugin for the project. The jar is to be found in the netbeans/harness directory 
-     * of any NetBeans installation. <br/>
-    <code>
-    &lt;plugin&gt;<br/>
-        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;<br/>
-        &lt;artifactId&gt;nbm-maven-plugin&lt;/artifactId&gt;<br/>
-        &lt;extensions&gt;true&lt;/extensions&gt;<br/>
-        &lt;dependencies&gt;<br/>
-            &lt;dependency&gt;<br/>
-                &lt;groupId&gt;javax.help&lt;/groupId&gt;<br/>
-                &lt;artifactId&gt;search&lt;/artifactId&gt;<br/>
-                &lt;version&gt;2.0&lt;/version&gt;<br/>
-                &lt;!--scope&gt;system&lt;/scope&gt;<br/>
-                &lt;systemPath&gt;/home/mkleint/netbeans/harness/jsearch-2.0_04.jar&lt;/systemPath--&gt;<br/>
-            &lt;/dependency&gt;<br/>
-        &lt;/dependencies&gt;<br/>
-    &lt;/plugin&gt;<br/>
-    <br/>
-    </code>
-     *
      * @parameter default-value="${basedir}/src/main/javahelp"
      * @since 2.7
      */
