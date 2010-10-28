@@ -41,6 +41,14 @@
             <scope>test</scope>
         </dependency>
         -->
+        <!-- To use Jelly in your functional tests, add or replace with:
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-jellytools-platform</artifactId>
+            <version>${D}{netbeans.version}</version>
+            <scope>test</scope>
+        </dependency>
+        -->
     </dependencies>
 
     <build>
