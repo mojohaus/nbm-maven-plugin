@@ -118,7 +118,7 @@ public abstract class CreateNetbeansFileStructure
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;groupId&gt;javax.help&lt;/groupId&gt;<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;artifactId&gt;search&lt;/artifactId&gt;<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;version&gt;2.0&lt;/version&gt;<br/>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;!--scope&gt;system&lt;/scope&gt;<br/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;scope&gt;system&lt;/scope&gt;<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;systemPath&gt;/home/mkleint/netbeans/harness/jsearch-2.0_04.jar&lt;/systemPath--&gt;<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;&lt;/dependency&gt;<br/>
     &nbsp;&nbsp;&lt;/dependencies&gt;<br/>
