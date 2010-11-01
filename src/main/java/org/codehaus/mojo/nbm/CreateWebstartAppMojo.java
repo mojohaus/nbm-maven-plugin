@@ -17,6 +17,7 @@
 package org.codehaus.mojo.nbm;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,6 +27,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.jar.JarFile;
@@ -44,6 +46,7 @@ import org.apache.tools.ant.types.selectors.AndSelector;
 import org.apache.tools.ant.types.selectors.FilenameSelector;
 import org.apache.tools.ant.types.selectors.OrSelector;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
+import org.codehaus.plexus.components.io.resources.PlexusIoResource;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -108,9 +111,9 @@ public class CreateWebstartAppMojo
     private String webstartClassifier;
 
     /**
-     * Jnlp codebase value within *.jnlp files.
-     * @parameter expression="${nbm.webstart.codebase}" default-value="$$codebase"
-     * 
+     * Codebase value within *.jnlp files.
+     * <strong>Defining this parameter is generally a bad idea.</strong>
+     * @parameter expression="${nbm.webstart.codebase}"
      */
     private String codebase;
 
@@ -178,10 +181,6 @@ public class CreateWebstartAppMojo
      */
     public @Override void execute() throws MojoExecutionException, MojoFailureException
     {
-        if ("$codebase".equals(codebase)) {
-            //MNBMODULE-47 maven core seems to strip one of the $ signs
-            codebase = "$$codebase";
-        }
         if ( !"nbm-application".equals( project.getPackaging() ) )
         {
             throw new MojoExecutionException(
@@ -246,6 +245,7 @@ public class CreateWebstartAppMojo
                 FileUtils.deleteDirectory( webstartBuildDir );
             }
             webstartBuildDir.mkdirs();
+            final String localCodebase = codebase != null ? codebase : webstartBuildDir.toURI().toString();
             getLog().info( "Generating webstartable binaries at " + webstartBuildDir.getAbsolutePath() );
 
             File nbmBuildDirFile = new File( outputDirectory, brandingToken );
@@ -254,7 +254,7 @@ public class CreateWebstartAppMojo
 
             MakeJNLP jnlpTask = (MakeJNLP) antProject.createTask( "makejnlp" );
             jnlpTask.setDir( webstartBuildDir );
-            jnlpTask.setCodebase( codebase );
+            jnlpTask.setCodebase( localCodebase );
             //TODO, how to figure verify excludes..
             jnlpTask.setVerify( false );
             jnlpTask.setPermissions( "<security><all-permissions/></security>" );
@@ -305,7 +305,7 @@ public class CreateWebstartAppMojo
 
             Properties props = new Properties();
             props.setProperty( "jnlp.resources", extSnippet );
-            props.setProperty( "jnlp.codebase", codebase );
+            props.setProperty( "jnlp.codebase", localCodebase );
             props.setProperty( "app.name", brandingToken );
             props.setProperty( "app.icon", "master.png" );
             props.setProperty( "app.title", project.getName() );
@@ -412,7 +412,55 @@ public class CreateWebstartAppMojo
                 destinationFile.delete();
             }
             ZipArchiver archiver = new ZipArchiver();
-            archiver.addDirectory( webstartBuildDir );
+            if ( codebase != null )
+            {
+                getLog().warn( "Defining <codebase>/${nbm.webstart.codebase} is generally unnecessary" );
+                archiver.addDirectory( webstartBuildDir );
+            }
+            else
+            {
+                archiver.addDirectory( webstartBuildDir, null, new String[] { "**/*.jnlp" } );
+                for ( final File jnlp : webstartBuildDir.listFiles() )
+                {
+                    if ( ! jnlp.getName().endsWith( ".jnlp") ) {
+                        continue;
+                    }
+                    archiver.addResource( new PlexusIoResource() {
+                        public @Override InputStream getContents() throws IOException
+                        {
+                            return new ByteArrayInputStream( FileUtils.fileRead( jnlp, "UTF-8" ).replace( localCodebase, "$$codebase" ).getBytes( "UTF-8" ) );
+                        }
+                        public @Override long getLastModified()
+                        {
+                            return jnlp.lastModified();
+                        }
+                        public @Override boolean isExisting()
+                        {
+                            return true;
+                        }
+                        public @Override long getSize()
+                        {
+                            return UNKNOWN_RESOURCE_SIZE;
+                        }
+                        public @Override URL getURL() throws IOException
+                        {
+                            return null;
+                        }
+                        public @Override String getName()
+                        {
+                            return jnlp.getAbsolutePath();
+                        }
+                        public @Override boolean isFile()
+                        {
+                            return true;
+                        }
+                        public @Override boolean isDirectory()
+                        {
+                            return false;
+                        }
+                    }, jnlp.getName(), archiver.getDefaultFileMode() );
+                }
+            }
             archiver.setDestFile( destinationFile );
             archiver.createArchive();
 
