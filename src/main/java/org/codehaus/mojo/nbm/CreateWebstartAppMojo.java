@@ -27,6 +27,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.jar.JarFile;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -162,6 +163,13 @@ public class CreateWebstartAppMojo
      * @parameter expression="${nbm.webstart.versions}" default-value="false"
      */
     private boolean processJarVersions;
+    /**
+     * additional command line arguments. Eg.
+     * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
+     * can be used to debug the IDE.
+     * @parameter expression="${netbeans.run.params}"
+     */
+    private String additionalArguments;
 
     /**
      * 
@@ -314,6 +322,26 @@ public class CreateWebstartAppMojo
             props.setProperty( "app.description", description );
             props.setProperty( "branding.token", brandingToken );
             props.setProperty( "netbeans.jnlp.fixPolicy", "false" );
+
+            StringBuilder stBuilder = new StringBuilder();
+            if ( additionalArguments != null )
+            {
+                StringTokenizer st = new StringTokenizer( additionalArguments );
+                while ( st.hasMoreTokens() )
+                {
+                    String arg = st.nextToken();
+                    if ( arg.startsWith( "-J" ) )
+                    {
+                        if ( stBuilder.length() > 0 )
+                        {
+                            stBuilder.append( ' ' );
+                        }
+                        stBuilder.append( arg.substring( 2 ) );
+                    }
+                }
+            }
+            props.setProperty( "netbeans.run.params", stBuilder.toString() );
+
             File masterJnlp = new File(
                 webstartBuildDir.getAbsolutePath() + File.separator + "master.jnlp" );
             filterCopy( masterJnlpFile, "master.jnlp", masterJnlp, props );
