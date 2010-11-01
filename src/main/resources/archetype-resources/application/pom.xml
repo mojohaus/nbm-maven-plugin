@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>application</artifactId>
-    <version>${version}</version>
     <packaging>nbm-application</packaging>
 
     <name>${artifactId} - NB App</name>
@@ -29,9 +28,9 @@
             <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>${groupId}</groupId>
+            <groupId>${D}{project.groupId}</groupId>
             <artifactId>branding</artifactId>
-            <version>${version}</version>
+            <version>${D}{project.version}</version>
         </dependency>
         <!-- To run NbModuleSuite functional tests in src/test/java, use nbjunit (assumes RELEASE70 or later):
         <dependency>
