@@ -95,9 +95,9 @@ public class CreateWebstartAppMojo
     private File outputDirectory;
 
     /**
-     * Distributable zip file of NetBeans platform application
+     * Ready-to-deploy WAR containing application in JNLP packaging.
      * 
-     * @parameter default-value="${project.build.directory}/${project.artifactId}-${project.version}-webstart.zip"
+     * @parameter default-value="${project.build.directory}/${project.artifactId}-${project.version}-jnlp.war"
      * @required
      */
     private File destinationFile;
@@ -460,6 +460,59 @@ public class CreateWebstartAppMojo
                         }
                     }, jnlp.getName(), archiver.getDefaultFileMode() );
                 }
+            }
+            File jdkhome = new File( System.getProperty( "java.home" ) );
+            File servlet = new File( jdkhome, "sample/jnlp/servlet/jnlp-servlet.jar" );
+            if ( ! servlet.isFile() )
+            {
+                servlet = new File( jdkhome.getParentFile(), "sample/jnlp/servlet/jnlp-servlet.jar" );
+            }
+            if ( servlet.isFile() ) {
+                archiver.addFile( servlet, "WEB-INF/lib/jnlp-servlet.jar" );
+                archiver.addResource( new PlexusIoResource() {
+                    public @Override InputStream getContents() throws IOException
+                    {
+                        return new ByteArrayInputStream( ( "" +
+                            "<web-app>\n" +
+                            "    <servlet>\n" +
+                            "        <servlet-name>JnlpDownloadServlet</servlet-name>\n" +
+                            "        <servlet-class>jnlp.sample.servlet.JnlpDownloadServlet</servlet-class>\n" +
+                            "    </servlet>\n" +
+                            "    <servlet-mapping>\n" +
+                            "        <servlet-name>JnlpDownloadServlet</servlet-name>\n" +
+                            "        <url-pattern>*.jnlp</url-pattern>\n" +
+                            "    </servlet-mapping>\n" +
+                            "</web-app>\n" ).getBytes() );
+                    }
+                        public @Override long getLastModified()
+                        {
+                            return UNKNOWN_MODIFICATION_DATE;
+                        }
+                        public @Override boolean isExisting()
+                        {
+                            return true;
+                        }
+                        public @Override long getSize()
+                        {
+                            return UNKNOWN_RESOURCE_SIZE;
+                        }
+                        public @Override URL getURL() throws IOException
+                        {
+                            return null;
+                        }
+                        public @Override String getName()
+                        {
+                            return "web.xml";
+                        }
+                        public @Override boolean isFile()
+                        {
+                            return true;
+                        }
+                        public @Override boolean isDirectory()
+                        {
+                            return false;
+                        }
+                }, "WEB-INF/web.xml", archiver.getDefaultFileMode() );
             }
             archiver.setDestFile( destinationFile );
             archiver.createArchive();
