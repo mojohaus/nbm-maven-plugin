@@ -343,7 +343,7 @@ public class CreateWebstartAppMojo
             props.setProperty( "netbeans.run.params", stBuilder.toString() );
 
             File masterJnlp = new File(
-                webstartBuildDir.getAbsolutePath() + File.separator + "master.jnlp" );
+                webstartBuildDir.getAbsolutePath() + File.separator + brandingToken + ".jnlp" );
             filterCopy( masterJnlpFile, "master.jnlp", masterJnlp, props );
 
 
