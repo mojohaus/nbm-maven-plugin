@@ -10,6 +10,7 @@
   <security><all-permissions/></security>
   <resources>
     ${jnlp.branding.jars}
+    ${jnlp.resources}
   </resources>
   <component-desc/>
 </jnlp>

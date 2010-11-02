@@ -304,7 +304,6 @@ public class CreateWebstartAppMojo
             String extSnippet = generateExtensions( fs, antProject, "" ); // "netbeans/"
 
             Properties props = new Properties();
-            props.setProperty( "jnlp.resources", extSnippet );
             props.setProperty( "jnlp.codebase", localCodebase );
             props.setProperty( "app.name", brandingToken );
             props.setProperty( "app.icon", "master.png" );
@@ -392,10 +391,11 @@ public class CreateWebstartAppMojo
                 signTask.execute();
             }
 
-            File brandingJnlp = new File(
-                webstartBuildDir.getAbsolutePath() + File.separator + "branding.jnlp" );
+            File modulesJnlp = new File(
+                webstartBuildDir.getAbsolutePath() + File.separator + "modules.jnlp" );
             props.setProperty( "jnlp.branding.jars", brandRefs.toString() );
-            filterCopy( null, "branding.jnlp", brandingJnlp, props );
+            props.setProperty( "jnlp.resources", extSnippet );
+            filterCopy( null, /* filename is historical */"branding.jnlp", modulesJnlp, props );
 
 // somehow expects a give folder/file format that we don't have..            
 //            getLog().info( "Verifying generated webstartable content." );
