@@ -322,7 +322,7 @@ public class CreateUpdateSiteMojo
             gz.createArchive();
             if ( "nbm-application".equals( project.getPackaging() ) )
             {
-                projectHelper.attachArtifact( project, "gz", "updatesite",
+                projectHelper.attachArtifact( project, "xml.gz", "updatesite",
                         gzipped );
             }
         } catch ( Exception ex )

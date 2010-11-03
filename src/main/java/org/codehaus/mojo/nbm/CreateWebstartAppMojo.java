@@ -519,7 +519,7 @@ public class CreateWebstartAppMojo
             archiver.createArchive();
 
             // attach standalone so that it gets installed/deployed
-            projectHelper.attachArtifact( project, "zip", webstartClassifier,
+            projectHelper.attachArtifact( project, "war", webstartClassifier,
                 destinationFile );
 
         }
