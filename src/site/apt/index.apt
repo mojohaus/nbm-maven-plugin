@@ -22,6 +22,7 @@ If you need NetBeans 6.5 binaries with an older version of nbm-maven-plugin or o
 you are encouraged to generate the repository content yourself for use with your company. See {{{repository.html}instructions}} for details.
 For explanation why it's like this, see {{{http://blogs.codehaus.org/people/mkleint/archives/001735_nb_65_artifacts_in_a_maven_repository.html}this blog entry}}.
 
+ Also see: {{{http://wiki.netbeans.org/NetBeansDeveloperFAQ#Mavenized_Builds}Maven NBM development FAQs}}
 
  Sample pom.xml excerpts for creation of a NetBeans module:
 
@@ -190,7 +191,7 @@ you don't need.
  The nbm-aplication project/packaging defines a build lifecycle that creates a final application
 from the nbm files in local/remote repotories and bundles them in a zip file (also uploadable to the repository)
 In addition to that you can configure the project to generate an autoupdate site and/or
-a webstartable binaries of the applications.
+a webstartable binaries of the applications (typically in a deployment profile):
 
 ------
             <plugin>
@@ -199,15 +200,10 @@ a webstartable binaries of the applications.
                 <executions>
                     <execution>
                         <id>extra</id>
-                        <phase>package</phase>
                         <goals>
                             <goal>autoupdate</goal>
                             <goal>webstart-app</goal>
                         </goals>
-                        <configuration>
-                            <!--distBase>central::default::http://repo1.maven.org/maven2</distBase-->
-                            <codebase>${project.build.directory}/webstart/milos</codebase>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -50,6 +50,7 @@ import org.netbeans.nbbuild.MakeUpdateDesc;
  * Create the Netbeans autopdate site definition.
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal autoupdate
+ * @phase package
  * @aggregator
  * @requiresDependencyResolution runtime
  *

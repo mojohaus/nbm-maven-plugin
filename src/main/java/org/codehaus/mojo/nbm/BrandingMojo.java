@@ -66,8 +66,8 @@ public class BrandingMojo
     private File brandingSources;
     /**
      * The branding token used by the application.
+     * Required unless {@code nbmBuildDir} does not exist and the mojo is thus skipped.
      * @parameter expression="${netbeans.branding.token}"
-     * @required
      */
     private String brandingToken;
     /**
@@ -89,6 +89,14 @@ public class BrandingMojo
         if ( !"nbm".equals( project.getPackaging() ) ) 
         {
             getLog().error( "The nbm:branding goal shall be used within a NetBeans module project only (packaging 'nbm')");
+        }
+        if ( ! brandingSources.isDirectory() ) {
+            getLog().info( "No branding to process." );
+            return;
+        }
+        if ( brandingToken == null )
+        {
+            throw new MojoExecutionException( "brandingToken must be defined for mojo:branding" );
         }
         try
         {
@@ -159,9 +167,6 @@ public class BrandingMojo
         {
             throw new MojoExecutionException( "Error creating branding", ex );
         }
-
-        getLog().info(
-                "Created branded jars for branding '" + brandingToken + "'." );
     }
 
     private String destinationFileName( String brandingFilePath )

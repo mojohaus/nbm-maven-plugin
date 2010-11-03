@@ -59,7 +59,7 @@ import org.netbeans.nbbuild.ModuleSelector;
  * @author <a href="mailto:johan.andren@databyran.se">Johan Andrén</a>
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal webstart-app
- * @phase packaging
+ * @phase package
  * @since 3.0
  */
 public class CreateWebstartAppMojo
