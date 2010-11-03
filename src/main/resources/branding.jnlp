@@ -5,7 +5,6 @@
       <title>${app.title}</title>
       <vendor>${app.vendor}</vendor>
       <description>${app.description}</description>
-      <icon href="${app.icon}"/>
   </information>
   <security><all-permissions/></security>
   <resources>

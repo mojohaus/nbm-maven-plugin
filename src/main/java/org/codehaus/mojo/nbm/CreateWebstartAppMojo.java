@@ -53,6 +53,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.netbeans.nbbuild.MakeJNLP;
 import org.netbeans.nbbuild.ModuleSelector;
+import org.netbeans.nbbuild.VerifyJNLP;
 
 /**
  * Create webstartable binaries for a 'nbm-application'.
@@ -126,7 +127,6 @@ public class CreateWebstartAppMojo
      * <li>${jnlp.resources}</li>
      * <li>${jnlp.codebase} - the 'codebase' parameter value is passed in.</li>
      * <li>${app.name}</li>
-     * <li>${app.icon}</li>
      * <li>${app.title}</li>
      * <li>${app.vendor}</li>
      * <li>${app.description}</li>
@@ -306,7 +306,6 @@ public class CreateWebstartAppMojo
             Properties props = new Properties();
             props.setProperty( "jnlp.codebase", localCodebase );
             props.setProperty( "app.name", brandingToken );
-            props.setProperty( "app.icon", "master.png" );
             props.setProperty( "app.title", project.getName() );
             if ( project.getOrganization() != null )
             {
@@ -397,13 +396,12 @@ public class CreateWebstartAppMojo
             props.setProperty( "jnlp.resources", extSnippet );
             filterCopy( null, /* filename is historical */"branding.jnlp", modulesJnlp, props );
 
-// somehow expects a give folder/file format that we don't have..            
-//            getLog().info( "Verifying generated webstartable content." );
-//            VerifyJNLP verifyTask = (VerifyJNLP) antProject.createTask( "verifyjnlp" );
-//            FileSet verify = new FileSet();
-//            verify.setFile( masterJnlp );
-//            verifyTask.addConfiguredFileset( verify );
-//            verifyTask.execute();
+            getLog().info( "Verifying generated webstartable content." );
+            VerifyJNLP verifyTask = (VerifyJNLP) antProject.createTask( "verifyjnlp" );
+            FileSet verify = new FileSet();
+            verify.setFile( masterJnlp );
+            verifyTask.addConfiguredFileset( verify );
+            verifyTask.execute();
 
 
             // create zip archive
