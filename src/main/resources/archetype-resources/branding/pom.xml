@@ -31,6 +31,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
+                <!-- Can be omitted as of 3.4: -->
                 <executions>
                     <execution>
                         <id>branding</id>
