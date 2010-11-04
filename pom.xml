@@ -11,7 +11,7 @@
     <name>NBM Maven Plugin</name>
     <description>Maven plugin for creating NetBeans modules. It defines a custom lifecycle called "nbm". During packaging, the module JAR is enhanced with NetBeans-specific manifest entries and, along with other required files, packed into a *.nbm file, ready for distribution. Additionally the plugin provides aggregator goals to create an update site or cluster for your module projects.
     </description>
-    <version>3.4-SNAPSHOT</version>
+    <version>3.4</version>
     <inceptionYear>2005</inceptionYear>
     <url>http://mojo.codehaus.org/nbm-maven-plugin/</url>
     <issueManagement>
@@ -29,9 +29,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven-plugin</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven-plugin</developerConnection>
-        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven-plugin</url>
+        <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nbm-maven-plugin-3.4</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-maven-plugin-3.4</developerConnection>
+        <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-maven-plugin-3.4</url>
     </scm>
     <developers>
         <developer>
@@ -125,22 +125,22 @@
                         <configuration>
                             <target>
                                 <!-- Cannot use dependency:copy since that would require a custom repo definition, which enforcer barfs on. -->
-                                <get src="http://bits.netbeans.org/maven2/org/netbeans/modules/org-netbeans-modules-apisupport-harness/${harness.version}/org-netbeans-modules-apisupport-harness-${harness.version}.nbm" dest="${project.build.directory}/harness.nbm" skipexisting="true"/>
+                                <get src="http://bits.netbeans.org/maven2/org/netbeans/modules/org-netbeans-modules-apisupport-harness/${harness.version}/org-netbeans-modules-apisupport-harness-${harness.version}.nbm" dest="${project.build.directory}/harness.nbm" skipexisting="true" />
                                 <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
-                                        <include name="netbeans/etc/app.conf"/>
-                                        <include name="netbeans/launchers/app.*"/>
-                                        <include name="netbeans/jnlp/"/>
+                                        <include name="netbeans/etc/app.conf" />
+                                        <include name="netbeans/launchers/app.*" />
+                                        <include name="netbeans/jnlp/" />
                                     </patternset>
-                                    <mapper type="glob" from="netbeans/*" to="harness/*"/>
+                                    <mapper type="glob" from="netbeans/*" to="harness/*" />
                                 </unzip>
                                 <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}">
                                     <patternset>
-                                        <include name="netbeans/tasks.jar"/>
+                                        <include name="netbeans/tasks.jar" />
                                     </patternset>
-                                    <mapper type="glob" from="netbeans/*" to="*"/>
+                                    <mapper type="glob" from="netbeans/*" to="*" />
                                 </unzip>
-                                <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes"/>
+                                <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes" />
                             </target>
                         </configuration>
                     </execution>
