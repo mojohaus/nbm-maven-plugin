@@ -31,16 +31,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <!-- Can be omitted as of 3.4: -->
-                <executions>
-                    <execution>
-                        <id>branding</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>branding</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
