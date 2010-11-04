@@ -480,7 +480,6 @@ public class CreateWebstartAppMojo
                             "        <servlet-name>JnlpDownloadServlet</servlet-name>\n" +
                             "        <url-pattern>*.jnlp</url-pattern>\n" +
                             "    </servlet-mapping>\n" +
-                            // XXX consider also "<welcome-file-list><welcome-file>" + brandingToken + ".jnlp</welcome-file></welcome-file-list>"
                             "</web-app>\n" ).getBytes() );
                     }
                         public @Override long getLastModified()
