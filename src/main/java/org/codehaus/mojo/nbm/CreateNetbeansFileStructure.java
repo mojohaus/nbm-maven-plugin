@@ -101,8 +101,9 @@ public abstract class CreateNetbeansFileStructure
     /**
      * The location of JavaHelp sources for the project. The documentation
      * itself is expected to be in the directory structure based on codenamebase of the module.
-     * eg. if your codenamebase is "org.netbeans.modules.apisupport", the the actual docs
-     * files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs
+     * eg. if your codenamebase is "org.netbeans.modules.apisupport", then the actual docs
+     * files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs.
+     * Obsolete as of NetBeans 7.0 with &#64;HelpSetRegistration.
      * @parameter default-value="${basedir}/src/main/javahelp"
      * @since 2.7
      */
