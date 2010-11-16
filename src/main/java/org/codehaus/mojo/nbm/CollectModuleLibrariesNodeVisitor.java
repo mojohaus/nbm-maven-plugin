@@ -117,7 +117,7 @@ public class CollectModuleLibrariesNodeVisitor
             if ( depExaminator == null )
             {
                 depExaminator = new ExamineManifest( log );
-                depExaminator.setJarFile( artifact.getFile() );
+                depExaminator.setArtifactFile( artifact.getFile() );
                 depExaminator.checkFile();
                 examinerCache.put( artifact, depExaminator );
             }

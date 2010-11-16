@@ -131,8 +131,14 @@ public class ExamineManifest
             {
                 source = jarFile;
             }
-            logger.debug(
-                    "Cannot find manifest entries in " + source.getAbsolutePath() );
+            if ( source == null )
+            {
+                logger.debug( "No manifest to examine" );
+            }
+            else
+            {
+                logger.debug( "Cannot find manifest entries in " + source.getAbsolutePath() );
+            }
         }
     }
 
@@ -278,6 +284,30 @@ public class ExamineManifest
     public void setManifestFile( File manifestFileLoc )
     {
         manifestFile = manifestFileLoc;
+    }
+
+    /**
+     * Either call {@link #setJarFile} or {@link #setManifestFile} as appropriate.
+     * @param artifactFileLoc a JAR or folder
+     */
+    public void setArtifactFile( File artifactFileLoc )
+    {
+        if ( artifactFileLoc.isFile() )
+        {
+            setJarFile( artifactFileLoc );
+        }
+        else if ( artifactFileLoc.isDirectory() )
+        {
+            File mani = new File( artifactFileLoc, "META-INF/MANIFEST.MF" );
+            if ( mani.isFile() )
+            {
+                setManifestFile( mani );
+            } // else e.g. jarprj/target/classes has no manifest, so nothing to examine
+        }
+        else
+        {
+            throw new IllegalArgumentException( artifactFileLoc.getAbsolutePath() );
+        }
     }
 
     public void setClasspath( String path )
