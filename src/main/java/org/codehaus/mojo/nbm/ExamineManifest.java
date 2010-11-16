@@ -226,7 +226,7 @@ public class ExamineManifest
             String bndName = attrs.getValue("Bundle-SymbolicName");
             if (bndName != null) {
                 setOsgiBundle(true);
-                setModule( bndName.replace('-', '_') ); //MNBMODULE-96
+                setModule( bndName./*MNBMODULE-125*/replaceFirst(" *;.+", "")./*MNBMODULE-96*/replace('-', '_') );
                 setSpecVersion( attrs.getValue("Bundle-Version") );
                 String exp = attrs.getValue("Export-Package");
                 setPublicPackages(exp != null);

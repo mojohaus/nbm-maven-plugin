@@ -60,4 +60,25 @@ public class ExamineManifestTest extends TestCase
         assertEquals( null, em.getModuleWithRelease() );
     }
 
+    public void testBundles()
+            throws Exception
+    {
+        ExamineManifest em = new ExamineManifest( new SystemStreamLog() );
+        File mf = File.createTempFile( "ExamineManifestTest", ".mf" );
+        mf.deleteOnExit();
+        PrintWriter w = new PrintWriter( mf );
+        w.println( "Bundle-SymbolicName: org.eclipse.jdt.core; singleton:=true" );
+        w.println( "Bundle-Version: 3.1.0" );
+        w.println( "Export-Package: org.eclipse.jdt.core," );
+        w.println( " org.eclipse.jdt.internal.formatter.old;x-internal:=true" );
+        w.flush();
+        w.close();
+        em.setManifestFile( mf );
+        em.setPopulateDependencies( true );
+        em.checkFile();
+        assertEquals( "org.eclipse.jdt.core", em.getModule() );
+        assertEquals( "3.1.0", em.getSpecVersion() );
+        assertTrue( em.hasPublicPackages() );
+    }
+
 }
