@@ -458,6 +458,7 @@ public class PopulateRepositoryMojo
                             {
                                 JarInputStream jis = new JarInputStream( is );
                                 Manifest mani = new Manifest(jis.getManifest());
+                                // XXX MNBMODULE-108 cont'd: retain some trace of the original attr
                                 mani.getMainAttributes().remove( Attributes.Name.CLASS_PATH );
                                 JarOutputStream jos = new JarOutputStream( os, mani );
                                 JarEntry entry;

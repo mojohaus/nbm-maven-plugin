@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.jar.Attributes;
 import java.util.regex.Pattern;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -439,7 +440,8 @@ public class NetbeansManifestUpdateMojo
 
             if ( classPath.length() > 0 )
             {
-                conditionallyAddAttribute( mainSection, "Class-Path",
+                // XXX related to MNBMODULE-108: generate real Class-Path only for version packed into JAR
+                conditionallyAddAttribute( mainSection, Attributes.Name.CLASS_PATH.toString(),
                     classPath.trim() );
             }
             if ( dependencies.length() > 0 )
