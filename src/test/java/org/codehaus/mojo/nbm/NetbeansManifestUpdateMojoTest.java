@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 import junit.framework.TestCase;
+import org.apache.tools.ant.taskdefs.Manifest;
 
 /**
  *
@@ -88,6 +89,15 @@ public class NetbeansManifestUpdateMojoTest extends TestCase {
         {
             Locale.setDefault( old );
         }
+    }
+
+    public void testNewlines()
+        throws Exception
+    {
+        Manifest m = new Manifest();
+        Manifest.Section s = m.getMainSection();
+        new NetbeansManifestUpdateMojo().conditionallyAddAttribute( s, "Desc", "Something.\n   Else.\n" );
+        assertEquals( "Something. Else.", s.getAttributeValue( "Desc" ));
     }
 
 }

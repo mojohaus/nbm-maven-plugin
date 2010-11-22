@@ -510,14 +510,14 @@ public class NetbeansManifestUpdateMojo
         return base;
     }
 
-    private String conditionallyAddAttribute( Manifest.Section section, String key, String value )
+    String conditionallyAddAttribute( Manifest.Section section, String key, String value )
     {
         Manifest.Attribute attr = section.getAttribute( key );
         if ( attr == null )
         {
             attr = new Manifest.Attribute();
             attr.setName( key );
-            attr.setValue( value != null ? value : "<undefined>" );
+            attr.setValue( value != null ? value.replaceAll("\\s+", " ").trim() : "<undefined>" );
             try
             {
                 section.addConfiguredAttribute( attr );
