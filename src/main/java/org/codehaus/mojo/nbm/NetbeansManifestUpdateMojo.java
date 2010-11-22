@@ -621,7 +621,7 @@ public class NetbeansManifestUpdateMojo
             {
                 if ( !deps.isEmpty() )
                 {
-                    throw new MojoFailureException( "Uncategorized problems with NetBeans dependency verification: " + deps );
+                    throw new MojoFailureException( "Uncategorized problems with NetBeans dependency verification (maybe MNBMODULE-102): " + deps );
                 }
                 else
                 {
