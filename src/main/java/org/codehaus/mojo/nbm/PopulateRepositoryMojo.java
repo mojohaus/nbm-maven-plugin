@@ -371,14 +371,13 @@ public class PopulateRepositoryMojo
         }
 
         List<ExternalsWrapper> externals = new ArrayList<ExternalsWrapper>();
-        IndexReader nexusReader = null;
         IndexSearcher searcher = null;
         if ( nexusIndexDirectory != null && nexusIndexDirectory.exists() )
         {
             try
             {
                 Directory nexusDir = FSDirectory.getDirectory( nexusIndexDirectory );
-                nexusReader = IndexReader.open( nexusDir );
+                IndexReader nexusReader = IndexReader.open( nexusDir );
                 searcher = new IndexSearcher( nexusReader );
             }
             catch ( IOException ex )
