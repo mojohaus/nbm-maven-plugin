@@ -80,6 +80,7 @@ public class NetbeansManifestUpdateMojoTest extends TestCase {
         try
         {
             assertEquals( null, NetbeansManifestUpdateMojo.shorten ( null ) );
+            assertEquals( null, NetbeansManifestUpdateMojo.shorten ( "" ) );
             assertEquals( "I typed some description here", NetbeansManifestUpdateMojo.shorten ( "I typed some description here" ) );
             assertEquals( "Now I'm trying to be serious.", NetbeansManifestUpdateMojo.shorten ( "Now I'm trying to be serious." ) );
             assertEquals( "A meaningful description.", NetbeansManifestUpdateMojo.shorten ( "A meaningful description. But will it work?" ) );

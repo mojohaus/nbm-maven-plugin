@@ -538,7 +538,7 @@ public class NetbeansManifestUpdateMojo
      */
     static String shorten( String paragraph )
     {
-        if ( paragraph == null )
+        if ( paragraph == null || paragraph.length() == 0 )
         {
             return null;
         }
