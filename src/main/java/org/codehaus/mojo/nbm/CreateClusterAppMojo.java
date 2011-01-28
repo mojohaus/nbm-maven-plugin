@@ -290,7 +290,7 @@ public class CreateClusterAppMojo
                     }
                     catch ( IOException ex )
                     {
-                        getLog().error( ex );
+                        getLog().error( art.getFile().getAbsolutePath(), ex );
                     }
                     finally
                     {
