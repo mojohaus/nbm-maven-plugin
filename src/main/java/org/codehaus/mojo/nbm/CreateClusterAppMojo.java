@@ -63,7 +63,7 @@ import org.netbeans.nbbuild.MakeListOfNBM;
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal cluster-app
- * @phase process-resources
+ * @phase package
  * @requiresDependencyResolution runtime
  * @requiresProject
  */
