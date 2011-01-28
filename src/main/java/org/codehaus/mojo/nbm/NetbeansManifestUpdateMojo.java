@@ -440,7 +440,6 @@ public class NetbeansManifestUpdateMojo
 
             if ( classPath.length() > 0 )
             {
-                // XXX related to MNBMODULE-108: generate real Class-Path only for version packed into JAR
                 conditionallyAddAttribute( mainSection, Attributes.Name.CLASS_PATH.toString(),
                     classPath.trim() );
             }
