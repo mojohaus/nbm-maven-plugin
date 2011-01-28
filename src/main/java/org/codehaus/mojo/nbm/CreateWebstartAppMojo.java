@@ -136,6 +136,15 @@ public class CreateWebstartAppMojo
      * @parameter 
      */
     private File masterJnlpFile;
+    
+    /**
+     * The basename (minus .jnlp extension) of the master JNLP file in the output.
+     * This file will be the entry point for javaws.
+     * Defaults to the branding token.
+     * @parameter expression="${master.jnlp.file.name}"
+     * @since 3.5
+     */
+    private String masterJnlpFileName;
 
     /**
      * keystore location for signing the nbm file
@@ -303,6 +312,11 @@ public class CreateWebstartAppMojo
             //TODO is it really netbeans/
             String extSnippet = generateExtensions( fs, antProject, "" ); // "netbeans/"
 
+            if ( masterJnlpFileName == null )
+            {
+               masterJnlpFileName = brandingToken;
+            }
+
             Properties props = new Properties();
             props.setProperty( "jnlp.codebase", localCodebase );
             props.setProperty( "app.name", brandingToken );
@@ -319,6 +333,7 @@ public class CreateWebstartAppMojo
             String description = project.getDescription() != null ? project.getDescription() : "No Project Description";
             props.setProperty( "app.description", description );
             props.setProperty( "branding.token", brandingToken );
+            props.setProperty( "master.jnlp.file.name", masterJnlpFileName );
             props.setProperty( "netbeans.jnlp.fixPolicy", "false" );
 
             StringBuilder stBuilder = new StringBuilder();
@@ -341,7 +356,7 @@ public class CreateWebstartAppMojo
             props.setProperty( "netbeans.run.params", stBuilder.toString() );
 
             File masterJnlp = new File(
-                webstartBuildDir.getAbsolutePath() + File.separator + brandingToken + ".jnlp" );
+                webstartBuildDir.getAbsolutePath() + File.separator + masterJnlpFileName + ".jnlp" );
             filterCopy( masterJnlpFile, "master.jnlp", masterJnlp, props );
 
 
