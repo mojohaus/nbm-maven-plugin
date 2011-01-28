@@ -457,8 +457,24 @@ public class PopulateRepositoryMojo
                             {
                                 JarInputStream jis = new JarInputStream( is );
                                 Manifest mani = new Manifest(jis.getManifest());
-                                // XXX MNBMODULE-108 cont'd: retain some trace of the original attr
                                 mani.getMainAttributes().remove( Attributes.Name.CLASS_PATH );
+                                if ( !man.deps.isEmpty() )
+                                { // MNBMODULE-132
+                                    StringBuilder b = new StringBuilder();
+                                    for ( Dependency dep : man.deps )
+                                    {
+                                        if ( b.length() > 0 )
+                                        {
+                                            b.append( ' ' );
+                                        }
+                                        b.append( dep.getGroupId() ).append( ':' ).append( dep.getArtifactId() ).append( ':' ).append( dep.getVersion() );
+                                    }
+                                    mani.getMainAttributes().putValue( "Maven-Class-Path", b.toString() );
+                                }
+                                else
+                                {
+                                    getLog().warn( "did not find any external artifacts for " + man.getModule() );
+                                }
                                 JarOutputStream jos = new JarOutputStream( os, mani );
                                 JarEntry entry;
                                 while ( ( entry = jis.getNextJarEntry() ) != null)
@@ -793,13 +809,15 @@ public class PopulateRepositoryMojo
             }
         }
 
+        wrapper.deps = deps;
         mavenModel.setDependencies( deps );
         FileWriter writer = null;
         File fil = null;
         try
         {
             MavenXpp3Writer xpp = new MavenXpp3Writer();
-            fil = File.createTempFile( "maven", "pom" );
+            fil = File.createTempFile( "maven", ".pom" );
+            fil.deleteOnExit();
             writer = new FileWriter( fil );
             xpp.write( writer, mavenModel );
         }
@@ -843,7 +861,8 @@ public class PopulateRepositoryMojo
         try
         {
             MavenXpp3Writer xpp = new MavenXpp3Writer();
-            fil = File.createTempFile( "maven", "pom" );
+            fil = File.createTempFile( "maven", ".pom" );
+            fil.deleteOnExit();
             writer = new FileWriter( fil );
             xpp.write( writer, mavenModel );
         }
@@ -907,7 +926,8 @@ public class PopulateRepositoryMojo
         try
         {
             MavenXpp3Writer xpp = new MavenXpp3Writer();
-            fil = File.createTempFile( "maven", "pom" );
+            fil = File.createTempFile( "maven", ".pom" );
+            fil.deleteOnExit();
             writer = new FileWriter( fil );
             xpp.write( writer, mavenModel );
         }
@@ -1014,6 +1034,8 @@ public class PopulateRepositoryMojo
         private String cluster;
 
         String module;
+
+        List<Dependency> deps;
 
         public ModuleWrapper( String module )
         {
