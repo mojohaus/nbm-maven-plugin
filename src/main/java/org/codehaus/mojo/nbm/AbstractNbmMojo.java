@@ -409,7 +409,13 @@ public abstract class AbstractNbmMojo
             // list of dependencies (as "nbm-file") or not..
             // that would be a timesaver
             ExamineManifest mnf = new ExamineManifest( getLog() );
-            mnf.setJarFile( art.getFile() );
+            File jar = art.getFile();
+            if ( ! jar.isFile() )
+            {
+                getLog().warn( "MNBMODULE-131: need to at least run package phase on " + jar );
+                return new ArtifactResult(null, null);
+            }
+            mnf.setJarFile( jar);
             mnf.checkFile();
             if ( mnf.isNetbeansModule() )
             {
