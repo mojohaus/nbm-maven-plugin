@@ -173,6 +173,25 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <!-- Hack to make target/tasks.jar appear on classpath. process-sources goal in fact has this effect. -->
+            <id>netbeans-tasks-jar</id>
+            <activation>
+                <property>
+                    <name>netbeans.execution</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.netbeans.nbbuild</groupId>
+                    <artifactId>tasks</artifactId>
+                    <version>${harness.version}</version>
+                    <scope>system</scope>
+                    <systemPath>${project.build.directory}/tasks.jar</systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
         <!--profile>
             <id>toolchained</id>
             <build>
@@ -227,16 +246,6 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-project</artifactId>
             <version>2.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.nbbuild</groupId>
-            <artifactId>tasks</artifactId>
-            <!-- XXX have to put something here, so that our source files will appear compilable to the IDE. -->
-            <!-- Cannot use system scope with systemPath=${project.build.directory}/tasks.jar because then running the plugin produces: -->
-            <!-- 'dependencies.dependency.systemPath' for org.netbeans.nbbuild:tasks:jar must specify an absolute path but is ${basedir}/target/tasks.jar -->
-            <!-- Note that target/classes is on CP before ~/.m2/repository/org/netbeans/nbbuild/tasks/6.7/tasks-6.7.jar so this is sort of safe. -->
-            <version>6.7</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
@@ -333,6 +342,6 @@
     </reporting>
     <properties>
         <mojo.java.target>1.6</mojo.java.target>
-        <harness.version>RELEASE691</harness.version>
+        <harness.version>RELEASE70-BETA</harness.version>
     </properties>
 </project>

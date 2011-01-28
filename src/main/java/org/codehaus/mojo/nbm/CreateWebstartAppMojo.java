@@ -165,6 +165,13 @@ public class CreateWebstartAppMojo
     private String keystorealias;
 
     /**
+     * keystore type
+     * @parameter expression="${keystoretype}"
+     * @since 3.5
+     */
+    private String keystoretype;
+
+    /**
      * If set true, build-jnlp target creates versioning info in jnlp descriptors and version.xml files.
      * This allows for incremental updates of Webstart applications, but requires download via
      * JnlpDownloadServlet
@@ -272,6 +279,10 @@ public class CreateWebstartAppMojo
             jnlpTask.setAlias( keystorealias );
             jnlpTask.setKeystore( keystore );
             jnlpTask.setStorePass( keystorepassword );
+            if ( keystoretype != null )
+            {
+                jnlpTask.setStoreType( keystoretype );
+            }
             jnlpTask.setProcessJarVersions( processJarVersions );
 
             FileSet fs = jnlpTask.createModules();
@@ -368,6 +379,10 @@ public class CreateWebstartAppMojo
             signTask.setKeystore( keystore );
             signTask.setStorepass( keystorepassword );
             signTask.setAlias( keystorealias );
+            if ( keystoretype != null )
+            {
+                signTask.setStoretype( keystoretype );
+            }
             signTask.setSignedjar( jnlpDestination );
             signTask.setJar( startup );
             signTask.execute();
