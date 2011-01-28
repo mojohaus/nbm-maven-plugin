@@ -6,13 +6,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>nbm-archetype</artifactId>
-  <version>1.7</version>
+  <version>1.8-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
   <name>NetBeans Module Archetype</name>
   <description>Archetype for development of NetBeans modules in Maven.</description>
   <scm>
-    <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nbm-archetype-1.7</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-archetype-1.7</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-archetype-1.7</url>
+    <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/mojo-archetypes/nbm-archetype</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/mojo-archetypes/nbm-archetype</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/mojo-archetypes/nbm-archetype</url>
   </scm>
 </project>
