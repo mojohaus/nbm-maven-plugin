@@ -212,6 +212,10 @@ public class CreateClusterAppMojo
                                     {
                                         path = path.replace( ".jar.pack.gz", ".jar" );
                                     }
+                                    if (path.endsWith( ".external" ) )
+                                    {
+                                        throw new MojoExecutionException( "MNBMODULE-138: not yet supported to unpack " + path + " from " + art.getFile() );
+                                    }
                                     File fl = new File( nbmBuildDirFile,
                                         path.replace( "/", File.separator ) );
                                     if ( ent.isDirectory() )
