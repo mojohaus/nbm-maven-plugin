@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>${groupId}</groupId>
-        <artifactId>${artifactId}</artifactId>
+        <artifactId>${artifactId}-parent</artifactId>
         <version>${version}</version>
     </parent>
 
-    <artifactId>application</artifactId>
+    <artifactId>${artifactId}-app</artifactId>
     <packaging>nbm-application</packaging>
 
-    <name>${artifactId} - NB App</name>
+    <name>${artifactId}-app</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>${D}{project.groupId}</groupId>
-            <artifactId>branding</artifactId>
+            <artifactId>${artifactId}-branding</artifactId>
             <version>${D}{project.version}</version>
         </dependency>
         <!-- To run NbModuleSuite functional tests in src/test/java, use nbjunit (assumes RELEASE70 or later):

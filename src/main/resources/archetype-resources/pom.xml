@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>${groupId}</groupId>
-    <artifactId>${artifactId}</artifactId>
+    <artifactId>${artifactId}-parent</artifactId>
     <version>${version}</version>
     <packaging>pom</packaging>
 
-    <name>${artifactId} - NB App Parent</name>
+    <name>${artifactId}-parent</name>
 
     <repositories>
         <!--
