@@ -8,7 +8,7 @@
     <version>${version}</version>
     <packaging>pom</packaging>
 
-    <name>${artifactId} NetBeans Module Suite</name>
+    <name>${artifactId}</name>
 
     <repositories>
         <!--
