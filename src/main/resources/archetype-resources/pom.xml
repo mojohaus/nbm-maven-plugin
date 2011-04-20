@@ -7,7 +7,7 @@
     <version>${version}</version>
     <packaging>nbm</packaging>
 
-    <name>${artifactId} NetBeans Module</name>
+    <name>${artifactId}</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
