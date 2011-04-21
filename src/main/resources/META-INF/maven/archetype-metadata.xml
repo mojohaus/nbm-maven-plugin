@@ -44,7 +44,7 @@
     </fileSets>
   <requiredProperties>
     <requiredProperty key="netbeansVersion">
-      <defaultValue>RELEASE691</defaultValue>
+      <defaultValue>RELEASE70</defaultValue>
     </requiredProperty>
   </requiredProperties>
 </archetype-descriptor>
