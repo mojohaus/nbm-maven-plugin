@@ -130,16 +130,25 @@
                                     <patternset>
                                         <include name="netbeans/etc/app.conf" />
                                         <include name="netbeans/launchers/app.*" />
-                                        <include name="netbeans/jnlp/" />
                                     </patternset>
                                     <mapper type="glob" from="netbeans/*" to="harness/*" />
                                 </unzip>
                                 <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}">
                                     <patternset>
-                                        <include name="netbeans/tasks.jar" />
+                                        <include name="netbeans/tasks.jar.pack.gz"/>
+                                        <include name="netbeans/jnlp/jnlp-launcher.jar.pack.gz"/>
                                     </patternset>
-                                    <mapper type="glob" from="netbeans/*" to="*" />
+                                    <flattenmapper/>
                                 </unzip>
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/tasks.jar.pack.gz"/>
+                                    <arg file="${project.build.directory}/tasks.jar"/>
+                                </exec>
+                                <mkdir dir="${project.build.directory}/classes/harness/jnlp"/>
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/jnlp-launcher.jar.pack.gz"/>
+                                    <arg file="${project.build.directory}/classes/harness/jnlp/jnlp-launcher.jar"/>
+                                </exec>
                                 <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes" />
                             </target>
                         </configuration>
@@ -342,6 +351,6 @@
     </reporting>
     <properties>
         <mojo.java.target>1.6</mojo.java.target>
-        <harness.version>RELEASE70-BETA</harness.version>
+        <harness.version>RELEASE70</harness.version>
     </properties>
 </project>
