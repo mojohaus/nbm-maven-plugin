@@ -132,11 +132,7 @@ public class BrandingMojo
             // create jar-files from each toplevel .jar directory
             scanner.setIncludes( new String[]
                     {
-                        "*/*.jar",
-                        "*/*/*.jar" //MNBMODULE-52 also use the 2nd level *.jar directories
-                                // could also use **/*.jar but not sure how to figure the
-                                // fine line between the module jar's folder and it's content
-                                // in the unlikely event that a module jar contains a folder named *.jar, we might get wrong data..
+                        "**/*.jar"
                     } );
             scanner.setBasedir( clusterDir );
             scanner.scan();
