@@ -24,19 +24,12 @@ import java.util.regex.Pattern;
 import junit.framework.TestCase;
 import org.apache.tools.ant.taskdefs.Manifest;
 
-/**
- *
- * @author mkleint
- */
 public class NetbeansManifestUpdateMojoTest extends TestCase {
     
     public NetbeansManifestUpdateMojoTest(String testName) {
         super(testName);
     }
 
-    /**
-     * Test of createCompiledPatternList method, of class NetbeansManifestUpdateMojo.
-     */
     public void testCreateCompiledPatternList()
     {
         List<String> subpackages = Arrays.asList( new String[] {
