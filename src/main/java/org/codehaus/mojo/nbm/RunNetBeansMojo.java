@@ -182,7 +182,7 @@ public class RunNetBeansMojo
             {
                 //TODO --jdkhome
                 "--userdir",
-                CommandLineUtils.quote( netbeansUserdir.getAbsolutePath() ),
+                netbeansUserdir.getAbsolutePath(),
                 "-J-Dnetbeans.logger.console=true",
                 "-J-ea",
             };

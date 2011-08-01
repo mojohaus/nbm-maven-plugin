@@ -116,7 +116,7 @@ public class RunPlatformAppMojo
 
             List<String> args = new ArrayList<String>();
             args.add("--userdir");
-            args.add(Commandline.quoteArgument( netbeansUserdir.getAbsolutePath()));
+            args.add( netbeansUserdir.getAbsolutePath() );
             args.add("-J-Dnetbeans.logger.console=true");
             args.add("-J-ea");
             args.add("--branding");
