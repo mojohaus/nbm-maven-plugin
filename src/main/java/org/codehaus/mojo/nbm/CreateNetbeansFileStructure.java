@@ -17,7 +17,11 @@
 package org.codehaus.mojo.nbm;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +31,11 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.artifact.Artifact;
@@ -44,7 +53,6 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.taskdefs.Jar;
-import org.apache.tools.ant.taskdefs.LoadProperties;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PatternSet;
@@ -245,19 +253,67 @@ public abstract class CreateNetbeansFileStructure
         //2. create nbm resources
         File moduleFile = new File( moduleJarLocation, moduleJarName + ".jar" );
 
-        getLog().info( "Copying module jar to " + moduleJarLocation );
         try
         {
-            FileUtils.getFileUtils().copyFile( jarFile, moduleFile, null, true,
-                    false );
-        } catch ( IOException ex )
+            boolean needPlainCopy = false;
+            InputStream is = new FileInputStream( jarFile );
+            try
+            {
+                JarInputStream jis = new JarInputStream( is );
+                Manifest m = jis.getManifest();
+                Attributes a = m.getMainAttributes();
+                String classPath = ( String ) a.remove( new Attributes.Name( "X-Class-Path" ) );
+                if ( classPath == null )
+                {
+                    needPlainCopy = true;
+                }
+                else // MNBMODULE-133
+                {
+                    getLog().info( "Copying module JAR to " + moduleJarLocation + " with manifest updates" );
+                    a.putValue( "Class-Path", classPath );
+                    a.remove( new Attributes.Name( "Maven-Class-Path" ) );
+                    OutputStream os = new FileOutputStream( moduleFile );
+                    try
+                    {
+                        JarOutputStream jos = new JarOutputStream( os, m );
+                        JarEntry entry;
+                        while ( ( entry = jis.getNextJarEntry() ) != null )
+                        {
+                            JarEntry entry2 = new JarEntry( entry );
+                            jos.putNextEntry( entry2 );
+                            int c;
+                            while ( ( c = jis.read() ) != -1 )
+                            {
+                                jos.write( c );
+                            }
+                            jos.closeEntry();
+                        }
+                        jos.finish();
+                        jos.close();
+                    }
+                    finally
+                    {
+                        os.close();
+                    }
+                }
+            }
+            finally
+            {
+                is.close();
+            }
+            if ( needPlainCopy )
+            {
+                getLog().info( "Copying module JAR to " + moduleJarLocation );
+                FileUtils.getFileUtils().copyFile( jarFile, moduleFile, null, true, false );
+            }
+        }
+        catch ( IOException x )
         {
-            getLog().error( "Cannot copy module jar" );
-            throw new MojoExecutionException( "Cannot copy module jar", ex );
+            throw new MojoExecutionException( "Cannot copy module jar", x );
         }
 
         ExamineManifest modExaminator = new ExamineManifest( getLog() );
-        modExaminator.setJarFile( jarFile );
+        modExaminator.setJarFile( moduleFile );
         modExaminator.checkFile();
         String classpathValue = modExaminator.getClasspath();
 

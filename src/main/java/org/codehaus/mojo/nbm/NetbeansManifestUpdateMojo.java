@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.jar.Attributes;
 import java.util.regex.Pattern;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -363,12 +362,17 @@ public class NetbeansManifestUpdateMojo
             List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts( treeroot, module, project, examinerCache,
                 libArtifacts, getLog(), useOSGiDependencies );
             String classPath = "";
+            StringBuilder mavenClassPath = new StringBuilder();
             String dependencies = "";
             String depSeparator = " ";
 
             for ( Artifact a : libArtifacts )
             {
                 classPath = classPath + " ext/" + a.getGroupId() + "/" + a.getFile().getName();
+                if ( mavenClassPath.length() > 0 ) {
+                    mavenClassPath.append( ' ' );
+                }
+                mavenClassPath.append( a.getGroupId() ).append( ':' ).append( a.getArtifactId() ).append( ':' ).append( a.getVersion() );
             }
 
             for ( ModuleWrapper wr : moduleArtifacts )
@@ -440,8 +444,12 @@ public class NetbeansManifestUpdateMojo
 
             if ( classPath.length() > 0 )
             {
-                conditionallyAddAttribute( mainSection, Attributes.Name.CLASS_PATH.toString(),
+                conditionallyAddAttribute( mainSection, "X-Class-Path",
                     classPath.trim() );
+            }
+            if ( mavenClassPath.length() > 0)
+            {
+                conditionallyAddAttribute( mainSection, "Maven-Class-Path", mavenClassPath.toString() );
             }
             if ( dependencies.length() > 0 )
             {
