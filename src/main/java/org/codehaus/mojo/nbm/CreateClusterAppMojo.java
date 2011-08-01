@@ -125,6 +125,13 @@ public class CreateClusterAppMojo
      */
     private String defaultCluster;
 
+    /**
+     * Process OSGi dependencies.
+     * These will all go into <code>defaultCluster</code>.
+     * @parameter default-value="false"
+     * @since 3.6
+     */
+    private boolean useOSGiDependencies;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
     /**
@@ -270,7 +277,7 @@ public class CreateClusterAppMojo
                                             {
                                                 makeTask.setModule( part );
                                             }
-                                            else if ( ex.isOsgiBundle() )
+                                            else if ( useOSGiDependencies && ex.isOsgiBundle() )
                                             {
                                                 wrappedBundleCNBs.add( ex.getModule() );
                                             }
@@ -308,7 +315,7 @@ public class CreateClusterAppMojo
                         }
                     }
                 }
-                if (res.isOSGiBundle()) {
+                if ( useOSGiDependencies && res.isOSGiBundle() ) {
                     bundles.put( art, res.getExaminedManifest() );
                 }
             }
