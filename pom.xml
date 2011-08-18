@@ -6,13 +6,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>nbm-suite-root</artifactId>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.6</version>
   <packaging>maven-archetype</packaging>
   <name>NetBeans Module Suite Archetype</name>
   <description>Root project archetype for creating multi module projects developing NetBeans IDE modules. Approximately similar in functionality to module suites in NetBeans Ant projects.</description>
   <scm>
-    <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/mojo-archetypes/nbm-suite-root</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/mojo-archetypes/nbm-suite-root</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/mojo-archetypes/nbm-suite-root</url>
+    <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nbm-suite-root-1.6</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-suite-root-1.6</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-suite-root-1.6</url>
   </scm>
 </project>
