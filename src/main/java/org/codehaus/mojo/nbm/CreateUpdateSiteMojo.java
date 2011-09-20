@@ -47,7 +47,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.netbeans.nbbuild.MakeUpdateDesc;
 
 /**
- * Create the Netbeans autopdate site definition.
+ * Create the NetBeans auto update site definition.
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal autoupdate
  * @phase package
