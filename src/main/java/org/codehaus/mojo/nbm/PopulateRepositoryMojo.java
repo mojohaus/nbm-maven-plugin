@@ -261,12 +261,12 @@ public class PopulateRepositoryMojo
         File rootDir = netbeansInstallDirectory;
         if ( !rootDir.exists() )
         {
-            getLog().error( "Netbeans installation doesn't exist." );
+            getLog().error( "NetBeans installation doesn't exist." );
             throw new MojoExecutionException(
-                "Netbeans installation doesn't exist." );
+                "NetBeans installation doesn't exist." );
         }
         getLog().info(
-            "Copying Netbeans artifacts from " + netbeansInstallDirectory );
+            "Copying NetBeans artifacts from " + netbeansInstallDirectory );
 
         PathConvert convert = (PathConvert) antProject.createTask( "pathconvert" );
         convert.setPathSep( "," );
@@ -303,7 +303,7 @@ public class PopulateRepositoryMojo
             examinator.setPopulateDependencies( true );
             examinator.setJarFile( module );
             examinator.checkFile();
-            if ( examinator.isNetbeansModule() )
+            if ( examinator.isNetBeansModule() )
             {
                 //TODO get artifact id from the module's manifest?
                 String artifact = module.getName().substring( 0,

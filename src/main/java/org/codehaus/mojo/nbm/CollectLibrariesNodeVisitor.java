@@ -131,7 +131,7 @@ public class CollectLibrariesNodeVisitor
             }
             if ( AbstractNbmMojo.matchesLibrary( artifact, explicitLibs, depExaminator, log, useOsgiDependencies ) )
             {
-                if ( depExaminator.isNetbeansModule() )
+                if ( depExaminator.isNetBeansModule() )
                 {
                     log.warn(
                         "You are using a NetBeans Module as a Library (classpath extension): " + artifact.getId() );

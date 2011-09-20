@@ -31,7 +31,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.shared.dependency.tree.DependencyNode;
 import org.codehaus.mojo.nbm.model.Dependency;
-import org.codehaus.mojo.nbm.model.NetbeansModule;
+import org.codehaus.mojo.nbm.model.NetBeansModule;
 
 /**
  *
@@ -98,22 +98,22 @@ public class AbstractNbmMojoTest extends TestCase {
     }
 
     /**
-     * Test of resolveNetbeansDependency method, of class AbstractNbmMojo.
+     * Test of resolveNetBeansDependency method, of class AbstractNbmMojo.
      */
-    public void testResolveNetbeansDependency() {
+    public void testResolveNetBeansDependency() {
         Artifact artifact = createArtifact("group", "artifact", "1.0", "jar", "compile");
         List<Dependency> deps = new ArrayList<Dependency>();
         ExamineManifest manifest = createNonModule();
-        Dependency result = AbstractNbmMojo.resolveNetbeansDependency(artifact, deps, manifest, log);
+        Dependency result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
         assertNull("not a netbeans module", result);
 
         manifest = createModule();
-        result = AbstractNbmMojo.resolveNetbeansDependency(artifact, deps, manifest, log);
+        result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
         assertNotNull("is a netbeans module", result);
 
         artifact = createArtifact("group", "artifact", "1.0", "nbm", "compile");
         manifest = createNonModule();
-        result = AbstractNbmMojo.resolveNetbeansDependency(artifact, deps, manifest, log);
+        result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
         assertNotNull("nbm type is a netbeans module", result);
 
 
@@ -123,16 +123,16 @@ public class AbstractNbmMojoTest extends TestCase {
         d.setId("group:artifact");
         deps.add(d);
         manifest = createNonModule();
-        result = AbstractNbmMojo.resolveNetbeansDependency(artifact, deps, manifest, log);
+        result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
         assertNull("not a netbeans module, declared in deps but without explicit value", result);
 
         d.setExplicitValue("XXX > 1.0");
-        result = AbstractNbmMojo.resolveNetbeansDependency(artifact, deps, manifest, log);
+        result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
         assertEquals("not a netbeans module but declared with explicit value", result, d);
 
         d.setExplicitValue(null);
         manifest = createModule();
-        result = AbstractNbmMojo.resolveNetbeansDependency(artifact, deps, manifest, log);
+        result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
         assertEquals("netbeans module defined in descriptor", result, d);
     }
 
@@ -145,7 +145,7 @@ public class AbstractNbmMojoTest extends TestCase {
         List<Artifact> runtimes = new ArrayList<Artifact>();
         DependencyNode module = createNode("gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
         treeRoot.addChild( module );
-        NetbeansModule mdl = new NetbeansModule();
+        NetBeansModule mdl = new NetBeansModule();
         List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log, false);
         assertEquals(0, result.size());
     }
@@ -159,7 +159,7 @@ public class AbstractNbmMojoTest extends TestCase {
         List<Artifact> runtimes = new ArrayList<Artifact>();
         DependencyNode library = createNode("gr1", "ar1", "1.0", "jar", "compile", false, runtimes, examinerCache);
         treeRoot.addChild( library );
-        NetbeansModule mdl = new NetbeansModule();
+        NetBeansModule mdl = new NetBeansModule();
         List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log, false);
         assertEquals(1, result.size());
     }
@@ -176,7 +176,7 @@ public class AbstractNbmMojoTest extends TestCase {
         treeRoot.addChild( library );
         DependencyNode translibrary = createNode("gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
         library.addChild(translibrary);
-        NetbeansModule mdl = new NetbeansModule();
+        NetBeansModule mdl = new NetBeansModule();
         List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log, false);
         assertEquals(2, result.size());
     }
@@ -192,7 +192,7 @@ public class AbstractNbmMojoTest extends TestCase {
         treeRoot.addChild( module );
         DependencyNode translibrary = createNode("gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
         module.addChild(translibrary);
-        NetbeansModule mdl = new NetbeansModule();
+        NetBeansModule mdl = new NetBeansModule();
         List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log, false);
         assertEquals(0, result.size());
     }
@@ -217,7 +217,7 @@ public class AbstractNbmMojoTest extends TestCase {
         DependencyNode translibrary3 = createNode(translibrary.getArtifact(), DependencyNode.OMITTED_FOR_DUPLICATE);
         translibrary2.addChild(translibrary3);
 
-        NetbeansModule mdl = new NetbeansModule();
+        NetBeansModule mdl = new NetBeansModule();
         List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log, false);
         assertEquals(2, result.size());
         assertEquals(result.get(0).getId(), library.getArtifact().getId());
@@ -248,13 +248,13 @@ public class AbstractNbmMojoTest extends TestCase {
 
     private ExamineManifest createNonModule() {
         ExamineManifest manifest = new ExamineManifest(log);
-        manifest.setNetbeansModule(false);
+        manifest.setNetBeansModule(false);
         return manifest;
     }
 
     private ExamineManifest createModule() {
         ExamineManifest manifest = new ExamineManifest(log);
-        manifest.setNetbeansModule(true);
+        manifest.setNetBeansModule(true);
         return manifest;
     }
 }

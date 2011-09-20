@@ -36,7 +36,7 @@ import org.netbeans.nbbuild.MakeNBM.Blurb;
 import org.netbeans.nbbuild.MakeNBM.Signature;
 
 /**
- * Create the Netbeans module artifact (nbm file), part of "nbm" lifecycle/packaging.
+ * Create the NetBeans module artifact (nbm file), part of "nbm" lifecycle/packaging.
  * <p/>
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
@@ -47,7 +47,7 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
  *
  */
 public class CreateNbmMojo
-        extends CreateNetbeansFileStructure
+        extends CreateNetBeansFileStructure
         implements Contextualizable
 {
 

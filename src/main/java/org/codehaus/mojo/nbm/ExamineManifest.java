@@ -43,7 +43,7 @@ public class ExamineManifest
     private Log logger;
     private File jarFile;
     private File manifestFile;
-    private boolean netbeansModule;
+    private boolean netBeansModule;
     private boolean osgiBundle;
 
     private boolean localized;
@@ -144,7 +144,7 @@ public class ExamineManifest
 
     void resetExamination()
     {
-        setNetbeansModule( false );
+        setNetBeansModule( false );
         setLocalized( false );
         setSpecVersion( null );
         setImplVersion( null );
@@ -159,8 +159,8 @@ public class ExamineManifest
     {
         Attributes attrs = mf.getMainAttributes();
         setModule( attrs.getValue( "OpenIDE-Module" ) );
-        setNetbeansModule( getModule() != null );
-        if ( isNetbeansModule() )
+        setNetBeansModule( getModule() != null );
+        if ( isNetBeansModule() )
         {
             setLocBundle( attrs.getValue( "OpenIDE-Module-Localizing-Bundle" ) );
             setLocalized( (getLocBundle() == null ? false : true) );
@@ -320,14 +320,14 @@ public class ExamineManifest
         return classpath;
     }
 
-    public boolean isNetbeansModule()
+    public boolean isNetBeansModule()
     {
-        return netbeansModule;
+        return netBeansModule;
     }
 
-    public void setNetbeansModule( boolean netbeansModule )
+    public void setNetBeansModule( boolean netBeansModule )
     {
-        this.netbeansModule = netbeansModule;
+        this.netBeansModule = netBeansModule;
     }
 
     public boolean isLocalized()

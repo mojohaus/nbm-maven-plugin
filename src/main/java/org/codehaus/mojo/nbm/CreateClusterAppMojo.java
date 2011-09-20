@@ -58,7 +58,7 @@ import org.codehaus.plexus.util.io.InputStreamFacade;
 import org.netbeans.nbbuild.MakeListOfNBM;
 
 /**
- * Create the Netbeans module clusters/application for the 'nbm-application' packaging
+ * Create the NetBeans module clusters/application for the 'nbm-application' packaging
  * projects
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
@@ -273,7 +273,7 @@ public class CreateClusterAppMojo
                                             ExamineManifest ex  = new ExamineManifest( getLog() );
                                             ex.setJarFile( fl );
                                             ex.checkFile();
-                                            if ( ex.isNetbeansModule() )
+                                            if ( ex.isNetBeansModule() )
                                             {
                                                 makeTask.setModule( part );
                                             }

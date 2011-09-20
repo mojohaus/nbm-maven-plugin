@@ -44,7 +44,7 @@ import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.mojo.nbm.model.Dependency;
-import org.codehaus.mojo.nbm.model.NetbeansModule;
+import org.codehaus.mojo.nbm.model.NetBeansModule;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.analyzer.DefaultClassAnalyzer;
 import org.apache.maven.shared.dependency.analyzer.asm.ASMDependencyAnalyzer;
@@ -77,12 +77,12 @@ import org.codehaus.plexus.util.IOUtil;
  * @requiresDependencyResolution runtime
  * @requiresProject
  */
-public class NetbeansManifestUpdateMojo
+public class NetBeansManifestUpdateMojo
     extends AbstractNbmMojo
 {
 
     /**
-     * Netbeans module assembly build directory.
+     * NetBeans module assembly build directory.
      * directory where the the netbeans jar and nbm file get constructed.
      * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      */
@@ -163,7 +163,7 @@ public class NetbeansManifestUpdateMojo
 
     /**
      * When encountering an OSGi bundle among dependencies, the plugin will generate a direct dependency
-     * on the bundle and will not include the bundle's jar into the nbm. Will only work with Netbeans 6.9+ runtime.
+     * on the bundle and will not include the bundle's jar into the nbm. Will only work with NetBeans 6.9+ runtime.
      * Therefore it is off by default.
      * WARNING: Additionally existing applications/modules need to check modules wrapping
      * external libraries for library jars that are also OSGi bundles. Such modules will no longer include the OSGi bundles
@@ -230,7 +230,7 @@ public class NetbeansManifestUpdateMojo
     {
         //need to do this to chekc for javahelp on CP.
         super.registerNbmAntTasks();
-        NetbeansModule module;
+        NetBeansModule module;
         if ( descriptor != null && descriptor.exists() )
         {
             module = readModuleDescriptor( descriptor );
@@ -395,21 +395,21 @@ public class NetbeansManifestUpdateMojo
                     else if ( "spec".equals( type ) )
                     {
                         depToken = depExaminator.getModuleWithRelease() + " > " +
-                            ( depExaminator.isNetbeansModule() ? depExaminator.getSpecVersion() : AdaptNbVersion.adaptVersion(
+                            ( depExaminator.isNetBeansModule() ? depExaminator.getSpecVersion() : AdaptNbVersion.adaptVersion(
                             depExaminator.getSpecVersion(),
                             AdaptNbVersion.TYPE_SPECIFICATION ) );
                     }
                     else if ( "impl".equals( type ) )
                     {
                         depToken = depExaminator.getModuleWithRelease() + " = " +
-                            ( depExaminator.isNetbeansModule() ? depExaminator.getImplVersion() : AdaptNbVersion.adaptVersion(
+                            ( depExaminator.isNetBeansModule() ? depExaminator.getImplVersion() : AdaptNbVersion.adaptVersion(
                             depExaminator.getImplVersion(),
                             AdaptNbVersion.TYPE_IMPLEMENTATION ) );
                     }
                     else
                     {
                         throw new MojoExecutionException(
-                            "Wrong type of Netbeans dependency: " + type + " Allowed values are: loose, spec, impl." );
+                            "Wrong type of NetBeans dependency: " + type + " Allowed values are: loose, spec, impl." );
                     }
                 }
                 if ( depToken == null )

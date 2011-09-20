@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.StringTokenizer;
 
 /**
- *  will try to convert the maven version number to a Netbeans friendly version number.
+ *  will try to convert the maven version number to a NetBeans friendly version number.
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  *
  */

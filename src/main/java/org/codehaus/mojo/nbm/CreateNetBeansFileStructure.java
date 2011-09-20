@@ -59,24 +59,24 @@ import org.apache.tools.ant.types.PatternSet;
 import org.apache.tools.ant.util.FileUtils;
 import org.netbeans.nbbuild.CreateModuleXML;
 import org.netbeans.nbbuild.MakeListOfNBM;
-import org.codehaus.mojo.nbm.model.NetbeansModule;
+import org.codehaus.mojo.nbm.model.NetBeansModule;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.netbeans.nbbuild.JHIndexer;
 
 /**
- * Create the Netbeans module directory structure, a prerequisite for nbm creation and cluster creation.
+ * Create the NetBeans module directory structure, a prerequisite for nbm creation and cluster creation.
  * <p/>
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  *
  */
-public abstract class CreateNetbeansFileStructure
+public abstract class CreateNetBeansFileStructure
         extends AbstractNbmMojo
 {
 
     /**
-     * Netbeans module assembly build directory.
+     * NetBeans module assembly build directory.
      * directory where the the netbeans jar and nbm file get constructed.
      * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      */
@@ -100,7 +100,7 @@ public abstract class CreateNetbeansFileStructure
      */
     protected File descriptor;
     /**
-     * Netbeans module's cluster. Replaces the cluster element in module descriptor.
+     * NetBeans module's cluster. Replaces the cluster element in module descriptor.
      *
      * @parameter default-value="extra"
      * @required
@@ -195,7 +195,7 @@ public abstract class CreateNetbeansFileStructure
 
     //items used by the CreateNBMMojo.
     protected Project antProject;
-    protected NetbeansModule module;
+    protected NetBeansModule module;
     protected File clusterDir;
     protected String moduleJarName;
 
@@ -529,21 +529,19 @@ public abstract class CreateNetbeansFileStructure
         }
         catch ( IllegalArgumentException ex )
         {
-            Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
-        }
-        catch ( IllegalAccessException ex )
+            Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
+        }        catch ( IllegalAccessException ex )
         {
-            Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
+            Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
         }        catch ( NoSuchFieldException ex )
         {
-            Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
-        }
-        catch ( SecurityException ex )
+            Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
+        }        catch ( SecurityException ex )
         {
-            Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
+            Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
         }        catch ( ClassNotFoundException ex )
         {
-            Logger.getLogger( CreateNetbeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
+            Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
         }
     }
 

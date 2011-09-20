@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.io.InputStreamFacade;
 
 /**
- * Create the Netbeans module clusters from reactor
+ * Create the NetBeans module clusters from reactor
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal cluster
  * @aggregator

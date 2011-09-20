@@ -44,8 +44,8 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Taskdef;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.codehaus.mojo.nbm.model.Dependency;
-import org.codehaus.mojo.nbm.model.NetbeansModule;
-import org.codehaus.mojo.nbm.model.io.xpp3.NetbeansModuleXpp3Reader;
+import org.codehaus.mojo.nbm.model.NetBeansModule;
+import org.codehaus.mojo.nbm.model.io.xpp3.NetBeansModuleXpp3Reader;
 import org.codehaus.plexus.util.IOUtil;
 
 public abstract class AbstractNbmMojo
@@ -109,7 +109,7 @@ public abstract class AbstractNbmMojo
         {
             return false;
         }
-        if ( depExaminator.isNetbeansModule()  || (useOsgiDependencies && depExaminator.isOsgiBundle()) )
+        if ( depExaminator.isNetBeansModule()  || (useOsgiDependencies && depExaminator.isOsgiBundle()) )
         {
             //TODO I can see how someone might want to include an osgi bundle as library, not dependency.
             // I guess it won't matter much in 6.9+, in older versions it could be a problem.
@@ -120,7 +120,7 @@ public abstract class AbstractNbmMojo
         return true;
     }
 
-    static Dependency resolveNetbeansDependency( Artifact artifact, List<Dependency> deps,
+    static Dependency resolveNetBeansDependency( Artifact artifact, List<Dependency> deps,
         ExamineManifest manifest, Log log )
     {
         String artId = artifact.getArtifactId();
@@ -130,7 +130,7 @@ public abstract class AbstractNbmMojo
         {
             if ( id.equals( dep.getId() ) )
             {
-                if ( manifest.isNetbeansModule() )
+                if ( manifest.isNetBeansModule() )
                 {
                     return dep;
                 }
@@ -154,7 +154,7 @@ public abstract class AbstractNbmMojo
             log.debug( "Adding nbm module dependency - " + id );
             return dep;
         }
-        if ( manifest.isNetbeansModule() )
+        if ( manifest.isNetBeansModule() )
         {
             Dependency dep = new Dependency();
             dep.setId( id );
@@ -165,7 +165,7 @@ public abstract class AbstractNbmMojo
         return null;
     }
 
-    protected final NetbeansModule readModuleDescriptor( File descriptor )
+    protected final NetBeansModule readModuleDescriptor( File descriptor )
         throws MojoExecutionException
     {
         if ( descriptor == null )
@@ -182,8 +182,8 @@ public abstract class AbstractNbmMojo
         try
         {
             r = new FileReader( descriptor );
-            NetbeansModuleXpp3Reader reader = new NetbeansModuleXpp3Reader();
-            NetbeansModule module = reader.read( r );
+            NetBeansModuleXpp3Reader reader = new NetBeansModuleXpp3Reader();
+            NetBeansModule module = reader.read( r );
             return module;
         }
         catch ( IOException exc )
@@ -204,7 +204,7 @@ public abstract class AbstractNbmMojo
         }
     }
 
-    protected final NetbeansModule createDefaultDescriptor( MavenProject project, boolean log )
+    protected final NetBeansModule createDefaultDescriptor( MavenProject project, boolean log )
     {
 
         if ( log )
@@ -212,7 +212,7 @@ public abstract class AbstractNbmMojo
             getLog().info(
                 "No Module Descriptor defined, trying to fallback to generated values:" );
         }
-        NetbeansModule module = new NetbeansModule();
+        NetBeansModule module = new NetBeansModule();
         module.setAuthor( "Nobody" );
         module.setCluster( "maven" );
         if ( log )
@@ -236,7 +236,7 @@ public abstract class AbstractNbmMojo
         return module;
     }
 
-    static List<Artifact> getLibraryArtifacts( DependencyNode treeRoot, NetbeansModule module,
+    static List<Artifact> getLibraryArtifacts( DependencyNode treeRoot, NetBeansModule module,
         List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
         Log log, boolean useOsgiDependencies ) throws MojoExecutionException
     {
@@ -256,7 +256,7 @@ public abstract class AbstractNbmMojo
         return include;
     }
 
-    static List<ModuleWrapper> getModuleDependencyArtifacts( DependencyNode treeRoot, NetbeansModule module,
+    static List<ModuleWrapper> getModuleDependencyArtifacts( DependencyNode treeRoot, NetBeansModule module,
         MavenProject project, Map<Artifact, ExamineManifest> examinerCache,
         List<Artifact> libraryArtifacts, Log log, boolean useOsgiDependencies ) throws MojoExecutionException
     {
@@ -280,7 +280,7 @@ public abstract class AbstractNbmMojo
                     depExaminator.checkFile();
                     examinerCache.put( artifact, depExaminator );
                 }
-                Dependency dep = resolveNetbeansDependency( artifact, deps,
+                Dependency dep = resolveNetBeansDependency( artifact, deps,
                     depExaminator, log );
                 if ( dep != null )
                 {
@@ -289,7 +289,7 @@ public abstract class AbstractNbmMojo
                     wr.artifact = artifact;
                     wr.transitive = false;
                     //only direct deps matter to us..
-                    if ( depExaminator.isNetbeansModule() && artifact.getDependencyTrail().size() > 2 )
+                    if ( depExaminator.isNetBeansModule() && artifact.getDependencyTrail().size() > 2 )
                     {
                         log.debug(
                             artifact.getId() + " omitted as NetBeans module dependency, not a direct one. Declare it in the pom for inclusion." );
@@ -417,7 +417,7 @@ public abstract class AbstractNbmMojo
             }
             mnf.setJarFile( jar);
             mnf.checkFile();
-            if ( mnf.isNetbeansModule() )
+            if ( mnf.isNetBeansModule() )
             {
                 Artifact nbmArt = artifactFactory.createDependencyArtifact(
                     art.getGroupId(),

@@ -2,7 +2,7 @@
 
 <model>
     <id>nbm</id>
-    <name>NetbeansModule</name>
+    <name>NetBeansModule</name>
     <description><![CDATA[Maven's model for the netbeans module descriptor.]]></description>
     <defaults>
         <default>
@@ -12,8 +12,8 @@
     </defaults>
     <classes>
         <class rootElement="true" xml.tagName="nbm">
-            <name>NetbeansModule</name>
-            <description>Describes the layout, dependencies and packaging of a Netbeans module.</description>
+            <name>NetBeansModule</name>
+            <description>Describes the layout, dependencies and packaging of a NetBeans module.</description>
             <version>1.0.0+</version>
             <fields>
                 <field>
@@ -50,7 +50,7 @@
                 <field>
                     <name>manifest</name>
                     <version>1.0.0+</version>
-                    <description>DEPRECATED, use the plugin configuration instead. Location of the manifest file with Netbeans specific manifest entries.
+                    <description>DEPRECATED, use the plugin configuration instead. Location of the manifest file with NetBeans specific manifest entries.
                         </description>
                     <type>String</type>
                     <!--defaultValue>src/main/nbm/manifest.mf</defaultValue-->
@@ -58,7 +58,7 @@
                 <field>
                     <name>homepageUrl</name>
                     <version>1.0.0+</version>
-                    <description>Homepage URL of the module. Is accessible from Netbeans UI upon installation, should point to place with additional information about the functionality. If not defined, it defaults to POM's url element.</description>
+                    <description>Homepage URL of the module. Is accessible from NetBeans UI upon installation, should point to place with additional information about the functionality. If not defined, it defaults to POM's url element.</description>
                     <type>String</type>
                 </field>
                 <field>
