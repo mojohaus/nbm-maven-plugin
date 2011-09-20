@@ -378,7 +378,7 @@ public abstract class CreateNetBeansFileStructure
             jhTask.setExcludes( javahelpSearch );
             Path path = new Path( antProject );
             jhTask.setClassPath( path );
-            MNMMODULE51hackClearStaticFieldsInJavaHelpIndexer();
+            clearStaticFieldsInJavaHelpIndexer();
             try
             {
                 jhTask.execute();
@@ -507,7 +507,7 @@ public abstract class CreateNetBeansFileStructure
     // this is a nasty workaround for the problem.
     // alternatively we could try invoking the indexer from a separate jvm i guess,
     // ut that's more work.
-    private void MNMMODULE51hackClearStaticFieldsInJavaHelpIndexer()
+    private void clearStaticFieldsInJavaHelpIndexer() // MNBMODULE-51 hack
     {
         try
         {
