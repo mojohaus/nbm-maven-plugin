@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
 #set( $slashed = $package.replaceAll("([.])", "/") )
 OpenIDE-Module-Localizing-Bundle: $slashed/branding/Bundle.properties
+AutoUpdate-Essential-Module: true
