@@ -34,7 +34,8 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.io.InputStreamFacade;
 
 /**
- * Create the NetBeans module clusters from reactor
+ * Create the NetBeans module clusters from reactor.
+ * Semi-deprecated; used only for standalone modules and "suites".
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal cluster
  * @aggregator

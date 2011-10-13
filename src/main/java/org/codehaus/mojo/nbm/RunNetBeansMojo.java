@@ -34,6 +34,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
 /**
  * Run NetBeans IDE with additional custom module clusters, 
  * to be used in conjunction with nbm:cluster.
+ * Semi-deprecated; used only for standalone modules and "suites".
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  * @goal run-ide
  * @aggregator
