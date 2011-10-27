@@ -186,10 +186,10 @@ public class CreateClusterAppMojo
 
                 if ( art.getType().equals( "nbm-file" ) )
                 {
-                    JarFile jf = null;
+                	try {
+                    JarFile jf = new JarFile( art.getFile() );
                     try
                     {
-                        jf = new JarFile( art.getFile() );
                         String clusterName = findCluster( jf );
                         ClusterTuple cluster = processCluster( clusterName, knownClusters, nbmBuildDirFile, art );
                         if ( cluster.newer )
@@ -299,20 +299,14 @@ public class CreateClusterAppMojo
 
                         }
                     }
+                    finally
+                    {
+                        jf.close();
+                    }
+                    }
                     catch ( IOException ex )
                     {
                         getLog().error( art.getFile().getAbsolutePath(), ex );
-                    }
-                    finally
-                    {
-                        try
-                        {
-                            jf.close();
-                        }
-                        catch ( IOException ex )
-                        {
-                            getLog().error( ex );
-                        }
                     }
                 }
                 if ( useOSGiDependencies && res.isOSGiBundle() ) {
@@ -432,10 +426,7 @@ public class CreateClusterAppMojo
     /**
      * 
      * @param buildDir Directory where the platform bundle is built
-     * @param harnessDir "harness" directory of the netbeans installation
-     * @param enabledClusters The names of all enabled clusters
-     * @param defaultOptions Options for the netbeans platform to be placed in config file
-     * @param brandingToken 
+     * @param brandingToken
      * 
      * @throws java.io.IOException
      */
@@ -676,10 +667,9 @@ public class CreateClusterAppMojo
     }
 
     static CRC32 crcForFile(File inFile) throws FileNotFoundException, IOException {
-        FileInputStream inFileStream = null;
         CRC32 crc = new CRC32();
+        InputStream inFileStream = new FileInputStream(inFile);
         try {
-        inFileStream = new FileInputStream(inFile);
         byte[] array = new byte[(int) inFile.length()];
         int len = inFileStream.read(array);
         if (len != array.length) {
@@ -687,7 +677,7 @@ public class CreateClusterAppMojo
         }
         crc.update(array);
         } finally {
-            inFileStream.close();
+        	inFileStream.close();
         }
 
         return crc;
