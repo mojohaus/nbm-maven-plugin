@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -1117,31 +1118,14 @@ public class PopulateRepositoryMojo
      * @param binaryData Array containing the digest
      * @return Encoded hex string, or null if encoding failed
      */
-    private static String encode( byte[] binaryData )
+    static String encode( byte[] binaryData )
     {
-        if ( binaryData.length != 16 && binaryData.length != 20 )
+        int bitLength = binaryData.length * 8;
+        if ( bitLength != 128 && bitLength != 160 )
         {
-            int bitLength = binaryData.length * 8;
             throw new IllegalArgumentException(
                 "Unrecognised length for binary data: " + bitLength + " bits" );
         }
-
-        String retValue = "";
-
-        for ( int i = 0; i < binaryData.length; i++ )
-        {
-            String t = Integer.toHexString( binaryData[i] & 0xff );
-
-            if ( t.length() == 1 )
-            {
-                retValue += ( "0" + t );
-            }
-            else
-            {
-                retValue += t;
-            }
-        }
-
-        return retValue.trim();
+        return String.format( "%0" + bitLength / 4 + "x", new BigInteger( binaryData ) );
     }
 }

@@ -50,4 +50,12 @@ public class PopulateRepositoryMojoTest extends AbstractMojoTestCase {
         assertFalse( new File( repo, "testgrp/testarg/1.0/testarg-1.0.jar" ).isFile() );
     }
 
+    public void testEncode() throws Exception
+    {
+        assertEquals( "057558504e1d03e57ce6fd80ad983b3c2e803b40", PopulateRepositoryMojo.encode( new byte[] {
+            (byte) 0x05, (byte) 0x75, (byte) 0x58, (byte) 0x50, (byte) 0x4e, (byte) 0x1d, (byte) 0x03, (byte) 0xe5, (byte) 0x7c, (byte) 0xe6,
+            (byte) 0xfd, (byte) 0x80, (byte) 0xad, (byte) 0x98, (byte) 0x3b, (byte) 0x3c, (byte) 0x2e, (byte) 0x80, (byte) 0x3b, (byte) 0x40,
+        } ) );
+    }
+
 }
