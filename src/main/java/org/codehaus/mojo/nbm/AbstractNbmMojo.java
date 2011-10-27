@@ -457,7 +457,7 @@ public abstract class AbstractNbmMojo
         return new ArtifactResult(null, null);
     }
 
-    protected final class ArtifactResult {
+    protected static final class ArtifactResult {
         private final Artifact converted;
         private final ExamineManifest manifest;
 

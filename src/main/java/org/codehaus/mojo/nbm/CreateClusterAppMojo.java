@@ -635,7 +635,7 @@ public class CreateClusterAppMojo
         return new ClusterTuple( clusterFile, newer );
     }
 
-    private class ClusterTuple {
+    private static class ClusterTuple {
         final File location;
         final boolean newer;
 

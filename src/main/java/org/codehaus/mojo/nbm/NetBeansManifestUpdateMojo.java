@@ -614,14 +614,14 @@ public class NetBeansManifestUpdateMojo
                     }
                 }
             }
-            for ( Artifact a : moduleAllClasses.keySet() )
+            for ( Map.Entry<Artifact,Set<String>> e : moduleAllClasses.entrySet() )
             {
                 List<String> strs = new ArrayList<String>(deps);
-                if ( deps.removeAll( moduleAllClasses.get( a ) ) )
+                if ( deps.removeAll( e.getValue() ) )
                 {
-                    strs.retainAll( moduleAllClasses.get( a ) );
+                    strs.retainAll( e.getValue() );
                     getLog().info( "Private classes referenced in module: " + Arrays.toString( strs.toArray() ) );
-                    getLog().error( "Project depends on packages not accessible at runtime in module " + a.getId() );
+                    getLog().error( "Project depends on packages not accessible at runtime in module " + e.getKey().getId() );
                 }
             }
             if ( verifyRuntime.equalsIgnoreCase( FAIL ) )

@@ -55,7 +55,7 @@ public class CollectModuleLibrariesNodeVisitor
     private DependencyNode root;
 
     private Stack<String> currentModule = new Stack<String>();
-    private final String LIB_ID = "!@#$%^&ROOT";
+    private static final String LIB_ID = "!@#$%^&ROOT";
 
     private final boolean useOSGiDependencies;
 

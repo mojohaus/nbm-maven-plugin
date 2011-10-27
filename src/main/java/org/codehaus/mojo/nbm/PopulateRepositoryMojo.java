@@ -966,7 +966,7 @@ public class PopulateRepositoryMojo
         return key;
     }
 
-    private class ExternalsWrapper
+    private static class ExternalsWrapper
     {
 
         private File file;
@@ -1018,7 +1018,7 @@ public class PopulateRepositoryMojo
 
     }
 
-    private class ModuleWrapper
+    private static class ModuleWrapper
     {
 
         ExamineManifest man;
@@ -1058,7 +1058,7 @@ public class PopulateRepositoryMojo
 
         public boolean equals( Object obj )
         {
-            return getModule().equals( ( (ModuleWrapper) obj ).getModule() );
+            return obj instanceof ModuleWrapper && getModule().equals( ( (ModuleWrapper) obj ).getModule() );
         }
 
         public String getModule()
