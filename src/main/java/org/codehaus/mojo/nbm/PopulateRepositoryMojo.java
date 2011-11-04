@@ -28,6 +28,7 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,8 +62,11 @@ import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -176,7 +180,31 @@ public class PopulateRepositoryMojo
      */
     private File nexusIndexDirectory;
 
+    /**
+     * Whether to create cluster POMs in the {@code org.netbeans.cluster} group.
+     * Only meaningful when {@code forcedVersion} is defined.
+     * @parameter expression="${defineCluster}" default-value="true"
+     * @since 3.7
+     */
+    private boolean defineCluster;
 
+    /**
+     * Optional remote repository to use for inspecting remote dependencies.
+     * This may be used to populate just part of an installation,
+     * when base modules are already available in Maven format.
+     * Currently only supported when {@code forcedVersion} is defined.
+     * @parameter expression="${dependencyRepositoryUrl}"
+     * @since 3.7
+     */
+    private String dependencyRepositoryUrl;
+
+    /**
+     * Repository ID to use when inspecting remote dependencies.
+     * Only meaningful when {@code dependencyRepositoryUrl} is defined.
+     * @parameter expression="${dependencyRepositoryId}" default-value="temp"
+     * @since 3.7
+     */
+    private String dependencyRepositoryId;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
     /**
@@ -222,7 +250,16 @@ public class PopulateRepositoryMojo
      * @component
      */
     private ArtifactRepositoryFactory repositoryFactory;
-// end of component params custom code folding
+
+    /**
+     * @component
+     */
+    private ArtifactResolver artifactResolver;
+
+    /**
+     * @component
+     */
+    private ArtifactRepositoryLayout artifactRepositoryLayout;
 // </editor-fold>
 
     public void execute() throws MojoExecutionException
@@ -614,7 +651,11 @@ public class PopulateRepositoryMojo
             }
         }
 
-        if ( forcedVersion == null )
+        if ( ! defineCluster )
+        {
+            getLog().info( "Not creating cluster POMs." );
+        }
+        else if ( forcedVersion == null )
         {
             getLog().warn( "Version not specified, cannot create cluster POMs." );
         }
@@ -689,6 +730,7 @@ public class PopulateRepositoryMojo
 
     private File createMavenProject( ModuleWrapper wrapper, List<ModuleWrapper> wrapperList,
                                      List<ExternalsWrapper> externalsList, IndexSearcher searcher )
+            throws MojoExecutionException
     {
         Model mavenModel = new Model();
 
@@ -719,6 +761,45 @@ public class PopulateRepositoryMojo
                     if ( wrapper.getModuleManifest().hasPublicPackages() && !wr.getModuleManifest().hasPublicPackages() )
                     {
                         dep.setScope( "runtime" );
+                    }
+                    deps.add( dep );
+                }
+                else if ( dependencyRepositoryUrl != null )
+                {
+                    Dependency dep = new Dependency();
+                    dep.setType( "jar" );
+                    String artifactId = elem.replace( '.', '-' );
+                    dep.setArtifactId( artifactId );
+                    if ( forcedVersion == null )
+                    {
+                        throw new MojoExecutionException( "Cannot use dependencyRepositoryUrl without forcedVersion" );
+                    }
+                    dep.setVersion( forcedVersion );
+                    ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+                    List<ArtifactRepository> repos = Collections.singletonList(
+                            repositoryFactory.createArtifactRepository( dependencyRepositoryId, dependencyRepositoryUrl, artifactRepositoryLayout, policy, policy) );
+                    try
+                    {
+                        artifactResolver.resolve( artifactFactory.createBuildArtifact( "org.netbeans.api", artifactId, forcedVersion, "pom" ), repos, localRepository );
+                        dep.setGroupId( "org.netbeans.api" );
+                    }
+                    catch ( AbstractArtifactResolutionException x )
+                    {
+                        try
+                        {
+                            artifactResolver.resolve( artifactFactory.createBuildArtifact( "org.netbeans.modules", artifactId, forcedVersion, "pom" ), repos, localRepository );
+                            dep.setGroupId( "org.netbeans.modules" );
+                            if ( wrapper.getModuleManifest().hasPublicPackages() )
+                            {
+                                dep.setScope( "runtime" );
+                            }
+                        }
+                        catch ( AbstractArtifactResolutionException x2 )
+                        {
+                            getLog().warn( x2.getOriginalMessage() );
+                            throw new MojoExecutionException( "No module found for dependency '" + elem + "'", x );
+                        }
+
                     }
                     deps.add( dep );
                 }
