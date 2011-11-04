@@ -237,7 +237,7 @@ public class PopulateRepositoryMojo
                 "netbeans", deployUrl, layout, true );
         } else if (skipLocalInstall) {
             throw new MojoExecutionException(
-                    "When skipping install to local repository, one shall define the deploUrl parameter" );
+                    "When skipping install to local repository, one shall define the deployUrl parameter" );
         }
 
 
