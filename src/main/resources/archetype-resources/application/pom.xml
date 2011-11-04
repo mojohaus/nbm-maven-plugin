@@ -18,6 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide/>
         <netbeans.run.params>${D}{netbeans.run.params.ide}</netbeans.run.params>
+        <all.clusters>${D}{project.build.directory}/${D}{brandingToken}</all.clusters>
     </properties>
 
     <dependencies>
@@ -32,15 +33,14 @@
             <artifactId>${artifactId}-branding</artifactId>
             <version>${D}{project.version}</version>
         </dependency>
-        <!-- To run NbModuleSuite functional tests in src/test/java, use nbjunit (assumes RELEASE70 or later):
+        <!-- NbModuleSuite functional in RELEASE70 or later: -->
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-nbjunit</artifactId>
             <version>${D}{netbeans.version}</version>
             <scope>test</scope>
         </dependency>
-        -->
-        <!-- To use Jelly in your functional tests, add or replace with:
+        <!-- To use Jelly Tools in your functional tests, add or replace with:
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-jellytools-platform</artifactId>
@@ -56,21 +56,22 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
             </plugin>
-            <!-- To run NbModuleSuite in integration-test phase:
+            <!-- Permits NbModuleSuite to be run in integration-test phase: -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.10</version>
                 <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>cluster.path.final</name>
-                            <value>${D}{project.build.directory}/${D}{brandingToken}/${D}{brandingToken}:${D}{project.build.directory}/${D}{brandingToken}/platform</value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <all.clusters>${D}{all.clusters}</all.clusters>
+                    </systemPropertyVariables>
+                    <!-- For RELEASE70 or RELEASE701 use (adding in any other clusters imported by your app):
+                    <systemPropertyVariables>
+                        <cluster.path.final>${D}{all.clusters}/${D}{brandingToken}:${D}{all.clusters}/platform</cluster.path.final>
+                    </systemPropertyVariables>
+                    -->
                 </configuration>
             </plugin>
-            -->
         </plugins>
     </build>
 
