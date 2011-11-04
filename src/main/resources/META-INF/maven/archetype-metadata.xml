@@ -4,23 +4,15 @@
   partial="false" name="NetBeans Platform Application Archetype">
     <fileSets>
         <fileSet filtered="true">
-            <directory></directory>
-            <includes>
-                <include>profiles.xml</include>
-                <include>nbactions.xml</include>
-                <include>branding/src/main/nbm-branding/**/*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet filtered="false">
-            <directory>branding/src/main/nbm-branding</directory>
-            <includes>
-                <include>**/*.gif</include>
-            </includes>
-        </fileSet>
-        <fileSet filtered="true">
             <directory>branding</directory>
             <includes>
                 <include>pom.xml</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true">
+            <directory>branding/src/main/nbm-branding</directory>
+            <includes>
+                <include>**/*.*</include>
             </includes>
         </fileSet>
         <fileSet filtered="true" packaged="true">
