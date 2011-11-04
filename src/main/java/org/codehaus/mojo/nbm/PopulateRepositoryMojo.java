@@ -775,7 +775,7 @@ public class PopulateRepositoryMojo
                         throw new MojoExecutionException( "Cannot use dependencyRepositoryUrl without forcedVersion" );
                     }
                     dep.setVersion( forcedVersion );
-                    ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+                    ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
                     List<ArtifactRepository> repos = Collections.singletonList(
                             repositoryFactory.createArtifactRepository( dependencyRepositoryId, dependencyRepositoryUrl, artifactRepositoryLayout, policy, policy) );
                     try
