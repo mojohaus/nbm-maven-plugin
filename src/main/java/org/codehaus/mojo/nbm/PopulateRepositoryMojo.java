@@ -88,6 +88,8 @@ import org.codehaus.plexus.util.StringUtils;
  * If you are looking for an existing remote repository for netbeans artifacts, check out
  * <a href="http://bits.netbeans.org/maven2/">http://bits.netbeans.org/maven2/</a>,
  * it contains API artifacts for multiple releases.
+ * <a href="http://bits.netbeans.org/netbeans/trunk/maven-snapshot/">http://bits.netbeans.org/netbeans/trunk/maven-snapshot/</a>
+ * may also be used for <code>SNAPSHOT</code> artifacts if you wish to test development builds.
  * <p/>
  * See this <a href="repository.html">HOWTO</a> on how to generate the NetBeans binaries required
  * by this goal.
