@@ -50,7 +50,6 @@ public class ExamineManifest
     private String specVersion;
     private String implVersion;
     private String module;
-    private String moduleDeps;
     private String locBundle;
     private String classpath;
     private boolean publicPackages;
@@ -142,53 +141,56 @@ public class ExamineManifest
         }
     }
 
-    void resetExamination()
+    private void resetExamination()
     {
         setNetBeansModule( false );
-        setLocalized( false );
-        setSpecVersion( null );
-        setImplVersion( null );
-        setModule( null );
-        setModuleDeps( null );
-        setLocBundle( null );
-        setPublicPackages( false );
-        setClasspath( "" );
+        this.localized = false;
+        this.specVersion = null;
+        this.implVersion = null;
+        this.module = null;
+        this.locBundle = null;
+        this.publicPackages = false;
+        classpath = "";
     }
 
-    void processManifest( Manifest mf )
+    private void processManifest( Manifest mf )
     {
         Attributes attrs = mf.getMainAttributes();
-        setModule( attrs.getValue( "OpenIDE-Module" ) );
+        this.module = attrs.getValue( "OpenIDE-Module" );
         setNetBeansModule( getModule() != null );
         if ( isNetBeansModule() )
         {
-            setLocBundle( attrs.getValue( "OpenIDE-Module-Localizing-Bundle" ) );
-            setLocalized( (getLocBundle() == null ? false : true) );
-            setSpecVersion( attrs.getValue(
-                    "OpenIDE-Module-Specification-Version" ) );
-            setImplVersion( attrs.getValue(
-                    "OpenIDE-Module-Implementation-Version" ) );
-            setModuleDeps(
-                    attrs.getValue( "OpenIDE-Module-Module-Dependencies" ) );
+            this.locBundle = attrs.getValue( "OpenIDE-Module-Localizing-Bundle" );
+            this.localized = (locBundle == null ? false : true);
+            this.specVersion = attrs.getValue(
+                       "OpenIDE-Module-Specification-Version" );
+            this.implVersion = attrs.getValue(
+                       "OpenIDE-Module-Implementation-Version" );
             String cp = attrs.getValue( Attributes.Name.CLASS_PATH );
-            setClasspath( cp == null ? "" : cp );
+            classpath = cp == null ? "" : cp;
             String value = attrs.getValue( "OpenIDE-Module-Public-Packages" );
             String frList = attrs.getValue( "OpenIDE-Module-Friends" );
-            if (value == null || value.trim().equals( "-" ) ) {
-                setPublicPackages( false );
-            } else {
-                if ( frList != null ) {
-                    setPublicPackages( false );
-                    String[] friendList = StringUtils.stripAll( StringUtils.split( frList, ",") );
-                    setFriends( Arrays.asList( friendList ) );
-                } else
+            if (value == null || value.trim().equals( "-" ) )
+            {
+                this.publicPackages = false;
+            }
+            else
+            {
+                if ( frList != null )
                 {
-                    setPublicPackages( true );
+                    this.publicPackages = false;
+                    String[] friendList = StringUtils.stripAll( StringUtils.split( frList, ",") );
+                    friendPackages = true;
+                    friends = Arrays.asList( friendList );
+                }
+                else
+                {
+                    this.publicPackages = true;
                 }
                 String[] packageList = StringUtils.stripAll( StringUtils.split( value, ",") );
-                setPackages( Arrays.asList( packageList ) );
+                packages = Arrays.asList( packageList );
             }
-            if ( isPopulateDependencies() )
+            if ( populateDependencies )
             {
                 String deps = attrs.getValue(
                         "OpenIDE-Module-Module-Dependencies" );
@@ -215,7 +217,7 @@ public class ExamineManifest
                             depList.add( tok.trim() );
                         }
                     }
-                    setDependencyTokens( depList );
+                    this.dependencyTokens = depList;
                 }
             }
 
@@ -225,19 +227,19 @@ public class ExamineManifest
             //check osgi headers first, let nb stuff override it, making nb default
             String bndName = attrs.getValue("Bundle-SymbolicName");
             if (bndName != null) {
-                setOsgiBundle(true);
-                setModule( bndName./*MNBMODULE-125*/replaceFirst(" *;.+", "")./*MNBMODULE-96*/replace('-', '_') );
-                setSpecVersion( attrs.getValue("Bundle-Version") );
+                this.osgiBundle = true;
+                this.module = bndName./*MNBMODULE-125*/replaceFirst(" *;.+", "")./*MNBMODULE-96*/replace('-', '_');
+                this.specVersion = attrs.getValue("Bundle-Version");
                 String exp = attrs.getValue("Export-Package");
-                setPublicPackages(exp != null);
+                this.publicPackages = exp != null;
             } else {
 
                 // for non-netbeans, non-osgi jars.
-                setSpecVersion(attrs.getValue("Specification-Version"));
-                setImplVersion(attrs.getValue("Implementation-Version"));
-                setModule(attrs.getValue("Package"));
-                setPublicPackages(false);
-                setClasspath("");
+                this.specVersion = attrs.getValue("Specification-Version");
+                this.implVersion = attrs.getValue("Implementation-Version");
+                this.module = attrs.getValue("Package");
+                this.publicPackages = false;
+                classpath = "";
                 /*    if (module != null) {
                 // now we have the package to make it a module definition, add the version there..
                 module = module + "/1";
@@ -245,20 +247,11 @@ public class ExamineManifest
                  */
                 if (getModule() == null) {
                     // do we want to do that?
-                    setModule(attrs.getValue("Extension-Name"));
+                    this.module = attrs.getValue("Extension-Name");
                 }
             }
         }
 
-    }
-
-    /**
-     * Getter for property jarFile.
-     * @return Value of property jarFile.
-     */
-    public java.io.File getJarFile()
-    {
-        return jarFile;
     }
 
     /**
@@ -267,15 +260,6 @@ public class ExamineManifest
     public void setJarFile( java.io.File jarFileLoc )
     {
         jarFile = jarFileLoc;
-    }
-
-    /** Getter for property manifestFile.
-     * @return Value of property manifestFile.
-     *
-     */
-    public File getManifestFile()
-    {
-        return manifestFile;
     }
 
     /** 
@@ -310,11 +294,6 @@ public class ExamineManifest
         }
     }
 
-    public void setClasspath( String path )
-    {
-        classpath = path;
-    }
-
     public String getClasspath()
     {
         return classpath;
@@ -325,7 +304,7 @@ public class ExamineManifest
         return netBeansModule;
     }
 
-    public void setNetBeansModule( boolean netBeansModule )
+    void setNetBeansModule( boolean netBeansModule )
     {
         this.netBeansModule = netBeansModule;
     }
@@ -335,29 +314,14 @@ public class ExamineManifest
         return localized;
     }
 
-    public void setLocalized( boolean localized )
-    {
-        this.localized = localized;
-    }
-
     public String getSpecVersion()
     {
         return specVersion;
     }
 
-    public void setSpecVersion( String specVersion )
-    {
-        this.specVersion = specVersion;
-    }
-
     public String getImplVersion()
     {
         return implVersion;
-    }
-
-    public void setImplVersion( String implVersion )
-    {
-        this.implVersion = implVersion;
     }
 
     /**
@@ -377,31 +341,6 @@ public class ExamineManifest
         return module;
     }
 
-    public void setModule( String module )
-    {
-        this.module = module;
-    }
-
-    public String getModuleDeps()
-    {
-        return moduleDeps;
-    }
-
-    public void setModuleDeps( String moduleDeps )
-    {
-        this.moduleDeps = moduleDeps;
-    }
-
-    public String getLocBundle()
-    {
-        return locBundle;
-    }
-
-    public void setLocBundle( String locBundle )
-    {
-        this.locBundle = locBundle;
-    }
-
     /**
      * returns true if there are defined public packages and there is no friend
      * declaration.
@@ -410,16 +349,6 @@ public class ExamineManifest
     public boolean hasPublicPackages()
     {
         return publicPackages;
-    }
-
-    public void setPublicPackages( boolean publicPackages )
-    {
-        this.publicPackages = publicPackages;
-    }
-
-    public boolean isPopulateDependencies()
-    {
-        return populateDependencies;
     }
 
     public void setPopulateDependencies( boolean populateDependencies )
@@ -432,11 +361,6 @@ public class ExamineManifest
         return dependencyTokens;
     }
 
-    public void setDependencyTokens( List<String> dependencyTokens )
-    {
-        this.dependencyTokens = dependencyTokens;
-    }
-
     /**
      * returns true if both public packages and friend list are declared.
      * @return
@@ -446,20 +370,9 @@ public class ExamineManifest
         return friendPackages;
     }
 
-    private void setFriends( List<String> fr )
-    {
-        friendPackages = true;
-        friends = fr;
-    }
-
     public List<String> getFriends()
     {
         return friends;
-    }
-
-    private void setPackages( List<String> pack )
-    {
-        packages = pack;
     }
 
     /**
@@ -475,10 +388,6 @@ public class ExamineManifest
 
     public boolean isOsgiBundle() {
         return osgiBundle;
-    }
-
-    public void setOsgiBundle(boolean osgiBundle) {
-        this.osgiBundle = osgiBundle;
     }
 
 }
