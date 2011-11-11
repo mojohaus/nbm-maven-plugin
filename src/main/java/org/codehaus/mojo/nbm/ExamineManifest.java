@@ -232,6 +232,20 @@ public class ExamineManifest
                 this.specVersion = attrs.getValue("Bundle-Version");
                 String exp = attrs.getValue("Export-Package");
                 this.publicPackages = exp != null;
+                if ( populateDependencies )
+                {
+                    String deps = attrs.getValue( "Require-Bundle" );
+                    if ( deps != null )
+                    {
+                        List<String> depList = new ArrayList<String>();
+                        // http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
+                        for ( String piece : deps.split( ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)" ) )
+                        {
+                            depList.add( piece.trim().replaceFirst( ";.+", "" ) );
+                        }
+                        this.dependencyTokens = depList;
+                    }
+                }
             } else {
 
                 // for non-netbeans, non-osgi jars.

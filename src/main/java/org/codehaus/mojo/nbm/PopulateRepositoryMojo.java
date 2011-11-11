@@ -38,8 +38,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.lucene.document.Document;
@@ -283,6 +281,21 @@ public class PopulateRepositoryMojo
                     "When skipping install to local repository, one shall define the deployUrl parameter" );
         }
 
+        IndexSearcher searcher = null;
+        if ( nexusIndexDirectory != null && nexusIndexDirectory.exists() )
+        {
+            try
+            {
+                Directory nexusDir = FSDirectory.getDirectory( nexusIndexDirectory );
+                IndexReader nexusReader = IndexReader.open( nexusDir );
+                searcher = new IndexSearcher( nexusReader );
+                getLog().info( "Opened index with " + nexusReader.numDocs() + " documents" );
+            }
+            catch ( IOException ex )
+            {
+                getLog().error( "Could not open " + nexusIndexDirectory, ex);
+            }
+        }
 
         if ( netbeansInstallDirectory == null )
         {
@@ -347,7 +360,7 @@ public class PopulateRepositoryMojo
             examinator.setPopulateDependencies( true );
             examinator.setJarFile( module );
             examinator.checkFile();
-            if ( examinator.isNetBeansModule() )
+            if ( examinator.isNetBeansModule() || examinator.isOsgiBundle() )
             {
                 //TODO get artifact id from the module's manifest?
                 String artifact = module.getName().substring( 0,
@@ -361,8 +374,17 @@ public class PopulateRepositoryMojo
                     artifact = "org-netbeans-core-startup";
                 }
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
-                String group = examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL;
+                String group = examinator.isOsgiBundle() ? GROUP_EXTERNAL : examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL;
                 Artifact art = createArtifact( artifact, version, group );
+                if (examinator.isOsgiBundle())
+                {
+                    Dependency dep = findExternal( searcher, module );
+                    if ( dep != null )
+                    {
+                        // XXX use those coords instead of publishing this
+                        // (for now all bundles are from Orbit, which does not publish to Central, or specially built)
+                    }
+                }
                 ModuleWrapper wr = new ModuleWrapper( artifact, version, group,
                     examinator, module );
                 wr.setCluster( clust );
@@ -415,21 +437,6 @@ public class PopulateRepositoryMojo
         }
 
         List<ExternalsWrapper> externals = new ArrayList<ExternalsWrapper>();
-        IndexSearcher searcher = null;
-        if ( nexusIndexDirectory != null && nexusIndexDirectory.exists() )
-        {
-            try
-            {
-                Directory nexusDir = FSDirectory.getDirectory( nexusIndexDirectory );
-                IndexReader nexusReader = IndexReader.open( nexusDir );
-                searcher = new IndexSearcher( nexusReader );
-            }
-            catch ( IOException ex )
-            {
-                Logger.getLogger( PopulateRepositoryMojo.class.getName() ).log( Level.SEVERE, null, ex );
-            }
-
-        }
         try
         {
             for ( Map.Entry<ModuleWrapper, Artifact> elem : moduleDefinitions.entrySet())
@@ -620,7 +627,7 @@ public class PopulateRepositoryMojo
                 }
                 catch ( IOException ex )
                 {
-                    Logger.getLogger( PopulateRepositoryMojo.class.getName() ).log( Level.SEVERE, null, ex );
+                    getLog().error( ex );
                 }
             }
         }
@@ -828,52 +835,12 @@ public class PopulateRepositoryMojo
                 File f = new File( wrapper.getFile().getParentFile(), path );
                 if ( f.exists() )
                 {
-                    FileInputStream fis = null;
-                    DigestOutputStream os = null;
-                    boolean added = false;
-                    if ( searcher != null )
+                    Dependency dep = findExternal( searcher, f );
+                    if ( dep != null )
                     {
-                        try
-                        {
-                            MessageDigest shaDig = MessageDigest.getInstance(
-                                "SHA1" );
-                            fis = new FileInputStream( f );
-                            os = new DigestOutputStream( new NullOutputStream(),
-                                shaDig );
-                            IOUtil.copy( fis, os );
-                            IOUtil.close( fis );
-                            IOUtil.close( os );
-                            String sha = encode( shaDig.digest() );
-                            TermQuery q = new TermQuery( new Term( "1", sha ) );
-                            Hits hits = searcher.search( q );
-                            if ( hits.length() == 1 )
-                            {
-                                Document doc = hits.doc( 0 );
-                                Field idField = doc.getField( "u" );
-                                if ( idField != null )
-                                {
-                                    String id = idField.stringValue();
-                                    String[] splits = StringUtils.split( id, "|" );
-                                    Dependency dep = new Dependency();
-                                    dep.setArtifactId( splits[1] );
-                                    dep.setGroupId( splits[0] );
-                                    dep.setVersion( splits[2] );
-                                    dep.setType( "jar" );
-                                    if ( splits.length > 3 && !"NA".equals( splits[3] ) )
-                                    {
-                                        dep.setClassifier( splits[3] );
-                                    }
-                                    deps.add( dep );
-                                    added = true;
-                                }
-                            }
-                        }
-                        catch ( Exception x )
-                        {
-                            x.printStackTrace();
-                        }
+                        deps.add( dep );
                     }
-                    if ( !added )
+                    else
                     {
                         ExternalsWrapper ex = new ExternalsWrapper();
                         ex.setFile( f );
@@ -886,7 +853,7 @@ public class PopulateRepositoryMojo
                         ex.setArtifact( artId );
                         ex.setGroupid( GROUP_EXTERNAL );
                         externalsList.add( ex );
-                        Dependency dep = new Dependency();
+                        dep = new Dependency();
                         dep.setArtifactId( artId );
                         dep.setGroupId( GROUP_EXTERNAL );
                         dep.setVersion( wrapper.getVersion() );
@@ -929,6 +896,65 @@ public class PopulateRepositoryMojo
             }
         }
         return fil;
+    }
+
+    private Dependency findExternal( IndexSearcher searcher, File f )
+    {
+        if ( searcher == null )
+        {
+            return null;
+        }
+        try
+        {
+            MessageDigest shaDig = MessageDigest.getInstance( "SHA1" );
+            InputStream is = new FileInputStream( f );
+            try {
+                OutputStream os = new DigestOutputStream( new NullOutputStream(), shaDig );
+                IOUtil.copy( is, os );
+                os.close();
+            }
+            finally
+            {
+                is.close();
+            }
+            String sha = encode( shaDig.digest() );
+            TermQuery q = new TermQuery( new Term( "1", sha ) );
+            Hits hits = searcher.search( q );
+            if ( hits.length() == 1 )
+            {
+                Document doc = hits.doc( 0 );
+                Field idField = doc.getField( "u" );
+                if ( idField != null )
+                {
+                    String id = idField.stringValue();
+                    String[] splits = StringUtils.split( id, "|" );
+                    Dependency dep = new Dependency();
+                    dep.setArtifactId( splits[1] );
+                    dep.setGroupId( splits[0] );
+                    dep.setVersion( splits[2] );
+                    dep.setType( "jar" );
+                    if ( splits.length > 3 && !"NA".equals( splits[3] ) )
+                    {
+                        dep.setClassifier( splits[3] );
+                    }
+                    getLog().info( "found match " + splits[0] + ":" + splits[1] + ":" + splits[2] + " for " + f.getName() );
+                    return dep;
+                }
+                else
+                {
+                    getLog().error( "no idField for " + q );
+                }
+            }
+            else
+            {
+                getLog().info( "no repository match for " + f.getName() );
+            }
+        }
+        catch ( Exception x )
+        {
+            getLog().error( x );
+        }
+        return null;
     }
 
     File createExternalProject( ExternalsWrapper wrapper )
@@ -994,7 +1020,10 @@ public class PopulateRepositoryMojo
             dep.setArtifactId( wr.getArtifact() );
             dep.setGroupId( wr.getGroup() );
             dep.setVersion( wr.getVersion() );
-            dep.setType( "nbm-file" );
+            if ( wr.getModuleManifest().isNetBeansModule() )
+            {
+                dep.setType( "nbm-file" );
+            }
             deps.add( dep );
         }
         mavenModel.setDependencies( deps );
@@ -1213,6 +1242,6 @@ public class PopulateRepositoryMojo
             throw new IllegalArgumentException(
                 "Unrecognised length for binary data: " + bitLength + " bits" );
         }
-        return String.format( "%0" + bitLength / 4 + "x", new BigInteger( binaryData ) );
+        return String.format( "%0" + bitLength / 4 + "x", new BigInteger( 1, binaryData ) );
     }
 }

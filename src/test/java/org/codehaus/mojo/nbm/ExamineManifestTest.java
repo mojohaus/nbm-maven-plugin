@@ -71,6 +71,8 @@ public class ExamineManifestTest extends TestCase
         w.println( "Bundle-Version: 3.1.0" );
         w.println( "Export-Package: org.eclipse.jdt.core," );
         w.println( " org.eclipse.jdt.internal.formatter.old;x-internal:=true" );
+        w.println( "Require-Bundle: org.eclipse.equinox.registry;bundle-version=\"[3.4.0,4." );
+        w.println( " 0.0)\",org.eclipse.equinox.common;bundle-version=\"[3.2.0,4.0.0)\"" );
         w.flush();
         w.close();
         em.setManifestFile( mf );
@@ -79,6 +81,7 @@ public class ExamineManifestTest extends TestCase
         assertEquals( "org.eclipse.jdt.core", em.getModule() );
         assertEquals( "3.1.0", em.getSpecVersion() );
         assertTrue( em.hasPublicPackages() );
+        assertEquals( "[org.eclipse.equinox.registry, org.eclipse.equinox.common]", em.getDependencyTokens().toString() );
     }
 
 }
