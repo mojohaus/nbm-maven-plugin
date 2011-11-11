@@ -3,7 +3,7 @@
 <model>
     <id>nbm</id>
     <name>NetBeansModule</name>
-    <description><![CDATA[Maven's model for the netbeans module descriptor.]]></description>
+    <description><![CDATA[Maven's model for the NetBeans module descriptor.]]></description>
     <defaults>
         <default>
             <key>package</key>

@@ -8,18 +8,18 @@
 
 Upgrading from 2.4 version to 2.5
 
- There are  significant changes in how netbeans module system dependencies are mapped to maven's own 
+ There are  significant changes in how NetBeans module system dependencies are mapped to maven's own 
 dependencies model. Th 2.4 and older version all module system deps had to be explicitly defined in the module descriptor at src/main/nbm/module.xml.
 That is no longer a requirement in 2.5 for most cases. The plugin will try to decide based on the declaration
 in maven POM file. 
  
  These are the rules:
 
-    * for netbeans module dependencies (jars that have the netbeans specific entries in META-INF/MANIFEST.MF)
+    * for NetBeans module dependencies (jars that have the NetBeans specific entries in META-INF/MANIFEST.MF)
 
         * It's defined in existing (though optional) module.xml file in <dependencies> section.
 
-        * It's a direct dependency (non-transitive) and is a netbeans module.
+        * It's a direct dependency (non-transitive) and is a NetBeans module.
 
         * When the dependency is of type "nbm". Such dependencies don't include their transitive deps on compilation classpath.
 

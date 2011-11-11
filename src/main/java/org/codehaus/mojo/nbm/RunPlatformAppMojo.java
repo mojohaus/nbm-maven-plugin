@@ -47,14 +47,14 @@ public class RunPlatformAppMojo
      */
     protected String brandingToken;
     /**
-     * output directory where the the netbeans application is created.
+     * output directory where the the NetBeans application is created.
      * @parameter default-value="${project.build.directory}"
      * @required
      */
     private File outputDirectory;
 
     /**
-     * netbeans user directory for the executed instance.
+     * NetBeans user directory for the executed instance.
      * @parameter default-value="${project.build.directory}/userdir" expression="${netbeans.userdir}"
      * @required
      */

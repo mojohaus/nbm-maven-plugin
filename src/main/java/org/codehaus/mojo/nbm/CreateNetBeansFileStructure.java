@@ -77,7 +77,7 @@ public abstract class CreateNetBeansFileStructure
 
     /**
      * NetBeans module assembly build directory.
-     * directory where the the netbeans jar and nbm file get constructed.
+     * directory where the the NetBeans jar and nbm file get constructed.
      * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      */
     protected File nbmBuildDir;
@@ -94,7 +94,7 @@ public abstract class CreateNetBeansFileStructure
      */
     protected String finalName;
     /**
-     * a netbeans module descriptor containing dependency information and more..
+     * a NetBeans module descriptor containing dependency information and more..
      *
      * @parameter default-value="${basedir}/src/main/nbm/module.xml"
      */

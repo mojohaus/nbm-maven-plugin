@@ -43,7 +43,7 @@ public class CreateStandaloneMojo
      */
     protected String brandingToken;
     /**
-     * output directory where the the netbeans application will be created.
+     * output directory where the the NetBeans application will be created.
      * @parameter default-value="${project.build.directory}"
      * @required
      */

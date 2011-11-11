@@ -82,10 +82,10 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * A goal for identifying netbeans modules from the installation and populating the local
+ * A goal for identifying NetBeans modules from the installation and populating the local
  * repository with them. Optionally you can also deploy to a remote repository.
  * <p/>
- * If you are looking for an existing remote repository for netbeans artifacts, check out
+ * If you are looking for an existing remote repository for NetBeans artifacts, check out
  * <a href="http://bits.netbeans.org/maven2/">http://bits.netbeans.org/maven2/</a>,
  * it contains API artifacts for multiple releases.
  * <a href="http://bits.netbeans.org/netbeans/trunk/maven-snapshot/">http://bits.netbeans.org/netbeans/trunk/maven-snapshot/</a>
@@ -109,7 +109,7 @@ public class PopulateRepositoryMojo
 {
 
     /**
-     * an url where to deploy the netbeans artifacts. Optional, if not specified, the artifacts will be only installed
+     * an url where to deploy the NetBeans artifacts. Optional, if not specified, the artifacts will be only installed
      * in local repository, if you need to give credentials to access remote repo, the id of the server is hardwired to "netbeans".
      * @parameter expression="${deployUrl}"
      */
@@ -126,14 +126,14 @@ public class PopulateRepositoryMojo
 
 
     /**
-     * Location of netbeans installation
+     * Location of NetBeans installation
      *
      * @parameter expression="${netbeansInstallDirectory}"
      */
     protected File netbeansInstallDirectory;
 
     /**
-     * If you want to install/deploy also netbeans api javadocs, download the javadoc zip file from netbeans.org
+     * If you want to install/deploy also NetBeans api javadocs, download the javadoc zip file from netbeans.org
      * expand it to a directory, it should contain multiple zip files. Define this parameter as absolute path to the zip files folder.
      *
      * @parameter expression="${netbeansJavadocDirectory}"
@@ -266,7 +266,7 @@ public class PopulateRepositoryMojo
 
     public void execute() throws MojoExecutionException
     {
-        getLog().info( "Populate repository with netbeans modules" );
+        getLog().info( "Populate repository with NetBeans modules" );
         Project antProject = registerNbmAntTasks();
         ArtifactRepository deploymentRepository = null;
         if ( deployUrl != null )
@@ -283,7 +283,7 @@ public class PopulateRepositoryMojo
         if ( netbeansInstallDirectory == null )
         {
             Input input = (Input) antProject.createTask( "input" );
-            input.setMessage( "Please enter netbeans installation directory:" );
+            input.setMessage( "Please enter NetBeans installation directory:" );
             input.setAddproperty( "installDir" );
             try
             {

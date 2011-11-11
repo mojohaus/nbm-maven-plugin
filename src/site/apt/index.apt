@@ -9,7 +9,7 @@
 NetBeans Module plugin
 
  This m2 plugin is able to create NetBeans module(plugin) artifacts. It registers a new packaging type "nbm". Any project with
-this packaging will be automatically turned into a netbeans module project. Additionally it allows to create clusters of modules, generate
+this packaging will be automatically turned into a NetBeans module project. Additionally it allows to create clusters of modules, generate
 an autoupdate site content or build and assemble an application on top of NetBeans platform.
 
  The plugin is also capable of populating the local maven repository with module jars and NBM files from a given NetBeans installation. Useful for
@@ -56,7 +56,7 @@ For explanation why it's like this, see {{{http://blogs.codehaus.org/people/mkle
   </build>
 
  ....
-    <!-- this section is important only to access the binaries of netbeans that you use as dependencies -->
+    <!-- this section is important only to access the binaries of NetBeans that you use as dependencies -->
     <repositories>
         <repository>
             <id>netbeans</id>
@@ -94,11 +94,11 @@ add the libraries on the module's classpath and allow other modules to depend on
  The plugin walks the dependency tree to detect and identify module dependencies
 and classpath libraries.
 
-  A maven dependency is turned into a netbeans runtime dependency when:
+  A maven dependency is turned into a NetBeans runtime dependency when:
 
-    * for netbeans module dependencies (dependency jars that have the netbeans specific entries in META-INF/MANIFEST.MF)
+    * for NetBeans module dependencies (dependency jars that have the NetBeans specific entries in META-INF/MANIFEST.MF)
 
-        * It's a direct dependency (non-transitive) and is a netbeans module itself. Preferred way of declaring
+        * It's a direct dependency (non-transitive) and is a NetBeans module itself. Preferred way of declaring
 module dependencies. 
 
         * It's defined in existing (though optional) module.xml file in <dependencies> section.
@@ -210,7 +210,7 @@ for more details.
 mvn nbm:cluster
 +-------------------------------------------------------------------------------+
 
- This goal aggregates output of multiple netbeans module projects and creates one 
+ This goal aggregates output of multiple NetBeans module projects and creates one 
 or more clusters in the current project. So usually one runs this goal on the parent POM project,
 which aggregates the content of all its modules. 
 The resulting cluster structure can later be used for running the application, creating an installer or similar.

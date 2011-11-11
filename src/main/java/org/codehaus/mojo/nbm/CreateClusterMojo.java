@@ -47,7 +47,7 @@ public class CreateClusterMojo
 {
 
     /**
-     * directory where the the netbeans cluster will be created.
+     * directory where the the NetBeans cluster will be created.
      * @parameter default-value="${project.build.directory}/netbeans_clusters"
      * @required
      */

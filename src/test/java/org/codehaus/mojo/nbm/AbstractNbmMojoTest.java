@@ -105,16 +105,16 @@ public class AbstractNbmMojoTest extends TestCase {
         List<Dependency> deps = new ArrayList<Dependency>();
         ExamineManifest manifest = createNonModule();
         Dependency result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
-        assertNull("not a netbeans module", result);
+        assertNull("not a NetBeans module", result);
 
         manifest = createModule();
         result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
-        assertNotNull("is a netbeans module", result);
+        assertNotNull("is a NetBeans module", result);
 
         artifact = createArtifact("group", "artifact", "1.0", "nbm", "compile");
         manifest = createNonModule();
         result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
-        assertNotNull("nbm type is a netbeans module", result);
+        assertNotNull("nbm type is a NetBeans module", result);
 
 
         artifact = createArtifact("group", "artifact", "1.0", "jar", "compile");
@@ -124,11 +124,11 @@ public class AbstractNbmMojoTest extends TestCase {
         deps.add(d);
         manifest = createNonModule();
         result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
-        assertNull("not a netbeans module, declared in deps but without explicit value", result);
+        assertNull("not a NetBeans module, declared in deps but without explicit value", result);
 
         d.setExplicitValue("XXX > 1.0");
         result = AbstractNbmMojo.resolveNetBeansDependency(artifact, deps, manifest, log);
-        assertEquals("not a netbeans module but declared with explicit value", result, d);
+        assertEquals("not a NetBeans module but declared with explicit value", result, d);
 
         d.setExplicitValue(null);
         manifest = createModule();

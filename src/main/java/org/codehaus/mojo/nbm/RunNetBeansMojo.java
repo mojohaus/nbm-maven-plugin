@@ -46,21 +46,21 @@ public class RunNetBeansMojo
 {
 
     /**
-     * directory where the module(s)' netbeans cluster(s) are located.
+     * directory where the module(s)' NetBeans cluster(s) are located.
      * is related to nbm:cluster goal.
      * @parameter default-value="${project.build.directory}/netbeans_clusters"
      * @required
      */
     protected File clusterBuildDir;
     /**
-     * directory where the the netbeans platform/IDE installation is,
-     * denotes the root directory of netbeans installation.
+     * directory where the the NetBeans platform/IDE installation is,
+     * denotes the root directory of NetBeans installation.
      * @parameter expression="${netbeans.installation}"
      * @required
      */
     protected File netbeansInstallation;
     /**
-     * netbeans user directory for the executed instance.
+     * NetBeans user directory for the executed instance.
      * @parameter default-value="${project.build.directory}/userdir" expression="${netbeans.userdir}"
      * @required
      */

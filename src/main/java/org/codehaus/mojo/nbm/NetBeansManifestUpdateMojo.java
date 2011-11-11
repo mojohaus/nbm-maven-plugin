@@ -83,13 +83,13 @@ public class NetBeansManifestUpdateMojo
 
     /**
      * NetBeans module assembly build directory.
-     * directory where the the netbeans jar and nbm file get constructed.
+     * directory where the the NetBeans jar and nbm file get constructed.
      * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      */
     protected File nbmBuildDir;
 
     /**
-     * a netbeans module descriptor containing dependency information and more
+     * a NetBeans module descriptor containing dependency information and more
      *
      * @parameter default-value="${basedir}/src/main/nbm/module.xml"
      */
@@ -246,8 +246,8 @@ public class NetBeansManifestUpdateMojo
             moduleName = project.getGroupId() + "." + project.getArtifactId();
             moduleName = moduleName.replaceAll( "-", "." );
         }
-//<!-- if a netbeans specific manifest is defined, examine this one, otherwise the already included one.
-// ignoring the case when some of the netbeans attributes are already defined in the jar and more is included.
+//<!-- if a NetBeans specific manifest is defined, examine this one, otherwise the already included one.
+// ignoring the case when some of the NetBeans attributes are already defined in the jar and more is included.
         File specialManifest = sourceManifestFile;
         File nbmManifest = ( module.getManifest() != null ? new File(
             project.getBasedir(), module.getManifest() ) : null );
@@ -416,7 +416,7 @@ public class NetBeansManifestUpdateMojo
                 {
                     //TODO report
                     getLog().error(
-                        "Cannot properly resolve the netbeans dependency for " + dep.getId() );
+                        "Cannot properly resolve the NetBeans dependency for " + dep.getId() );
                 }
                 else
                 {

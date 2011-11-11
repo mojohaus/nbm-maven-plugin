@@ -13,7 +13,7 @@ Example nbm descriptors
 *Usual case
 
  A rather common module descriptor. Basic properties filled in, defines some libraries that ship with the module and
- declared dependencies on other netbeans modules.
+ declared dependencies on other NetBeans modules.
 
 ------
 

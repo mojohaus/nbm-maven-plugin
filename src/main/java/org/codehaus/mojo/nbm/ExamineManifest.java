@@ -33,7 +33,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * Tag examines the manifest of a jar file and retrieves netbeans specific information.
+ * Tag examines the manifest of a jar file and retrieves NetBeans specific information.
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  *
  */
