@@ -107,6 +107,10 @@ import org.codehaus.plexus.util.StringUtils;
 public class PopulateRepositoryMojo
     extends AbstractNbmMojo
 {
+    private static final String GROUP_API = "org.netbeans.api";
+    private static final String GROUP_IMPL = "org.netbeans.modules";
+    private static final String GROUP_EXTERNAL = "org.netbeans.external";
+    private static final String GROUP_CLUSTER = "org.netbeans.cluster";
 
     /**
      * an url where to deploy the NetBeans artifacts. Optional, if not specified, the artifacts will be only installed
@@ -357,7 +361,7 @@ public class PopulateRepositoryMojo
                     artifact = "org-netbeans-core-startup";
                 }
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
-                String group = "org.netbeans." + ( examinator.hasPublicPackages() ? "api" : "modules" );
+                String group = examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL;
                 Artifact art = createArtifact( artifact, version, group );
                 ModuleWrapper wr = new ModuleWrapper( artifact, version, group,
                     examinator, module );
@@ -782,15 +786,15 @@ public class PopulateRepositoryMojo
                             repositoryFactory.createArtifactRepository( dependencyRepositoryId, dependencyRepositoryUrl, artifactRepositoryLayout, policy, policy) );
                     try
                     {
-                        artifactResolver.resolve( artifactFactory.createBuildArtifact( "org.netbeans.api", artifactId, forcedVersion, "pom" ), repos, localRepository );
-                        dep.setGroupId( "org.netbeans.api" );
+                        artifactResolver.resolve( artifactFactory.createBuildArtifact( GROUP_API, artifactId, forcedVersion, "pom" ), repos, localRepository );
+                        dep.setGroupId( GROUP_API );
                     }
                     catch ( AbstractArtifactResolutionException x )
                     {
                         try
                         {
-                            artifactResolver.resolve( artifactFactory.createBuildArtifact( "org.netbeans.modules", artifactId, forcedVersion, "pom" ), repos, localRepository );
-                            dep.setGroupId( "org.netbeans.modules" );
+                            artifactResolver.resolve( artifactFactory.createBuildArtifact( GROUP_IMPL, artifactId, forcedVersion, "pom" ), repos, localRepository );
+                            dep.setGroupId( GROUP_IMPL );
                             if ( wrapper.getModuleManifest().hasPublicPackages() )
                             {
                                 dep.setScope( "runtime" );
@@ -880,11 +884,11 @@ public class PopulateRepositoryMojo
                         }
                         ex.setVersion( wrapper.getVersion() );
                         ex.setArtifact( artId );
-                        ex.setGroupid( "org.netbeans.external" );
+                        ex.setGroupid( GROUP_EXTERNAL );
                         externalsList.add( ex );
                         Dependency dep = new Dependency();
                         dep.setArtifactId( artId );
-                        dep.setGroupId( "org.netbeans.external" );
+                        dep.setGroupId( GROUP_EXTERNAL );
                         dep.setVersion( wrapper.getVersion() );
                         dep.setType( "jar" );
                         deps.add( dep );
@@ -1035,7 +1039,7 @@ public class PopulateRepositoryMojo
 
     private Artifact createClusterArtifact( String artifact, String version )
     {
-        return artifactFactory.createBuildArtifact( "org.netbeans.cluster",
+        return artifactFactory.createBuildArtifact( GROUP_CLUSTER,
             artifact, version, "pom" );
     }
 
