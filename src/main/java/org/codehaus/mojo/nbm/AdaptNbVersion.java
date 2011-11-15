@@ -19,6 +19,7 @@ package org.codehaus.mojo.nbm;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 /**
  *  will try to convert the maven version number to a NetBeans friendly version number.
@@ -32,12 +33,12 @@ public class AdaptNbVersion
     public static final String TYPE_IMPLEMENTATION = "impl"; //NOI18N
     private static final String SNAPSHOT = "SNAPSHOT"; //NOI18N
 
-    public static String adaptVersion( String version, Object type )
+    public static String adaptVersion( String version, Object type, Date date )
     {
         StringTokenizer tok = new StringTokenizer( version, "." );
         if ( SNAPSHOT.equals( version ) && TYPE_IMPLEMENTATION.equals( type ) )
         {
-            return "0.0.0." + generateSnapshotValue();
+            return "0.0.0." + generateSnapshotValue( date );
         }
         StringBuffer toReturn = new StringBuffer();
         while ( tok.hasMoreTokens() )
@@ -48,7 +49,7 @@ public class AdaptNbVersion
                 int snapshotIndex = token.indexOf( SNAPSHOT );
                 if ( snapshotIndex > 0 )
                 {
-                    String repl = token.substring( 0, snapshotIndex ) + generateSnapshotValue();
+                    String repl = token.substring( 0, snapshotIndex ) + generateSnapshotValue( date );
                     if ( token.length() > snapshotIndex + SNAPSHOT.length() )
                     {
                         repl = token.substring(
@@ -94,8 +95,10 @@ public class AdaptNbVersion
         return toReturn.toString();
     }
 
-    private static String generateSnapshotValue()
+    private static String generateSnapshotValue( Date date )
     {
-        return new SimpleDateFormat( "yyyyMMdd" ).format( new Date() );
+        SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyyMMdd" );
+        dateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+        return dateFormat.format( date );
     }
 }

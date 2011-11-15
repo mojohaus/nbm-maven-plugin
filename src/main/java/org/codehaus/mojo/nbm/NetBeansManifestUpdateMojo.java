@@ -298,16 +298,17 @@ public class NetBeansManifestUpdateMojo
         {
             manifest = new Manifest();
         }
+        Date date = new Date();
         String specVersion = AdaptNbVersion.adaptVersion( project.getVersion(),
-            AdaptNbVersion.TYPE_SPECIFICATION );
+            AdaptNbVersion.TYPE_SPECIFICATION, date );
         String implVersion = AdaptNbVersion.adaptVersion( project.getVersion(),
-            AdaptNbVersion.TYPE_IMPLEMENTATION );
+            AdaptNbVersion.TYPE_IMPLEMENTATION, date );
         Manifest.Section mainSection = manifest.getMainSection();
         conditionallyAddAttribute( mainSection,
             "OpenIDE-Module-Specification-Version", specVersion );
         conditionallyAddAttribute( mainSection,
             "OpenIDE-Module-Implementation-Version", implVersion );
-        final String timestamp = createTimestamp();
+        final String timestamp = createTimestamp( date );
         conditionallyAddAttribute( mainSection, "OpenIDE-Module-Build-Version",
             timestamp );
         String projectCNB = conditionallyAddAttribute( mainSection, "OpenIDE-Module", moduleName );
@@ -397,14 +398,14 @@ public class NetBeansManifestUpdateMojo
                         depToken = depExaminator.getModuleWithRelease() + " > " +
                             ( depExaminator.isNetBeansModule() ? depExaminator.getSpecVersion() : AdaptNbVersion.adaptVersion(
                             depExaminator.getSpecVersion(),
-                            AdaptNbVersion.TYPE_SPECIFICATION ) );
+                            AdaptNbVersion.TYPE_SPECIFICATION, date ) );
                     }
                     else if ( "impl".equals( type ) )
                     {
                         depToken = depExaminator.getModuleWithRelease() + " = " +
                             ( depExaminator.isNetBeansModule() ? depExaminator.getImplVersion() : AdaptNbVersion.adaptVersion(
                             depExaminator.getImplVersion(),
-                            AdaptNbVersion.TYPE_IMPLEMENTATION ) );
+                            AdaptNbVersion.TYPE_IMPLEMENTATION, date ) );
                     }
                     else
                     {
@@ -497,11 +498,11 @@ public class NetBeansManifestUpdateMojo
      *
      * @return timestamp represented as <code>201012292045</code>
      */
-    private String createTimestamp()
+    private static String createTimestamp( Date date )
     {
         final SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyyMMddHHmm" );
         dateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-        final String timestamp = dateFormat.format( new Date() );
+        final String timestamp = dateFormat.format( date );
         return timestamp;
     }
 
