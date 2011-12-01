@@ -564,7 +564,7 @@ public class CreateClusterAppMojo
             }
             else
             {
-                getLog().debug( "Using fallback executables shipping with the nbm-maven-plugin. (from 6.9main NetBeans Platform)" );
+                getLog().debug( "Using fallback executables bundled with the nbm-maven-plugin." );
                 writeFile( "harness/launchers/app.sh", destSh );
                 writeFile( "harness/launchers/app.exe", destExe );
             }
