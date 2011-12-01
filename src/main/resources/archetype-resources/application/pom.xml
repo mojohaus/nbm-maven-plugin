@@ -64,6 +64,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <all.clusters>${D}{all.clusters}</all.clusters>
+                        <branding.token>${D}{brandingToken}</branding.token>
                     </systemPropertyVariables>
                     <!-- For RELEASE70 or RELEASE701 use (adding in any other clusters imported by your app):
                     <systemPropertyVariables>
