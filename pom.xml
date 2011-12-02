@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.codehaus.mojo</groupId>
-        <artifactId>mojo-parent</artifactId>
-        <version>28</version>
+        <artifactId>nbm-maven</artifactId>
+        <version>1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nbm-maven-plugin</artifactId>
@@ -12,8 +12,8 @@
     <description>Maven plugin for creating NetBeans modules. It defines a custom lifecycle called "nbm". During packaging, the module JAR is enhanced with NetBeans-specific manifest entries and, along with other required files, packed into a *.nbm file, ready for distribution. Additionally the plugin provides aggregator goals to create an update site or cluster for your module projects.
     </description>
     <version>3.7-SNAPSHOT</version>
-    <inceptionYear>2005</inceptionYear>
-    <url>http://mojo.codehaus.org/nbm-maven-plugin/</url>
+     <inceptionYear>2005</inceptionYear>
+   <url>http://mojo.codehaus.org/nbm-maven-plugin/</url>
     <issueManagement>
         <system>jira</system>
         <url>http://jira.codehaus.org/browse/MNBMODULE</url>
@@ -29,9 +29,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven-plugin</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven-plugin</developerConnection>
-        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven-plugin</url>
+        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-plugin</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-plugin</developerConnection>
+        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven/nbm-maven-plugin</url>
     </scm>
     <developers>
         <developer>
@@ -112,50 +112,6 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <!-- Cannot use dependency:copy since that would require a custom repo definition, which enforcer barfs on. -->
-                                <!-- XXX but check whether MDEP-334 can work in 2.4 -->
-                                <get src="http://bits.netbeans.org/maven2/org/netbeans/modules/org-netbeans-modules-apisupport-harness/${harness.version}/org-netbeans-modules-apisupport-harness-${harness.version}.nbm" dest="${project.build.directory}/harness.nbm" skipexisting="true" />
-                                <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}/classes">
-                                    <patternset>
-                                        <include name="netbeans/etc/app.conf" />
-                                        <include name="netbeans/launchers/app.*" />
-                                    </patternset>
-                                    <mapper type="glob" from="netbeans/*" to="harness/*" />
-                                </unzip>
-                                <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}">
-                                    <patternset>
-                                        <include name="netbeans/tasks.jar.pack.gz" />
-                                        <include name="netbeans/jnlp/jnlp-launcher.jar.pack.gz" />
-                                    </patternset>
-                                    <flattenmapper />
-                                </unzip>
-                                <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/tasks.jar.pack.gz" />
-                                    <arg file="${project.build.directory}/tasks.jar" />
-                                </exec>
-                                <mkdir dir="${project.build.directory}/classes/harness/jnlp" />
-                                <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/jnlp-launcher.jar.pack.gz" />
-                                    <arg file="${project.build.directory}/classes/harness/jnlp/jnlp-launcher.jar" />
-                                </exec>
-                                <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes" />
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -182,25 +138,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <!-- Hack to make target/tasks.jar appear on classpath. process-sources goal in fact has this effect. -->
-            <id>netbeans-tasks-jar</id>
-            <activation>
-                <property>
-                    <name>netbeans.execution</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.netbeans.nbbuild</groupId>
-                    <artifactId>tasks</artifactId>
-                    <version>${harness.version}</version>
-                    <scope>system</scope>
-                    <systemPath>${project.build.directory}/tasks.jar</systemPath>
-                </dependency>
-            </dependencies>
         </profile>
         <!--profile>
             <id>toolchained</id>
@@ -338,6 +275,11 @@
             <version>2.0.05</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nbm-maven-harness</artifactId>
+            <version>RELEASE701</version>
+        </dependency>
     </dependencies>
     <reporting>
         <plugins>
@@ -352,6 +294,5 @@
     </reporting>
     <properties>
         <mojo.java.target>1.6</mojo.java.target>
-        <harness.version>RELEASE701</harness.version>
     </properties>
 </project>
