@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>nbm-maven</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <version>1</version>
+    </parent>
+    <artifactId>nbm-maven-harness</artifactId>
+    <version>RELEASE701</version>
+    <name>NBM Harness for Maven</name>
+    <scm>
+        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</developerConnection>
+        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</url>
+    </scm>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- Cannot use dependency:copy since that would require a custom repo definition, which enforcer barfs on. -->
+                                <!-- XXX but check whether MDEP-334 can work in 2.4 -->
+                                <get src="http://bits.netbeans.org/maven2/org/netbeans/modules/org-netbeans-modules-apisupport-harness/${project.version}/org-netbeans-modules-apisupport-harness-${project.version}.nbm" dest="${project.build.directory}/harness.nbm" skipexisting="true"/>
+                                <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}/classes">
+                                    <patternset>
+                                        <include name="netbeans/etc/app.conf"/>
+                                        <include name="netbeans/launchers/app.*"/>
+                                    </patternset>
+                                    <mapper type="glob" from="netbeans/*" to="harness/*"/>
+                                </unzip>
+                                <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}">
+                                    <patternset>
+                                        <include name="netbeans/tasks.jar.pack.gz"/>
+                                        <include name="netbeans/jnlp/jnlp-launcher.jar.pack.gz"/>
+                                    </patternset>
+                                    <flattenmapper/>
+                                </unzip>
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/tasks.jar.pack.gz"/>
+                                    <arg file="${project.build.directory}/tasks.jar"/>
+                                </exec>
+                                <mkdir dir="${project.build.directory}/classes/harness/jnlp"/>
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/jnlp-launcher.jar.pack.gz"/>
+                                    <arg file="${project.build.directory}/classes/harness/jnlp/jnlp-launcher.jar"/>
+                                </exec>
+                                <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- No real effect on the build, but prevents NB IDE from thinking src/main/java should be considered in preference to the JAR: -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
