@@ -125,6 +125,7 @@
                         <configuration>
                             <target>
                                 <!-- Cannot use dependency:copy since that would require a custom repo definition, which enforcer barfs on. -->
+                                <!-- XXX but check whether MDEP-334 can work in 2.4 -->
                                 <get src="http://bits.netbeans.org/maven2/org/netbeans/modules/org-netbeans-modules-apisupport-harness/${harness.version}/org-netbeans-modules-apisupport-harness-${harness.version}.nbm" dest="${project.build.directory}/harness.nbm" skipexisting="true" />
                                 <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
