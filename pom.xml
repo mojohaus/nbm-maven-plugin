@@ -19,6 +19,25 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>get</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifact>org.netbeans.modules:org-netbeans-modules-apisupport-harness:${project.version}:nbm</artifact>
+                    <transitive>false</transitive>
+                    <remoteRepositories>netbeans::default::http://bits.netbeans.org/maven2/</remoteRepositories>
+                    <destination>${project.build.directory}/harness.nbm</destination>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.6</version>
                 <executions>
@@ -29,9 +48,6 @@
                         </goals>
                         <configuration>
                             <target>
-                                <!-- Cannot use dependency:copy since that would require a custom repo definition, which enforcer barfs on. -->
-                                <!-- XXX but check whether MDEP-334 can work in 2.4 -->
-                                <get src="http://bits.netbeans.org/maven2/org/netbeans/modules/org-netbeans-modules-apisupport-harness/${project.version}/org-netbeans-modules-apisupport-harness-${project.version}.nbm" dest="${project.build.directory}/harness.nbm" skipexisting="true"/>
                                 <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
                                         <include name="netbeans/etc/app.conf"/>
