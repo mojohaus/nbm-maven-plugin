@@ -256,7 +256,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nbm-maven-harness</artifactId>
-            <version>RELEASE701</version>
+            <version>RELEASE71</version>
         </dependency>
     </dependencies>
     <reporting>
