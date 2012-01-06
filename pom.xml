@@ -8,7 +8,7 @@
         <version>1</version>
     </parent>
     <artifactId>nbm-maven-harness</artifactId>
-    <version>RELEASE701</version>
+    <version>RELEASE71</version>
     <name>NBM Harness for Maven</name>
     <scm>
         <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</connection>
