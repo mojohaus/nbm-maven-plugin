@@ -10,9 +10,9 @@ public class ApplicationTest extends NbTestCase {
     public static Test suite() {
         return NbModuleSuite.createConfiguration(ApplicationTest.class).
                 gui(false).
-                // Fails in RELEASE71-BETA but may succeed in RELEASE71: failOnMessage(Level.WARNING).
+                failOnMessage(Level.WARNING). // works at least in RELEASE71
                 failOnException(Level.INFO).
-                suite();
+                suite(); // RELEASE71+, else use NbModuleSuite.create(NbModuleSuite.createConfiguration(...))
     }
 
     public ApplicationTest(String n) {
