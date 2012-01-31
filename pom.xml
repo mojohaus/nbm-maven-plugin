@@ -115,7 +115,6 @@
           <plugin>
               <groupId>org.codehaus.mojo</groupId>
               <artifactId>animal-sniffer-maven-plugin</artifactId>
-              <version>1.7</version>
               <executions>
                   <execution>
                       <phase>package</phase>
@@ -276,17 +275,6 @@
             <version>RELEASE71</version>
         </dependency>
     </dependencies>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <targetJdk>${project.build.java.target}</targetJdk>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
     <properties>
         <mojo.java.target>1.6</mojo.java.target>
     </properties>

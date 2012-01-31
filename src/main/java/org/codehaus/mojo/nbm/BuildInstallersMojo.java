@@ -165,7 +165,9 @@ public class BuildInstallersMojo
     /**
      * Local maven repository.
      *
-     * @parameter expression="${localRepository}" @required @readonly
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
      */
     protected ArtifactRepository localRepository;
 

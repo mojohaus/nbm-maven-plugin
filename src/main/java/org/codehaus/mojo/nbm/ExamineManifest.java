@@ -358,7 +358,6 @@ public class ExamineManifest
     /**
      * returns true if there are defined public packages and there is no friend
      * declaration.
-     * @return
      */
     public boolean hasPublicPackages()
     {
@@ -377,7 +376,6 @@ public class ExamineManifest
 
     /**
      * returns true if both public packages and friend list are declared.
-     * @return
      */
     public boolean hasFriendPackages()
     {
@@ -392,8 +390,6 @@ public class ExamineManifest
     /**
      * list of package statements from OpenIDE-Module-Public-Packages.
      * All items end with .*
-     *
-     * @return
      */
     public List<String> getPackages()
     {

@@ -180,7 +180,7 @@ public abstract class CreateNetBeansFileStructure
 
     /**
      *
-     * @component role="org.apache.maven.shared.filtering.MavenResourcesFiltering" role-hint="default"
+     * @component
      * @required
      */
     protected MavenResourcesFiltering mavenResourcesFiltering;
