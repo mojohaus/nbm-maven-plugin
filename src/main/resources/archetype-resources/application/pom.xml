@@ -71,15 +71,17 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.10</version>
                 <configuration>
+#if (${netbeansVersion} == "RELEASE70" || ${netbeansVersion} == "RELEASE701")
+                    <!-- For RELEASE70 or RELEASE701 only (adding in any other clusters imported by your app); RELEASE71+ uses all.clusters directly, plus branding.token: -->
+                    <systemPropertyVariables>
+                        <cluster.path.final>${D}{all.clusters}/${D}{brandingToken}:${D}{all.clusters}/platform</cluster.path.final>
+                    </systemPropertyVariables>
+#else
                     <systemPropertyVariables>
                         <all.clusters>${D}{all.clusters}</all.clusters>
                         <branding.token>${D}{brandingToken}</branding.token>
                     </systemPropertyVariables>
-                    <!-- For RELEASE70 or RELEASE701 use (adding in any other clusters imported by your app):
-                    <systemPropertyVariables>
-                        <cluster.path.final>${D}{all.clusters}/${D}{brandingToken}:${D}{all.clusters}/platform</cluster.path.final>
-                    </systemPropertyVariables>
-                    -->
+#end
                 </configuration>
             </plugin>
         </plugins>
