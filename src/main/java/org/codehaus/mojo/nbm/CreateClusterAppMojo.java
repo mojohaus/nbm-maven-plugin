@@ -570,8 +570,7 @@ public class CreateClusterAppMojo
             }
         }
 
-        Project antProject = new Project();
-        antProject.init();
+        Project antProject = antProject();
 
         Chmod chmod = (Chmod) antProject.createTask( "chmod" );
         FileSet fs = new FileSet();

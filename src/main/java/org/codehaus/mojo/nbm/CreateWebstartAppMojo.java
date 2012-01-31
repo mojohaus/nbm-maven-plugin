@@ -31,7 +31,6 @@ import java.net.URL;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.jar.JarFile;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -64,7 +63,7 @@ import org.netbeans.nbbuild.VerifyJNLP;
  * @since 3.0
  */
 public class CreateWebstartAppMojo
-    extends AbstractMojo
+    extends AbstractNbmMojo
 {
 
     /**
@@ -202,8 +201,7 @@ public class CreateWebstartAppMojo
             throw new MojoExecutionException(
                 "This goal only makes sense on project with nbm-application packaging." );
         }
-        Project antProject = new Project();
-        antProject.init();
+        Project antProject = antProject();
 
         if ( keystore != null && keystorealias != null && keystorepassword != null )
         {

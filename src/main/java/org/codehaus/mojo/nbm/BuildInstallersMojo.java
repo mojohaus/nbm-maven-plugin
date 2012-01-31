@@ -30,7 +30,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
-import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.util.StringUtils;
@@ -137,12 +136,6 @@ public class BuildInstallersMojo
      * @parameter
      */
     private Map<String, String> userSettings;
-    /**
-     * Messages verbosity level 0 = error, 1 = warning, 2 = info, 3 = verbose, 4 = debug
-     *
-     * @parameter default-value="2"
-     */
-    private int installerVerbose;
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
     /**
      * @component
@@ -175,13 +168,7 @@ public class BuildInstallersMojo
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        Project antProject = new Project();
-        DefaultLogger consoleLogger = new DefaultLogger();
-        consoleLogger.setErrorPrintStream( System.err );
-        consoleLogger.setOutputPrintStream( System.out );
-        consoleLogger.setMessageOutputLevel( installerVerbose );
-        antProject.addBuildListener( consoleLogger );
-        antProject.init();
+        Project antProject = antProject();
 
         File nbmBuildDirFile = new File( outputDirectory, "netbeans_site" );
         if ( !nbmBuildDirFile.exists() )

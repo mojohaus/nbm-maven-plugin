@@ -40,6 +40,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.tree.DependencyNode;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
+import org.apache.tools.ant.BuildEvent;
+import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Taskdef;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -52,10 +54,77 @@ public abstract class AbstractNbmMojo
     extends AbstractMojo
 {
 
-    protected final Project registerNbmAntTasks()
+    /**
+     * Creates a project initialized with the same logger.
+     */
+    protected final Project antProject()
     {
         Project antProject = new Project();
         antProject.init();
+        antProject.addBuildListener( new BuildListener()
+        {
+            @Override
+            public void buildStarted( BuildEvent be )
+            {
+                getLog().debug( "Ant build started" );
+            }
+            @Override
+            public void buildFinished( BuildEvent be )
+            {
+                if ( be.getException() != null )
+                {
+                    getLog().error( be.getMessage(), be.getException() );
+                }
+                else
+                {
+                    getLog().debug( "Ant build finished" );
+                }
+            }
+            @Override
+            public void targetStarted( BuildEvent be )
+            {
+                getLog().info( be.getTarget().getName() + ":" );
+            }
+            @Override
+            public void targetFinished( BuildEvent be )
+            {
+                getLog().debug( be.getTarget().getName() + " finished" );
+            }
+            @Override
+            public void taskStarted( BuildEvent be )
+            {
+                getLog().debug( be.getTask().getTaskName() + " started" );
+            }
+            @Override
+            public void taskFinished( BuildEvent be )
+            {
+                getLog().debug( be.getTask().getTaskName() + " finished" );
+            }
+            @Override
+            public void messageLogged( BuildEvent be )
+            {
+                switch ( be.getPriority() )
+                {
+                    case Project.MSG_ERR:
+                        getLog().error( be.getMessage() );
+                        break;
+                    case Project.MSG_WARN:
+                        getLog().warn( be.getMessage() );
+                        break;
+                    case Project.MSG_INFO:
+                        getLog().info( be.getMessage() );
+                        break;
+                    default:
+                        getLog().debug( be.getMessage() );
+                }
+            }
+        } );
+        return antProject;
+    }
+
+    protected final Project registerNbmAntTasks()
+    {
+        Project antProject = antProject();
 
         Taskdef taskdef = (Taskdef) antProject.createTask( "taskdef" );
         taskdef.setClassname( "org.netbeans.nbbuild.MakeListOfNBM" );
