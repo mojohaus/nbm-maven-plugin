@@ -40,6 +40,15 @@
             <version>${D}{netbeans.version}</version>
             <scope>test</scope>
         </dependency>
+#if (${netbeansVersion} == "RELEASE71")
+        <!-- Cf.: https://netbeans.org/bugzilla/show_bug.cgi?id=207956 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+#end
         <!-- To use Jelly Tools in your functional tests, add or replace with:
         <dependency>
             <groupId>org.netbeans.api</groupId>
