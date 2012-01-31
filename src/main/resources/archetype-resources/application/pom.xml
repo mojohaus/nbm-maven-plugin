@@ -101,6 +101,7 @@
                                 <goals>
                                     <goal>autoupdate</goal>
                                     <goal>webstart-app</goal>
+                                    <goal>build-installers</goal>
                                 </goals>
                             </execution>
                         </executions>
