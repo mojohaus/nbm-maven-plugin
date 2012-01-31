@@ -20,7 +20,7 @@ See the {{{./populate-repository-mojo.html}nbm:populate-repository}} goal and th
 or the repository manager you are using. The repository hosts binaries of NetBeans 6.5 and later.
 If you need NetBeans 6.5 binaries with an older version of nbm-maven-plugin or older versions of NetBeans with new 3.0 nbm-maven-plugin generated metadata,
 you are encouraged to generate the repository content yourself for use with your company. See {{{./repository.html}instructions}} for details.
-For explanation why it's like this, see {{{http://blogs.codehaus.org/people/mkleint/archives/001735_nb_65_artifacts_in_a_maven_repository.html}this blog entry}}.
+For explanation why it's like this, see {{{http://netbeans.org/bugzilla/show_bug.cgi?id=202041}bug #202041}}.
 
  Also see: {{{http://wiki.netbeans.org/NetBeansDeveloperFAQ#Mavenized_Builds}Maven NBM development FAQs}}
 
