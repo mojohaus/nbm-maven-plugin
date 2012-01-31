@@ -70,7 +70,7 @@ public class BuildInstallersMojo
     /**
     * Installation directory name at the destination system
     *
-    * @parameter expression="${project.name}"
+    * @parameter expression="${netbeans.branding.token}"
     */
     protected String installDirName;
     /**
@@ -90,25 +90,25 @@ public class BuildInstallersMojo
     /**
      * Create installer for Windows
      *
-     * @parameter default-value="false"
+     * @parameter default-value="true"
      */
     private boolean installerOsWindows;
     /**
      * Create installer for Solaris
      *
-     * @parameter default-value="false"
+     * @parameter default-value="true"
      */
     private boolean installerOsSolaris;
     /**
      * Create installer for Linux
      *
-     * @parameter default-value="false"
+     * @parameter default-value="true"
      */
     private boolean installerOsLinux;
     /**
      * Create installer for MacOSx
      *
-     * @parameter default-value="false"
+     * @parameter default-value="true"
      */
     private boolean installerOsMacosx;
     /**
@@ -274,18 +274,26 @@ public class BuildInstallersMojo
         if ( this.installerOsLinux )
         {
             platforms.add( "linux" );
+            File linuxFile = new File(outputDirectory, installersFilePrefix + "-linux.sh");
+            projectHelper.attachArtifact( project, "sh", "linux", linuxFile);
         }
         if ( this.installerOsSolaris )
         {
             platforms.add( "solaris" );
+            File solarisFile = new File(outputDirectory, installersFilePrefix + "-solaris.sh");
+            projectHelper.attachArtifact( project, "sh", "solaris", solarisFile);
         }
         if ( this.installerOsWindows )
         {
             platforms.add( "windows" );
+            File windowsFile = new File(outputDirectory, installersFilePrefix + "-windows.exe");
+            projectHelper.attachArtifact( project, "exe", "windows", windowsFile);
         }
         if ( this.installerOsMacosx )
         {
             platforms.add( "macosx" );
+            File macosxFile = new File(outputDirectory, installersFilePrefix + "-macosx.tgz");
+            projectHelper.attachArtifact( project, "tgz", "macosx", macosxFile);
         }
 
         StringBuilder sb = new StringBuilder();
