@@ -14,12 +14,12 @@ an autoupdate site content or build and assemble an application on top of NetBea
 
  The plugin is also capable of populating the local maven repository with module jars and NBM files from a given NetBeans installation. Useful for
 module development, modules with public APIs are separated from those without a public API.
-See the {{{populate-repository-mojo.html}nbm:populate-repository}} goal and the {{{repository.html}HOWTO document}} for details.
+See the {{{./populate-repository-mojo.html}nbm:populate-repository}} goal and the {{{./repository.html}HOWTO document}} for details.
 
  To get access to a repository with NetBeans.org module artifacts and metadata, add {{{http://bits.netbeans.org/maven2/}http://bits.netbeans.org/maven2/}} repository to your project POM
 or the repository manager you are using. The repository hosts binaries of NetBeans 6.5 and later.
 If you need NetBeans 6.5 binaries with an older version of nbm-maven-plugin or older versions of NetBeans with new 3.0 nbm-maven-plugin generated metadata,
-you are encouraged to generate the repository content yourself for use with your company. See {{{repository.html}instructions}} for details.
+you are encouraged to generate the repository content yourself for use with your company. See {{{./repository.html}instructions}} for details.
 For explanation why it's like this, see {{{http://blogs.codehaus.org/people/mkleint/archives/001735_nb_65_artifacts_in_a_maven_repository.html}this blog entry}}.
 
  Also see: {{{http://wiki.netbeans.org/NetBeansDeveloperFAQ#Mavenized_Builds}Maven NBM development FAQs}}
@@ -118,7 +118,7 @@ given nbm module are also hidden. So you can end up with less stuff on classpath
         * It's defined in existing (though optional) module.xml file in <libraries> section. Consider this deprecated in 3.0+.
 
 
- The complete {{{nbm.html}nbm descriptor format}} documentation, and {{{descriptor.html}example descriptors}} are also available.
+ The complete {{{./nbm.html}nbm descriptor format}} documentation, and {{{./descriptor.html}example descriptors}} are also available.
 
  Additionally we perform dependency analysis in order to warn the user when runtime dependencies are wrong.
 So project's own classes and it's classpath libraries' classes are checked against the module dependencies
@@ -203,7 +203,7 @@ webstartable binaries of the applications (typically in a deployment profile):
             </plugin>
 ------
 
- See the {{{autoupdate-mojo.html}autoupdate}} and {{{webstart-app-mojo.html}webstart-app}} goals
+ See the {{{./autoupdate-mojo.html}autoupdate}} and {{{./webstart-app-mojo.html}webstart-app}} goals
 for more details.
 
 +-------------------------------------------------------------------------------+
@@ -241,7 +241,7 @@ the IDE or NetBeans platform.
 
  nbm:run-platform only makes sense to execute on projects with nbm-application packaging.
 
- For more information on plugin configuration and customization, see {{{plugin-info.html}goal documentation}}. 
+ For more information on plugin configuration and customization, see {{{./plugin-info.html}goal documentation}}.
 
 
 Public packages declaration

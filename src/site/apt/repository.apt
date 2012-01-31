@@ -10,7 +10,7 @@ HOWTO on uploading NetBeans release binaries to a Maven repository.
 
  There is a goal that converts the NetBeans module information into Maven metadata
 and is capable of uploading the module jar file, javadoc, sources and nbm files to local
-and remote repositories. See {{{populate-repository-mojo.html}populate-repository goal}} description.
+and remote repositories. See {{{./populate-repository-mojo.html}populate-repository goal}} description.
 
  For a binary-only upload (jar files and nbm files only), it's possible to download the bits from official sites. See below for URLs.
 For the complete upload, you will need to checkout the sources of the IDE/Platform you
