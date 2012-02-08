@@ -69,6 +69,13 @@
                 <role>Patch Contributor</role>
             </roles>
         </contributor>
+        <contributor>
+            <name>Frantisek Mantlik</name>
+            <email>frantisek@mantlik.cz</email>
+            <roles>
+                <role>Goal Contributor</role>
+            </roles>
+        </contributor>
     </contributors>
     <build>
         <plugins>
