@@ -5,10 +5,10 @@
     <parent>
         <artifactId>nbm-maven</artifactId>
         <groupId>org.codehaus.mojo</groupId>
-        <version>1</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>nbm-maven-harness</artifactId>
-    <version>RELEASE71</version>
+    <version>7.1-SNAPSHOT</version>
     <name>NBM Harness for Maven</name>
     <licenses>
         <license>
@@ -35,7 +35,7 @@
                             <goal>get</goal>
                         </goals>
                         <configuration>
-                            <artifact>org.netbeans.modules:org-netbeans-modules-apisupport-harness:${project.version}:nbm</artifact>
+                            <artifact>org.netbeans.modules:org-netbeans-modules-apisupport-harness:${netbeans.version}:nbm</artifact>
                             <transitive>false</transitive>
                             <remoteRepositories>${netbeans.repo}</remoteRepositories>
                             <destination>${project.build.directory}/harness.nbm</destination>
@@ -48,7 +48,7 @@
                             <goal>get</goal>
                         </goals>
                         <configuration>
-                            <artifact>org.netbeans.modules:org-netbeans-libs-nbi-ant:${project.version}:nbm</artifact>
+                            <artifact>org.netbeans.modules:org-netbeans-libs-nbi-ant:${netbeans.version}:nbm</artifact>
                             <transitive>false</transitive>
                             <remoteRepositories>${netbeans.repo}</remoteRepositories>
                             <destination>${project.build.directory}/nbi-ant.nbm</destination>
@@ -61,7 +61,7 @@
                             <goal>get</goal>
                         </goals>
                         <configuration>
-                            <artifact>org.netbeans.modules:org-netbeans-libs-nbi-engine:${project.version}:nbm</artifact>
+                            <artifact>org.netbeans.modules:org-netbeans-libs-nbi-engine:${netbeans.version}:nbm</artifact>
                             <transitive>false</transitive>
                             <remoteRepositories>${netbeans.repo}</remoteRepositories>
                             <destination>${project.build.directory}/nbi-engine.nbm</destination>
@@ -222,6 +222,7 @@
         </plugins>
     </build>
     <properties>
-        <netbeans.repo>netbeans::default::http://bits.netbeans.org/maven2/</netbeans.repo>        
+        <netbeans.repo>netbeans::default::http://bits.netbeans.org/maven2/</netbeans.repo>
+        <netbeans.version>RELEASE71</netbeans.version>
     </properties>
 </project>
