@@ -1,14 +1,13 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>nbm-maven</artifactId>
         <groupId>org.codehaus.mojo</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     <artifactId>nbm-maven-harness</artifactId>
-    <version>7.1-SNAPSHOT</version>
+    <version>7.1</version>
     <name>NBM Harness for Maven</name>
     <licenses>
         <license>
@@ -17,9 +16,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</developerConnection>
-        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</url>
+        <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nbm-maven-1.0/nbm-maven-harness</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-maven-1.0/nbm-maven-harness</developerConnection>
+        <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-maven-1.0/nbm-maven-harness</url>
     </scm>
     <build>
         <plugins>
@@ -83,64 +82,64 @@
                             <target>
                                 <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
-                                        <include name="netbeans/etc/app.conf"/>
-                                        <include name="netbeans/etc/applicationIcon.icns*"/>
-                                        <include name="netbeans/launchers/app.*"/>
+                                        <include name="netbeans/etc/app.conf" />
+                                        <include name="netbeans/etc/applicationIcon.icns*" />
+                                        <include name="netbeans/launchers/app.*" />
                                     </patternset>
-                                    <mapper type="glob" from="netbeans/*" to="harness/*"/>
+                                    <mapper type="glob" from="netbeans/*" to="harness/*" />
                                 </unzip>
                                 <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}">
                                     <patternset>
-                                        <include name="netbeans/tasks.jar.pack.gz"/>
-                                        <include name="netbeans/jnlp/jnlp-launcher.jar.pack.gz"/>
+                                        <include name="netbeans/tasks.jar.pack.gz" />
+                                        <include name="netbeans/jnlp/jnlp-launcher.jar.pack.gz" />
                                     </patternset>
-                                    <flattenmapper/>
+                                    <flattenmapper />
                                 </unzip>
                                 <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/tasks.jar.pack.gz"/>
-                                    <arg file="${project.build.directory}/tasks.jar"/>
+                                    <arg file="${project.build.directory}/tasks.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/tasks.jar" />
                                 </exec>
-                                <mkdir dir="${project.build.directory}/classes/harness/jnlp"/>
+                                <mkdir dir="${project.build.directory}/classes/harness/jnlp" />
                                 <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/jnlp-launcher.jar.pack.gz"/>
-                                    <arg file="${project.build.directory}/classes/harness/jnlp/jnlp-launcher.jar"/>
+                                    <arg file="${project.build.directory}/jnlp-launcher.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/jnlp/jnlp-launcher.jar" />
                                 </exec>
-                                <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes"/>
+                                <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes" />
                                 <unzip src="${project.build.directory}/nbi-ant.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
-                                        <include name="netbeans/modules/"/>
-                                        <include name="netbeans/nbi/"/>
+                                        <include name="netbeans/modules/" />
+                                        <include name="netbeans/nbi/" />
                                     </patternset>
-                                    <mapper type="glob" from="netbeans/*" to="harness/*"/>
+                                    <mapper type="glob" from="netbeans/*" to="harness/*" />
                                 </unzip>
                                 <unzip src="${project.build.directory}/nbi-engine.nbm" dest="${project.build.directory}/classes">
                                     <patternset>
-                                        <include name="netbeans/modules/"/>
+                                        <include name="netbeans/modules/" />
                                     </patternset>
-                                    <mapper type="glob" from="netbeans/*" to="harness/*"/>
+                                    <mapper type="glob" from="netbeans/*" to="harness/*" />
                                 </unzip>
                                 <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-ant.jar.pack.gz"/>
-                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-ant.jar"/>
+                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-ant.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-ant.jar" />
                                 </exec>
                                 <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-engine.jar.pack.gz"/>
-                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-engine.jar"/>
+                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-engine.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-engine.jar" />
                                 </exec>
                                 <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-engine.jar.pack.gz"/>
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-engine.jar"/>
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-engine.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-engine.jar" />
                                 </exec>
                                 <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-registries-management.jar.pack.gz"/>
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-registries-management.jar"/>
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-registries-management.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-registries-management.jar" />
                                 </exec>
                                 <exec executable="unpack200" failonerror="true">
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-ant-tasks.jar.pack.gz"/>
-                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-ant-tasks.jar"/>
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-ant-tasks.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-ant-tasks.jar" />
                                 </exec>
                                 <delete>
-                                    <fileset dir="${project.build.directory}/classes/harness/modules" includes="**/*.pack.gz"/>
+                                    <fileset dir="${project.build.directory}/classes/harness/modules" includes="**/*.pack.gz" />
                                 </delete>
                                 <!-- patch product.xml - unable to delete temp files after build finishes -->
                                 <replace file="${project.build.directory}/classes/harness/nbi/.common/product.xml">
@@ -148,10 +147,8 @@
                                     <replacevalue expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}" deleteonexit="true"]]></replacevalue>
                                 </replace>
                                 <!-- patch replace exec with ant task in common.xml -->
-                                <replaceregexp  file="${project.build.directory}/classes/harness/nbi/.common/common.xml"
-                                    match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" flags="s" />
-                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml"
-                                    failOnNoReplacements="true">
+                                <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" flags="s" />
+                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml" failOnNoReplacements="true">
                                     <replacetoken expandProperties="false">@EXEC@</replacetoken>
                                     <replacevalue expandProperties="false"><![CDATA[ant inheritrefs="false" 
                 dir="${cvs.dir}/${nbproject.path}">
@@ -162,16 +159,14 @@
                   <property name="custom.tasks.cls" value="${custom.tasks.cls}" />
             </ant]]></replacevalue>
                                 </replace>
-                                <replaceregexp  file="${project.build.directory}/classes/harness/nbi/.common/common.xml"
-                                    match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" flags="s" />
-                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml"
-                                    failOnNoReplacements="true">
+                                <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" flags="s" />
+                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml" failOnNoReplacements="true">
                                     <replacetoken expandProperties="false">@EXEC@</replacetoken>
                                     <replacevalue expandProperties="false"><![CDATA[condition property="nb.jdk.home.value"
                    value="${@java.home@}/.."
                    else="${@java.home@}">
                 <not>
-                    <equals arg1="Apple Inc." arg2="${java.vendor}"/>
+                    <equals arg1="Apple Inc." arg2="${java.vendor}" />
                 </not>
         </condition>
         <condition property="custom.parameter.name" value="reference.NBI_Engine.jar">
@@ -186,9 +181,8 @@
         <condition property="custom.parameter.value" value="${engine.dist.file}">
             <contains string="${nb.custom.parameter}" substring="javac.classpath" />
         </condition>
-        <echoproperties/>
-        <ant inheritRefs="false" 
-              dir="${cvs.dir}/${nbproject.path}" > 
+        <echoproperties />
+        <ant inheritRefs="false" dir="${cvs.dir}/${nbproject.path}" > 
                   <target name="clean" />
                   <target name="compile" />
                   <property name="platforms.JDK_1.5.home" value="${nb.jdk.home.value}" />
@@ -199,8 +193,7 @@
                   <property name="${custom.parameter.name}" value="${custom.parameter.value}" />
         </ant]]></replacevalue>
                                 </replace>
-                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml"
-                                    failOnNoReplacements="true" token="@java.home@" value="java.home" />
+                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml" failOnNoReplacements="true" token="@java.home@" value="java.home" />
                             </target>
                         </configuration>
                     </execution>
