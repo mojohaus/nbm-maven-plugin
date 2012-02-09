@@ -10,6 +10,12 @@
     <artifactId>nbm-maven-harness</artifactId>
     <version>RELEASE71</version>
     <name>NBM Harness for Maven</name>
+    <licenses>
+        <license>
+            <name>CDDL + GPL 2 with Classpath Exception</name>
+            <url>http://netbeans.org/cddl-gplv2.html</url>
+        </license>
+    </licenses>
     <scm>
         <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</connection>
         <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</developerConnection>
