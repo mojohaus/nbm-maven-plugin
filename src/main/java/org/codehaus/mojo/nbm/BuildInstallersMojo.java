@@ -41,9 +41,9 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
  *
- * @author Frantisek Mantlik 
- * @goal build-installers 
- * @phase package 
+ * @author Frantisek Mantlik
+ * @goal build-installers
+ * @phase package
  * @requiresDependencyResolution runtime
  * @requiresProject
  */
