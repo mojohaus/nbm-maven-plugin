@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>netbeans-platform-app-archetype</artifactId>
-  <version>1.11-SNAPSHOT</version>
+  <version>1.12-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
   <name>NetBeans Platform Application Archetype</name>
   <description>Archetype for sample application based on NetBeans Platform. Creates parent POM with branding and empty NBM project.</description>
