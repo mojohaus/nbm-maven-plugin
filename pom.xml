@@ -4,10 +4,10 @@
     <parent>
         <artifactId>nbm-maven</artifactId>
         <groupId>org.codehaus.mojo</groupId>
-        <version>1.0</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
     <artifactId>nbm-maven-harness</artifactId>
-    <version>7.1</version>
+    <version>7.2-SNAPSHOT</version>
     <name>NBM Harness for Maven</name>
     <licenses>
         <license>
@@ -16,9 +16,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nbm-maven-1.0/nbm-maven-harness</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-maven-1.0/nbm-maven-harness</developerConnection>
-        <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-maven-1.0/nbm-maven-harness</url>
+        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</developerConnection>
+        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</url>
     </scm>
     <build>
         <plugins>
