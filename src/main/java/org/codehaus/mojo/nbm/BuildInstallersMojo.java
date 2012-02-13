@@ -43,7 +43,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * Build installers for Mavenized NetBeans application.
  * Creates installers for supported operating systems
  * and packages each installer as a deployable artifact.
- * 
+ * <p>See a <a href="buildinstexample.html">how-to</a> on customizing the installer.
  * @author <a href="mailto:frantisek@mantlik.cz">Frantisek Mantlik</a>
  * @goal build-installers
  * @phase package
