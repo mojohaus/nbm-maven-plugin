@@ -40,8 +40,11 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
- *
- * @author Frantisek Mantlik
+ * Build installers for Mavenized NetBeans application.
+ * Creates installers for supported operating systems
+ * and packages each installer as a deployable artifact.
+ * 
+ * @author <a href="mailto:frantisek@mantlik.cz">Frantisek Mantlik</a>
  * @goal build-installers
  * @phase package
  * @requiresDependencyResolution runtime
@@ -124,7 +127,9 @@ public class BuildInstallersMojo
     private File installerLicenseFile;
     /**
      * Custom installer template.
-     *
+     * This file, if provided, will replace default template from
+     * &lt;NetBeansInstallation&gt;/harness/nbi/stub/template.xml
+     * 
      * @parameter
      */
     private File templateFile;
