@@ -90,7 +90,7 @@
                         <goals>
                             <goal>xpp3-reader</goal>
                             <goal>java</goal>
-                            <!--goal>xdoc</goal-->
+                            <goal>xdoc</goal>
                             <!--goal>xsd</goal-->
                         </goals>
                     </execution>
