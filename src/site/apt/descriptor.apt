@@ -8,7 +8,7 @@
 
 Example nbm descriptors
 
- These descriptors are referenced from the {{{./nbm-mojo.html}nbm:nbm}} and {{{./jar-mojo.html}nbm:jar}} mojos.
+ These descriptors are referenced from the {{{./nbm-mojo.html}nbm:nbm}} mojo.
  
 *Usual case
 

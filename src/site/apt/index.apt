@@ -135,7 +135,7 @@ There are a few prerequisites.
 
    * It works only in NetBeans 6.9 and later which support the embedding of bundles at runtime
 
-   * Add <useOSGiDependencies>true</useOSGiDependencies> configuration entry to all the modules depending on OSGi bundles.
+   * Add \<useOSGiDependencies\>true\</useOSGiDependencies\> configuration entry to all the modules depending on OSGi bundles.
      Existing applications/modules need to check modules wrapping
      external libraries for library jars that are also OSGi bundles. Such modules will no longer include the OSGi bundles
      as part of the module NBM but will include a modular dependency reference on the bundle only. Modules depending on these old wrapper modules
