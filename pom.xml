@@ -13,7 +13,7 @@
     </description>
     <version>3.8-SNAPSHOT</version>
      <inceptionYear>2005</inceptionYear>
-   <url>http://mojo.codehaus.org/nbm-maven-plugin/</url>
+   <url>http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin/</url>
     <issueManagement>
         <system>jira</system>
         <url>http://jira.codehaus.org/browse/MNBMODULE</url>
