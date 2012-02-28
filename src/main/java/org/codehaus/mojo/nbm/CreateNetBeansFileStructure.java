@@ -111,10 +111,11 @@ public abstract class CreateNetBeansFileStructure
      * itself is expected to be in the directory structure based on codenamebase of the module.
      * eg. if your codenamebase is "org.netbeans.modules.apisupport", then the actual docs
      * files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs.
-     * Obsolete as of NetBeans 7.0 with &#64;HelpSetRegistration.
+     * @deprecated Obsolete as of NetBeans 7.0 with &#64;HelpSetRegistration.
      * @parameter default-value="${basedir}/src/main/javahelp"
      * @since 2.7
      */
+    @Deprecated
     protected File nbmJavahelpSource;
     /**
      * @parameter expression="${project}"
@@ -352,6 +353,7 @@ public abstract class CreateNetBeansFileStructure
         //javahelp stuff.
         if ( nbmJavahelpSource.exists() )
         {
+            getLog().warn( "src/main/javahelp/ deprecated; use @HelpSetRegistration instead" );
             File javahelp_target = new File( buildDir, "javahelp" );
             String javahelpbase = moduleJarName.replace( '-', File.separatorChar ) + File.separator + "docs";
             String javahelpSearch = "JavaHelpSearch";
