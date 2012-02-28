@@ -319,12 +319,7 @@ public abstract class CreateNetBeansFileStructure
 
         if ( module != null )
         {
-            // copy libraries to the designated place..            
-            List<String> librList = new ArrayList<String>();
-            if ( module.getLibraries() != null )
-            {
-                librList.addAll( module.getLibraries() );
-            }
+            // copy libraries to the designated place..
             @SuppressWarnings("unchecked")
             List<Artifact> artifacts = project.getRuntimeArtifacts();
             for ( Artifact artifact : artifacts )
