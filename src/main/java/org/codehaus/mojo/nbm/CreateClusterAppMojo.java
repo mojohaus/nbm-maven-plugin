@@ -16,15 +16,8 @@
  */
 package org.codehaus.mojo.nbm;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.URL;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -43,6 +36,7 @@ import java.util.zip.ZipEntry;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -219,15 +213,23 @@ public class CreateClusterAppMojo
                                     {
                                         path = path.replace( ".jar.pack.gz", ".jar" );
                                     }
-                                    if (path.endsWith( ".external" ) )
-                                    {
-                                        throw new MojoExecutionException( "MNBMODULE-138: not yet supported to unpack " + path + " from " + art.getFile() );
-                                    }
                                     File fl = new File( nbmBuildDirFile,
                                         path.replace( "/", File.separator ) );
                                     if ( ent.isDirectory() )
                                     {
                                         fl.mkdirs();
+                                    }
+                                    else if ( path.endsWith( ".external" ) ) // MNBMODULE-138
+                                    {
+                                        InputStream is = jf.getInputStream( ent );
+                                        try
+                                        {
+                                            externalDownload( new File( fl.getParentFile(), fl.getName().replaceFirst( "[.]external$", "" ) ), is );
+                                        }
+                                        finally
+                                        {
+                                            is.close();
+                                        }
                                     }
                                     else
                                     {
@@ -623,6 +625,77 @@ public class CreateClusterAppMojo
             }
         }
         return new ClusterTuple( clusterFile, newer );
+    }
+
+    private void externalDownload( File f, InputStream is ) throws IOException
+    {
+        // Cf. org.netbeans.nbbuild.AutoUpdate
+        BufferedReader r = new BufferedReader( new InputStreamReader( is, "UTF-8" ) );
+        long crc = -1;
+        boolean found = false;
+        String line;
+        while ( ( line = r.readLine() ) != null )
+        {
+            if ( line.startsWith( "CRC:" ) )
+            {
+                crc = Long.parseLong( line.substring( 4 ).trim() );
+            }
+            else if ( line.startsWith( "URL:m2:/" ) )
+            {
+                if ( ! found )
+                {
+                    String[] coords = line.substring( 8 ).trim().split( ":" );
+                    Artifact artifact;
+                    if ( coords.length == 4 )
+                    {
+                        artifact = artifactFactory.createArtifact( coords[0], coords[1], coords[2], null, coords[3] );
+                    }
+                    else
+                    {
+                        artifact = artifactFactory.createArtifactWithClassifier( coords[0], coords[1], coords[2], coords[3], coords[4] );
+                    }
+                    try
+                    {
+                        artifactResolver.resolve( artifact, project.getRemoteArtifactRepositories(), localRepository );
+                        FileUtils.copyFile( artifact.getFile(), f );
+                        found = true;
+                    }
+                    catch ( AbstractArtifactResolutionException x )
+                    {
+                        getLog().warn( "Cannot find " + line.substring( 8 ), x);
+                    }
+                }
+            }
+            else if ( line.startsWith( "URL:" ) )
+            {
+                if ( ! found )
+                {
+                    String url = line.substring( 4 ).trim();
+                    try
+                    {
+                        // XXX use Wagon API instead
+                        FileUtils.copyURLToFile( new URL( url ), f );
+                        found = true;
+                    }
+                    catch ( IOException x )
+                    {
+                        getLog().warn( "Cannot download " + url, x);
+                    }
+                }
+            }
+            else
+            {
+                getLog().warn( "Unrecognized line: " + line );
+            }
+        }
+        if ( ! found )
+        {
+            throw new IOException( "Could not download " + f );
+        }
+        if ( crc != -1 && crc != crcForFile( f ).getValue())
+        {
+            throw new IOException( "CRC-32 of " + f + " does not match declared " + crc );
+        }
     }
 
     private static class ClusterTuple {

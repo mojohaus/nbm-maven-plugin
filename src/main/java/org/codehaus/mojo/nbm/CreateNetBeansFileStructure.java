@@ -16,12 +16,7 @@
  */
 package org.codehaus.mojo.nbm;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +26,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -39,6 +35,7 @@ import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 //import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
@@ -326,16 +323,30 @@ public abstract class CreateNetBeansFileStructure
             for ( Artifact artifact : artifacts )
             {
                 File source = artifact.getFile();
-                if ( classpathValue.contains( "ext/" + artifact.getGroupId() + "/" + source.getName() ) )
+                String name = source.getName();
+                if ( classpathValue.contains( "ext/" + artifact.getGroupId() + "/" + name ) )
                 {
                     File targetDir = new File( moduleJarLocation, "ext/" + artifact.getGroupId() );
                     targetDir.mkdirs();
-                    File target = new File( targetDir, source.getName() );
+                    File target = new File( targetDir, name );
 
                     try
                     {
                         FileUtils.getFileUtils().copyFile( source, target, null,
                                 true, false );
+                        if ( trackedInCentral( source ) ) // MNBMODULE-138
+                        {
+                            getLog().info( "Using *.external replacement for " + name );
+                            PrintWriter external = new PrintWriter( new File( targetDir, name + ".external" ), "UTF-8" );
+                            try
+                            {
+                                writeExternal( external, artifact );
+                            }
+                            finally
+                            {
+                                external.close();
+                            }
+                        }
                     } catch ( IOException ex )
                     {
                         getLog().error( "Cannot copy library jar" );
@@ -571,6 +582,52 @@ public abstract class CreateNetBeansFileStructure
             }
         }
         return false;
+    }
+
+    private static boolean trackedInCentral( File source ) throws IOException
+    {
+        // Cf. EnhancedLocalRepositoryManager, TrackingFileManager
+        File trackingFile = new File( source.getParentFile(), "_maven.repositories" );
+        if ( !trackingFile.isFile() )
+        {
+            return false;
+        }
+        InputStream is = new FileInputStream( trackingFile );
+        try
+        {
+            Properties props = new Properties();
+            props.load( is );
+            return props.containsKey( source.getName() + ">central" );
+        }
+        finally
+        {
+            is.close();
+        }
+    }
+
+    private static void writeExternal( PrintWriter w, Artifact artifact ) throws IOException
+    {
+        w.write( "CRC:" );
+        w.write( Long.toString( CreateClusterAppMojo.crcForFile( artifact.getFile() ).getValue() ) );
+        w.write( "\nURL:m2:/" );
+        w.write( artifact.getGroupId() );
+        w.write( ':' );
+        w.write( artifact.getArtifactId() );
+        w.write( ':' );
+        w.write( artifact.getVersion() );
+        w.write( ':' );
+        w.write( artifact.getType() );
+        if ( artifact.getClassifier() != null )
+        {
+            w.write( ':' );
+            w.write( artifact.getClassifier() );
+        }
+        w.write( "\nURL:" );
+        // artifact.repository is null, so cannot use its url, and anyway might be a mirror
+        w.write( /* M3: RepositorySystem.DEFAULT_REMOTE_REPO_URL + '/' */ "http://repo.maven.apache.org/maven2/" );
+        w.write( new DefaultRepositoryLayout().pathOf( artifact ) );
+        w.write( '\n' );
+        w.flush();
     }
 
 }
