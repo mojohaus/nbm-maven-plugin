@@ -266,7 +266,8 @@ public class PopulateRepositoryMojo
     private ArtifactRepositoryLayout artifactRepositoryLayout;
 // </editor-fold>
 
-    public void execute() throws MojoExecutionException
+    public void execute()
+        throws MojoExecutionException
     {
         getLog().info( "Populate repository with NetBeans modules" );
         Project antProject = registerNbmAntTasks();
@@ -276,7 +277,9 @@ public class PopulateRepositoryMojo
             ArtifactRepositoryLayout layout = new DefaultRepositoryLayout();
             deploymentRepository = repositoryFactory.createDeploymentArtifactRepository(
                 "netbeans", deployUrl, layout, true );
-        } else if (skipLocalInstall) {
+        }
+        else if ( skipLocalInstall )
+        {
             throw new MojoExecutionException(
                     "When skipping install to local repository, one shall define the deployUrl parameter" );
         }
@@ -293,7 +296,7 @@ public class PopulateRepositoryMojo
             }
             catch ( IOException ex )
             {
-                getLog().error( "Could not open " + nexusIndexDirectory, ex);
+                getLog().error( "Could not open " + nexusIndexDirectory, ex );
             }
         }
 
@@ -312,18 +315,16 @@ public class PopulateRepositoryMojo
                 throw new MojoExecutionException( e.getMessage(), e );
             }
             String prop = antProject.getProperty( "installDir" );
-            netbeansInstallDirectory = new File(prop);
+            netbeansInstallDirectory = new File( prop );
         }
 
         File rootDir = netbeansInstallDirectory;
         if ( !rootDir.exists() )
         {
             getLog().error( "NetBeans installation doesn't exist." );
-            throw new MojoExecutionException(
-                "NetBeans installation doesn't exist." );
+            throw new MojoExecutionException( "NetBeans installation doesn't exist." );
         }
-        getLog().info(
-            "Copying NetBeans artifacts from " + netbeansInstallDirectory );
+        getLog().info( "Copying NetBeans artifacts from " + netbeansInstallDirectory );
 
         PathConvert convert = (PathConvert) antProject.createTask( "pathconvert" );
         convert.setPathSep( "," );
@@ -353,8 +354,7 @@ public class PopulateRepositoryMojo
         {
             String token = tok.nextToken();
             File module = new File( token );
-            String clust = module.getAbsolutePath().substring(
-                rootDir.getAbsolutePath().length() + 1 );
+            String clust = module.getAbsolutePath().substring( rootDir.getAbsolutePath().length() + 1 );
             clust = clust.substring( 0, clust.indexOf( File.separator ) );
             ExamineManifest examinator = new ExamineManifest( getLog() );
             examinator.setPopulateDependencies( true );
@@ -363,8 +363,7 @@ public class PopulateRepositoryMojo
             if ( examinator.isNetBeansModule() || examinator.isOsgiBundle() )
             {
                 //TODO get artifact id from the module's manifest?
-                String artifact = module.getName().substring( 0,
-                    module.getName().indexOf( ".jar" ) );
+                String artifact = module.getName().substring( 0, module.getName().indexOf( ".jar" ) );
                 if ( "boot".equals( artifact ) )
                 {
                     artifact = "org-netbeans-bootstrap";
@@ -376,7 +375,7 @@ public class PopulateRepositoryMojo
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
                 String group = examinator.isOsgiBundle() ? GROUP_EXTERNAL : examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL;
                 Artifact art = createArtifact( artifact, version, group );
-                if (examinator.isOsgiBundle())
+                if ( examinator.isOsgiBundle() )
                 {
                     Dependency dep = findExternal( searcher, module );
                     if ( dep != null )
@@ -385,8 +384,7 @@ public class PopulateRepositoryMojo
                         // (for now all bundles are from Orbit, which does not publish to Central, or specially built)
                     }
                 }
-                ModuleWrapper wr = new ModuleWrapper( artifact, version, group,
-                    examinator, module );
+                ModuleWrapper wr = new ModuleWrapper( artifact, version, group, examinator, module );
                 wr.setCluster( clust );
                 moduleDefinitions.put( wr, art );
                 Collection<ModuleWrapper> col = clusters.get( clust );
@@ -439,7 +437,7 @@ public class PopulateRepositoryMojo
         List<ExternalsWrapper> externals = new ArrayList<ExternalsWrapper>();
         try
         {
-            for ( Map.Entry<ModuleWrapper, Artifact> elem : moduleDefinitions.entrySet())
+            for ( Map.Entry<ModuleWrapper, Artifact> elem : moduleDefinitions.entrySet() )
             {
                 ModuleWrapper man = elem.getKey();
                 Artifact art = elem.getValue();
@@ -456,7 +454,7 @@ public class PopulateRepositoryMojo
                     if ( zip.exists() )
                     {
                         javadoc = zip;
-                        javadocArt = createAttachedArtifact(art, javadoc, "jar", "javadoc");
+                        javadocArt = createAttachedArtifact( art, javadoc, "jar", "javadoc" );
                     }
                 }
                 File source = null;
@@ -467,7 +465,7 @@ public class PopulateRepositoryMojo
                     if ( zip.exists() )
                     {
                         source = zip;
-                        sourceArt = createAttachedArtifact(art, source, "jar", "sources");
+                        sourceArt = createAttachedArtifact( art, source, "jar", "sources" );
                     }
                 }
                 File nbm = null;
@@ -484,10 +482,11 @@ public class PopulateRepositoryMojo
                     if ( zip.exists() )
                     {
                         nbm = zip;
-                        nbmArt = createAttachedArtifact(art, nbm, "nbm-file", null);
-                        if (nbmArt.getArtifactHandler().getExtension().equals("nbm-file")) {
+                        nbmArt = createAttachedArtifact( art, nbm, "nbm-file", null );
+                        if ( nbmArt.getArtifactHandler().getExtension().equals( "nbm-file" ) )
+                        {
                             // Maven 2.x compatibility.
-                            nbmArt = createAttachedArtifact(art, nbm, "nbm", null);
+                            nbmArt = createAttachedArtifact( art, nbm, "nbm", null );
                         }
                         assert nbmArt.getArtifactHandler().getExtension().equals( "nbm" );
                     }
@@ -498,7 +497,7 @@ public class PopulateRepositoryMojo
                 {
                     try
                     {
-                        moduleJarMinusCP = File.createTempFile( man.getArtifact(), ".jar");
+                        moduleJarMinusCP = File.createTempFile( man.getArtifact(), ".jar" );
                         moduleJarMinusCP.deleteOnExit();
                         InputStream is = new FileInputStream( moduleJar );
                         try
@@ -507,7 +506,7 @@ public class PopulateRepositoryMojo
                             try
                             {
                                 JarInputStream jis = new JarInputStream( is );
-                                Manifest mani = new Manifest(jis.getManifest());
+                                Manifest mani = new Manifest( jis.getManifest() );
                                 mani.getMainAttributes().remove( Attributes.Name.CLASS_PATH );
                                 if ( !man.deps.isEmpty() )
                                 { // MNBMODULE-132
@@ -528,14 +527,14 @@ public class PopulateRepositoryMojo
                                 }
                                 JarOutputStream jos = new JarOutputStream( os, mani );
                                 JarEntry entry;
-                                while ( ( entry = jis.getNextJarEntry() ) != null)
+                                while ( ( entry = jis.getNextJarEntry() ) != null )
                                 {
                                     if ( entry.getName().matches( "META-INF/.+[.]SF" ) )
                                     {
                                         throw new IOException( "cannot handle signed JARs" );
                                     }
                                     jos.putNextEntry( entry );
-                                    byte[] buf = new byte[ (int) entry.getSize() ];
+                                    byte[] buf = new byte[(int) entry.getSize()];
                                     int read = jis.read( buf, 0, buf.length );
                                     if ( read != buf.length )
                                     {
@@ -564,49 +563,46 @@ public class PopulateRepositoryMojo
                 }
                 try
                 {
-                if ( !skipLocalInstall )
-                {
-                    install( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar, art );
-                    if ( javadoc != null )
+                    if ( !skipLocalInstall )
                     {
-                        install( javadoc, javadocArt );
-                    }
-                    if ( source != null )
-                    {
-                        install( source, sourceArt );
-                    }
-                    if ( nbm != null )
-                    {
-                        install( nbm, nbmArt );
-                    }
-                }
-                try
-                {
-                    if ( deploymentRepository != null )
-                    {
-                        artifactDeployer.deploy( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar, art,
-                            deploymentRepository, localRepository );
+                        install( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar, art );
                         if ( javadoc != null )
                         {
-                            artifactDeployer.deploy( javadoc, javadocArt,
-                                deploymentRepository, localRepository );
+                            install( javadoc, javadocArt );
                         }
                         if ( source != null )
                         {
-                            artifactDeployer.deploy( source, sourceArt,
-                                deploymentRepository, localRepository );
+                            install( source, sourceArt );
                         }
                         if ( nbm != null )
                         {
-                            artifactDeployer.deploy( nbm, nbmArt,
-                                deploymentRepository, localRepository );
+                            install( nbm, nbmArt );
                         }
                     }
-                }
-                catch ( ArtifactDeploymentException ex )
-                {
-                    throw new MojoExecutionException( "Error Deploying artifact", ex );
-                }
+                    try
+                    {
+                        if ( deploymentRepository != null )
+                        {
+                            artifactDeployer.deploy( moduleJarMinusCP != null ? moduleJarMinusCP : moduleJar, art,
+                                                     deploymentRepository, localRepository );
+                            if ( javadoc != null )
+                            {
+                                artifactDeployer.deploy( javadoc, javadocArt, deploymentRepository, localRepository );
+                            }
+                            if ( source != null )
+                            {
+                                artifactDeployer.deploy( source, sourceArt, deploymentRepository, localRepository );
+                            }
+                            if ( nbm != null )
+                            {
+                                artifactDeployer.deploy( nbm, nbmArt, deploymentRepository, localRepository );
+                            }
+                        }
+                    }
+                    catch ( ArtifactDeploymentException ex )
+                    {
+                        throw new MojoExecutionException( "Error Deploying artifact", ex );
+                    }
                 }
                 finally
                 {
@@ -637,7 +633,7 @@ public class PopulateRepositoryMojo
         {
             index = 0;
             count = externals.size();
-            for (ExternalsWrapper ex : externals)
+            for ( ExternalsWrapper ex : externals )
             {
                 Artifact art = createArtifact( ex.getArtifact(), ex.getVersion(), ex.getGroupid() );
                 index = index + 1;
@@ -674,15 +670,14 @@ public class PopulateRepositoryMojo
         }
         else
         {
-            for ( Map.Entry<String, Collection<ModuleWrapper>> elem : clusters.entrySet())
+            for ( Map.Entry<String, Collection<ModuleWrapper>> elem : clusters.entrySet() )
             {
-                String cluster = stripClusterName(elem.getKey());
+                String cluster = stripClusterName( elem.getKey() );
                 Collection<ModuleWrapper> modules = elem.getValue();
                 getLog().info( "Processing cluster " + cluster );
                 Artifact art = createClusterArtifact( cluster, forcedVersion );
                 File pom = createClusterProject( art, modules );
-                ProjectArtifactMetadata metadata = new ProjectArtifactMetadata(
-                    art, pom );
+                ProjectArtifactMetadata metadata = new ProjectArtifactMetadata( art, pom );
                 art.addMetadata( metadata );
                 if ( !skipLocalInstall )
                 {
@@ -692,21 +687,20 @@ public class PopulateRepositoryMojo
                 {
                     if ( deploymentRepository != null )
                     {
-                        artifactDeployer.deploy( pom, art, deploymentRepository,
-                            localRepository );
+                        artifactDeployer.deploy( pom, art, deploymentRepository, localRepository );
                     }
                 }
                 catch ( ArtifactDeploymentException ex )
                 {
-                    throw new MojoExecutionException( "Error Deploying artifact",
-                        ex );
+                    throw new MojoExecutionException( "Error Deploying artifact", ex );
                 }
             }
 
         }
     }
 
-    void install( File file, Artifact art ) throws MojoExecutionException
+    void install( File file, Artifact art )
+        throws MojoExecutionException
     {
         assert localRepository != null;
         try
@@ -721,7 +715,8 @@ public class PopulateRepositoryMojo
     }
 
     //performs the same tasks as the MavenProjectHelper
-    Artifact createAttachedArtifact(Artifact primary, File file, String type, String classifier) {
+    Artifact createAttachedArtifact( Artifact primary, File file, String type, String classifier )
+    {
         assert type != null;
 
         ArtifactHandler handler = null;
@@ -818,8 +813,7 @@ public class PopulateRepositoryMojo
                 }
                 else
                 {
-                    getLog().warn(
-                        "No module found for dependency '" + elem + "'" );
+                    getLog().warn( "No module found for dependency '" + elem + "'" );
                 }
             }
         }
@@ -983,7 +977,6 @@ public class PopulateRepositoryMojo
         catch ( IOException ex )
         {
             ex.printStackTrace();
-
         }
         finally
         {
@@ -1051,7 +1044,6 @@ public class PopulateRepositoryMojo
         catch ( IOException ex )
         {
             ex.printStackTrace();
-
         }
         finally
         {
@@ -1062,14 +1054,12 @@ public class PopulateRepositoryMojo
 
     Artifact createArtifact( String artifact, String version, String group )
     {
-        return artifactFactory.createBuildArtifact( group, artifact, version,
-            "jar" );
+        return artifactFactory.createBuildArtifact( group, artifact, version, "jar" );
     }
 
     private Artifact createClusterArtifact( String artifact, String version )
     {
-        return artifactFactory.createBuildArtifact( GROUP_CLUSTER,
-            artifact, version, "pom" );
+        return artifactFactory.createBuildArtifact( GROUP_CLUSTER, artifact, version, "pom" );
     }
 
     private static Pattern PATTERN_CLUSTER = Pattern.compile( "([a-zA-Z]+)[0-9\\.]*" );
@@ -1223,7 +1213,8 @@ public class PopulateRepositoryMojo
         extends OutputStream
     {
 
-        public void write( int b ) throws IOException
+        public void write( int b )
+            throws IOException
         {
         }
     }

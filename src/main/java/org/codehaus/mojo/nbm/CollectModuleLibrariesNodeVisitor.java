@@ -121,7 +121,7 @@ public class CollectModuleLibrariesNodeVisitor
                 depExaminator.checkFile();
                 examinerCache.put( artifact, depExaminator );
             }
-            if ( depExaminator.isNetBeansModule()  || (useOSGiDependencies && depExaminator.isOsgiBundle()) )
+            if ( depExaminator.isNetBeansModule() || ( useOSGiDependencies && depExaminator.isOsgiBundle() ) )
             {
                 currentModule.push( artifact.getDependencyConflictId() );
                 ArrayList<Artifact> arts = new ArrayList<Artifact>();
@@ -153,12 +153,14 @@ public class CollectModuleLibrariesNodeVisitor
                     // if a library, iterate to it's child nodes.
                     return true;
                 }
-            } else {
+            }
+            else
+            {
                 //MNBMODULE-95 we check the non-module dependencies to see if they
                 // depend on modules/bundles. these bundles are transitive, so
                 // we add the root module as the first currentModule to keep
                 //any bundle/module underneath it as transitive
-                currentModule.push( LIB_ID  + artifact.getDependencyConflictId());
+                currentModule.push( LIB_ID + artifact.getDependencyConflictId() );
             }
         }
         catch ( MojoExecutionException mojoExecutionException )
@@ -177,8 +179,9 @@ public class CollectModuleLibrariesNodeVisitor
         {
             return false;
         }
-        if ( !currentModule.empty() && (currentModule.peek().equals( node.getArtifact().getDependencyConflictId()) ||
-                currentModule.peek().equals( LIB_ID + node.getArtifact().getDependencyConflictId()) ))
+        if ( !currentModule.empty()
+            && ( currentModule.peek().equals( node.getArtifact().getDependencyConflictId() )
+                            || currentModule.peek().equals( LIB_ID + node.getArtifact().getDependencyConflictId() ) ) )
         {
             currentModule.pop();
         }
@@ -190,7 +193,8 @@ public class CollectModuleLibrariesNodeVisitor
      * @return a map of module artifact lists, key is the dependencyConflictId
      * @throws org.apache.maven.plugin.MojoExecutionException
      */
-    public Map<String, List<Artifact>> getDeclaredArtifacts() throws MojoExecutionException
+    public Map<String, List<Artifact>> getDeclaredArtifacts()
+        throws MojoExecutionException
     {
         if ( throwable != null )
         {
@@ -204,7 +208,8 @@ public class CollectModuleLibrariesNodeVisitor
      * @return a map of module artifact lists, key is the dependencyConflictId
      * @throws org.apache.maven.plugin.MojoExecutionException
      */
-    public Map<String, List<Artifact>> getTransitiveArtifacts() throws MojoExecutionException
+    public Map<String, List<Artifact>> getTransitiveArtifacts()
+        throws MojoExecutionException
     {
         if ( throwable != null )
         {
@@ -213,4 +218,3 @@ public class CollectModuleLibrariesNodeVisitor
         return transitiveNodes;
     }
 }
-

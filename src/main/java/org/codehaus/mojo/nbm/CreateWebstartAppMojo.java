@@ -194,7 +194,9 @@ public class CreateWebstartAppMojo
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
      */
-    public @Override void execute() throws MojoExecutionException, MojoFailureException
+    @Override
+    public void execute()
+        throws MojoExecutionException, MojoFailureException
     {
         if ( !"nbm-application".equals( project.getPackaging() ) )
         {
@@ -208,8 +210,7 @@ public class CreateWebstartAppMojo
             File ks = new File( keystore );
             if ( !ks.exists() )
             {
-                throw new MojoFailureException(
-                    "Cannot find keystore file at " + ks.getAbsolutePath() );
+                throw new MojoFailureException( "Cannot find keystore file at " + ks.getAbsolutePath() );
             }
             else
             {
@@ -332,8 +333,7 @@ public class CreateWebstartAppMojo
             props.setProperty( "app.title", project.getName() );
             if ( project.getOrganization() != null )
             {
-                props.setProperty( "app.vendor",
-                    project.getOrganization().getName() );
+                props.setProperty( "app.vendor", project.getOrganization().getName() );
             }
             else
             {
@@ -407,14 +407,14 @@ public class CreateWebstartAppMojo
                     brandRefs.append( "    <jar href=\'branding/" ).append( dest.getName() ).append( "\'/>\n" );
                 }
 
-                signTask = (SignJar)antProject.createTask("signjar");
-                signTask.setKeystore(keystore);
-                signTask.setStorepass(keystorepassword);
-                signTask.setAlias(keystorealias);
+                signTask = (SignJar) antProject.createTask( "signjar" );
+                signTask.setKeystore( keystore );
+                signTask.setStorepass( keystorepassword );
+                signTask.setAlias( keystorealias );
                 FileSet set = new FileSet();
-                set.setDir(brandingDir);
-                set.setIncludes("*.jar");
-                signTask.addFileset(set);
+                set.setDir( brandingDir );
+                set.setIncludes( "*.jar" );
+                signTask.addFileset( set );
                 signTask.execute();
             }
 
@@ -448,7 +448,8 @@ public class CreateWebstartAppMojo
                 archiver.addDirectory( webstartBuildDir, null, new String[] { "**/*.jnlp" } );
                 for ( final File jnlp : webstartBuildDir.listFiles() )
                 {
-                    if ( ! jnlp.getName().endsWith( ".jnlp") ) {
+                    if ( !jnlp.getName().endsWith( ".jnlp" ) )
+                    {
                         continue;
                     }
                     archiver.addResource( new PlexusIoResource() {
@@ -493,7 +494,8 @@ public class CreateWebstartAppMojo
             {
                 servlet = new File( jdkhome.getParentFile(), "sample/jnlp/servlet/jnlp-servlet.jar" );
             }
-            if ( servlet.isFile() ) {
+            if ( servlet.isFile() )
+            {
                 archiver.addFile( servlet, "WEB-INF/lib/jnlp-servlet.jar" );
                 archiver.addResource( new PlexusIoResource() {
                     public @Override InputStream getContents() throws IOException
@@ -510,62 +512,59 @@ public class CreateWebstartAppMojo
                             "    </servlet-mapping>\n" +
                             "</web-app>\n" ).getBytes() );
                     }
-                        public @Override long getLastModified()
-                        {
-                            return UNKNOWN_MODIFICATION_DATE;
-                        }
-                        public @Override boolean isExisting()
-                        {
-                            return true;
-                        }
-                        public @Override long getSize()
-                        {
-                            return UNKNOWN_RESOURCE_SIZE;
-                        }
-                        public @Override URL getURL() throws IOException
-                        {
-                            return null;
-                        }
-                        public @Override String getName()
-                        {
-                            return "web.xml";
-                        }
-                        public @Override boolean isFile()
-                        {
-                            return true;
-                        }
-                        public @Override boolean isDirectory()
-                        {
-                            return false;
-                        }
+                    public @Override long getLastModified()
+                    {
+                        return UNKNOWN_MODIFICATION_DATE;
+                    }
+                    public @Override boolean isExisting()
+                    {
+                        return true;
+                    }
+                    public @Override long getSize()
+                    {
+                        return UNKNOWN_RESOURCE_SIZE;
+                    }
+                    public @Override URL getURL() throws IOException
+                    {
+                        return null;
+                    }
+                    public @Override String getName()
+                    {
+                        return "web.xml";
+                    }
+                    public @Override boolean isFile()
+                    {
+                        return true;
+                    }
+                    public @Override boolean isDirectory()
+                    {
+                        return false;
+                    }
                 }, "WEB-INF/web.xml", archiver.getDefaultFileMode() );
             }
             archiver.setDestFile( destinationFile );
             archiver.createArchive();
 
             // attach standalone so that it gets installed/deployed
-            projectHelper.attachArtifact( project, "war", webstartClassifier,
-                destinationFile );
+            projectHelper.attachArtifact( project, "war", webstartClassifier, destinationFile );
 
         }
         catch ( Exception ex )
         {
             throw new MojoExecutionException( "Error creating webstartable binary.", ex );
         }
-
-
     }
 
     /**
      * @param standaloneBuildDir
      * @return The name of the jnlp-launcher jarfile in the build directory
      */
-    private File copyLauncher( File standaloneBuildDir, File builtInstallation ) throws IOException
+    private File copyLauncher( File standaloneBuildDir, File builtInstallation )
+        throws IOException
     {
-        File jnlpStarter = new File( builtInstallation.getAbsolutePath() +
-            File.separator + "harness" +
-            File.separator + "jnlp" +
-            File.separator + "jnlp-launcher.jar" );
+        File jnlpStarter =
+            new File( builtInstallation.getAbsolutePath() + File.separator + "harness" + File.separator + "jnlp"
+                + File.separator + "jnlp-launcher.jar" );
         // buffer so it isn't reading a byte at a time!
         InputStream source = null;
         FileOutputStream outstream = null;
@@ -609,18 +608,15 @@ public class CreateWebstartAppMojo
             }
             else
             {
-                instream = getClass().getClassLoader().getResourceAsStream(
-                    resourcePath );
+                instream = getClass().getClassLoader().getResourceAsStream( resourcePath );
             }
             FileOutputStream outstream = new FileOutputStream( destinationFile );
 
-            source = new BufferedReader( new InputStreamReader( instream,
-                "UTF-8" ) );
+            source = new BufferedReader( new InputStreamReader( instream, "UTF-8" ) );
             destination = new OutputStreamWriter( outstream, "UTF-8" );
 
             // support ${token}
-            Reader reader = new InterpolationFilterReader( source,
-                filterProperties, "${", "}" );
+            Reader reader = new InterpolationFilterReader( source, filterProperties, "${", "}" );
 
             IOUtil.copy( reader, destination );
         }
@@ -639,7 +635,8 @@ public class CreateWebstartAppMojo
      * @return
      * @throws java.io.IOException
      */
-    private String generateExtensions( FileSet files, Project antProject, String masterPrefix ) throws IOException
+    private String generateExtensions( FileSet files, Project antProject, String masterPrefix )
+        throws IOException
     {
         StringBuilder buff = new StringBuilder();
         for ( String nm : files.getDirectoryScanner( antProject ).getIncludedFiles() )
@@ -666,7 +663,7 @@ public class CreateWebstartAppMojo
             }
             String dashcnb = codenamebase.replace( '.', '-' );
 
-            buff.append( "    <extension name='" ).append( codenamebase ).append( "' href='" ).append( masterPrefix ).append( dashcnb ).append( ".jnlp' />\n");
+            buff.append( "    <extension name='" ).append( codenamebase ).append( "' href='" ).append( masterPrefix ).append( dashcnb ).append( ".jnlp' />\n" );
             theJar.close();
         }
         return buff.toString();

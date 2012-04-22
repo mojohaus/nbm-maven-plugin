@@ -147,7 +147,8 @@ public class CreateUpdateSiteMojo
 
     // </editor-fold>
 
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void execute()
+        throws MojoExecutionException, MojoFailureException
     {
         Project antProject = registerNbmAntTasks();
         File nbmBuildDirFile = new File( outputDirectory, "netbeans_site" );
@@ -157,15 +158,17 @@ public class CreateUpdateSiteMojo
         }
 
         boolean isRepository = false;
-        if ("auto".equals(distBase)) {
+        if ( "auto".equals( distBase ) )
+        {
             distBase = null;
         }
-        ArtifactRepository distRepository = getDeploymentRepository(distBase, container, getLog());
+        ArtifactRepository distRepository = getDeploymentRepository( distBase, container, getLog() );
         String oldDistBase = null;
         if ( distRepository != null )
         {
             isRepository = true;
-        } else
+        }
+        else
         {
             if ( distBase != null && !distBase.contains( "::" ) )
             {
@@ -179,8 +182,10 @@ public class CreateUpdateSiteMojo
             Set<Artifact> artifacts = project.getArtifacts();
             for ( Artifact art : artifacts )
             {
-                ArtifactResult res = turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
-                if (res.hasConvertedArtifact()) {
+                ArtifactResult res =
+                    turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
+                if ( res.hasConvertedArtifact() )
+                {
                     art = res.getConvertedArtifact();
                 }
 
@@ -193,33 +198,32 @@ public class CreateUpdateSiteMojo
                     {
                         copyTask.setFlatten( true );
                         copyTask.setTodir( nbmBuildDirFile );
-                    } else
+                    }
+                    else
                     {
                         String path = distRepository.pathOf( art );
-                        File f = new File( nbmBuildDirFile, path.replace( '/',
-                                File.separatorChar ) );
+                        File f = new File( nbmBuildDirFile, path.replace( '/', File.separatorChar ) );
                         copyTask.setTofile( f );
                     }
                     try
                     {
                         copyTask.execute();
-                    } catch ( BuildException ex )
+                    }
+                    catch ( BuildException ex )
                     {
-                        throw new MojoExecutionException(
-                                "Cannot merge nbm files into autoupdate site",
-                                ex );
+                        throw new MojoExecutionException( "Cannot merge nbm files into autoupdate site", ex );
                     }
 
                 }
-                if (res.isOSGiBundle()) {
-                    //TODO check for bundles
+                if ( res.isOSGiBundle() )
+                {
+                    // TODO check for bundles
                 }
             }
-            getLog().info(
-                    "Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile() );
+            getLog().info( "Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile() );
 
-
-        } else if ( reactorProjects != null && reactorProjects.size() > 0 )
+        }
+        else if ( reactorProjects != null && reactorProjects.size() > 0 )
         {
 
             Iterator it = reactorProjects.iterator();
@@ -240,7 +244,8 @@ public class CreateUpdateSiteMojo
                         copyTask.setOverwrite( true );
                         copyTask.setFlatten( true );
                         copyTask.setTodir( nbmBuildDirFile );
-                    } else
+                    }
+                    else
                     {
                         File target = new File( moduleDir, "target" );
                         boolean has = false;
@@ -261,33 +266,31 @@ public class CreateUpdateSiteMojo
                         {
                             continue;
                         }
-                        Artifact art = artifactFactory.createArtifact(
-                                proj.getGroupId(), proj.getArtifactId(),
-                                proj.getVersion(), null, "nbm-file" );
+                        Artifact art =
+                            artifactFactory.createArtifact( proj.getGroupId(), proj.getArtifactId(), proj.getVersion(),
+                                                            null, "nbm-file" );
                         String path = distRepository.pathOf( art );
-                        File f = new File( nbmBuildDirFile, path.replace( '/',
-                                File.separatorChar ) );
+                        File f = new File( nbmBuildDirFile, path.replace( '/', File.separatorChar ) );
                         copyTask.setTofile( f );
                     }
                     try
                     {
                         copyTask.execute();
-                    } catch ( BuildException ex )
+                    }
+                    catch ( BuildException ex )
                     {
-                        throw new MojoExecutionException(
-                                "Cannot merge nbm files into autoupdate site",
-                                ex );
+                        throw new MojoExecutionException( "Cannot merge nbm files into autoupdate site", ex );
                     }
                 }
             }
-        } else
+        }
+        else
         {
             throw new MojoExecutionException(
                     "This goal only makes sense on reactor projects or project with 'nbm-application' packaging." );
 
         }
-        MakeUpdateDesc descTask = (MakeUpdateDesc) antProject.createTask(
-                "updatedist" );
+        MakeUpdateDesc descTask = (MakeUpdateDesc) antProject.createTask( "updatedist" );
         File xmlFile = new File( nbmBuildDirFile, fileName );
         descTask.setDesc( xmlFile );
         if ( oldDistBase != null )
@@ -305,39 +308,36 @@ public class CreateUpdateSiteMojo
         try
         {
             descTask.execute();
-        } catch ( BuildException ex )
-        {
-            throw new MojoExecutionException(
-                    "Cannot create autoupdate site xml file", ex );
         }
-        getLog().info(
-                "Generated autoupdate site content at " + nbmBuildDirFile.getAbsolutePath() );
+        catch ( BuildException ex )
+        {
+            throw new MojoExecutionException( "Cannot create autoupdate site xml file", ex );
+        }
+        getLog().info( "Generated autoupdate site content at " + nbmBuildDirFile.getAbsolutePath() );
 
         try
         {
             GZipArchiver gz = new GZipArchiver();
             gz.addFile( xmlFile, fileName );
-            File gzipped = new File( nbmBuildDirFile, fileName + ".gz");
+            File gzipped = new File( nbmBuildDirFile, fileName + ".gz" );
             gz.setDestFile( gzipped );
             gz.createArchive();
             if ( "nbm-application".equals( project.getPackaging() ) )
             {
-                projectHelper.attachArtifact( project, "xml.gz", "updatesite",
-                        gzipped );
+                projectHelper.attachArtifact( project, "xml.gz", "updatesite", gzipped );
             }
-        } catch ( Exception ex )
+        }
+        catch ( Exception ex )
         {
-            throw new MojoExecutionException(
-                    "Cannot create gzipped version of the update site xml file.",
-                    ex );
+            throw new MojoExecutionException( "Cannot create gzipped version of the update site xml file.", ex );
         }
 
     }
-    private static final Pattern ALT_REPO_SYNTAX_PATTERN = Pattern.compile(
-            "(.+)::(.+)::(.+)" );
 
-    static ArtifactRepository getDeploymentRepository(String distBase, PlexusContainer container, Log log)
-            throws MojoExecutionException, MojoFailureException
+    private static final Pattern ALT_REPO_SYNTAX_PATTERN = Pattern.compile( "(.+)::(.+)::(.+)" );
+
+    static ArtifactRepository getDeploymentRepository( String distBase, PlexusContainer container, Log log )
+        throws MojoExecutionException, MojoFailureException
     {
 
         ArtifactRepository repo = null;
@@ -357,7 +357,8 @@ public class CreateUpdateSiteMojo
                 throw new MojoFailureException( distBase,
                         "Invalid syntax for repository.",
                         "Invalid syntax for alternative repository. Use \"id::layout::url\"." );
-            } else
+            }
+            else
             {
                 String id = matcher.group( 1 ).trim();
                 String layout = matcher.group( 2 ).trim();
@@ -366,12 +367,11 @@ public class CreateUpdateSiteMojo
                 ArtifactRepositoryLayout repoLayout;
                 try
                 {
-                    repoLayout = (ArtifactRepositoryLayout) container.lookup(
-                            ArtifactRepositoryLayout.ROLE, layout );
-                } catch ( ComponentLookupException e )
+                    repoLayout = (ArtifactRepositoryLayout) container.lookup( ArtifactRepositoryLayout.ROLE, layout );
+                }
+                catch ( ComponentLookupException e )
                 {
-                    throw new MojoExecutionException(
-                            "Cannot find repository layout: " + layout, e );
+                    throw new MojoExecutionException( "Cannot find repository layout: " + layout, e );
                 }
 
                 repo = new DefaultArtifactRepository( id, url, repoLayout );
@@ -381,9 +381,8 @@ public class CreateUpdateSiteMojo
     }
 
     public void contextualize( Context context )
-            throws ContextException
+        throws ContextException
     {
-        this.container = (PlexusContainer) context.get(
-                PlexusConstants.PLEXUS_KEY );
+        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }

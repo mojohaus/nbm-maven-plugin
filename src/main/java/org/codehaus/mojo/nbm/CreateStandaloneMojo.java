@@ -67,7 +67,8 @@ public class CreateStandaloneMojo
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void execute()
+        throws MojoExecutionException, MojoFailureException
     {
 
         try
@@ -79,14 +80,15 @@ public class CreateStandaloneMojo
             fs.setDirectory( outputDirectory );
             fs.setIncludes( new String[] {
                 brandingToken + "/**",
-            });
+            } );
             fs.setExcludes( new String[] {
                 brandingToken + "/bin/*",
-            });
-            archiver.addFileSet( fs);
-            File bins = new File(nbmBuildDirFile, "bin");
-            for (File bin : bins.listFiles()) {
-                archiver.addFile( bin, brandingToken + "/bin/" + bin.getName(), 0755);
+            } );
+            archiver.addFileSet( fs );
+            File bins = new File( nbmBuildDirFile, "bin" );
+            for ( File bin : bins.listFiles() )
+            {
+                archiver.addFile( bin, brandingToken + "/bin/" + bin.getName(), 0755 );
             }
             File zipFile = new File( outputDirectory, finalName + ".zip" );
             //TODO - somehow check for last modified content to see if we shall be
@@ -96,7 +98,8 @@ public class CreateStandaloneMojo
             archiver.createArchive();
             project.getArtifact().setFile( zipFile );
 
-        } catch ( Exception ex )
+        }
+        catch ( Exception ex )
         {
             throw new MojoExecutionException( "", ex );
         }

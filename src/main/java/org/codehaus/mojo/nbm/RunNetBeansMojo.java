@@ -78,13 +78,16 @@ public class RunNetBeansMojo
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void execute()
+        throws MojoExecutionException, MojoFailureException
     {
         netbeansUserdir.mkdirs();
 
         List<File> clusters = new ArrayList<File>();
-        if (!clusterBuildDir.exists() || clusterBuildDir.listFiles() == null) {
-            throw new MojoExecutionException("No clusters to include in execution found. Please run the nbm:cluster or nbm:cluster-app goals before this one.");
+        if ( !clusterBuildDir.exists() || clusterBuildDir.listFiles() == null )
+        {
+            throw new MojoExecutionException(
+                                              "No clusters to include in execution found. Please run the nbm:cluster or nbm:cluster-app goals before this one." );
         }
         File[] fls = clusterBuildDir.listFiles();
         for ( int i = 0; i < fls.length; i++ )
@@ -100,14 +103,14 @@ public class RunNetBeansMojo
             buff.append( cluster.getAbsolutePath() );
             buff.append( ":" );
         }
-        if (buff.lastIndexOf( ":") > -1) {
+        if ( buff.lastIndexOf( ":" ) > -1 )
+        {
             buff.deleteCharAt( buff.lastIndexOf( ":" ) );
         }
         //http://www.netbeans.org/issues/show_bug.cgi?id=174819
-        StringReader sr = new StringReader( "netbeans_extraclusters=\"" + buff.toString() + "\"\n" +
-                                             "extraclusters=\"" + buff.toString() + "\"\n" +
-                                             "extra_clusters=\"" + buff.toString() + "\"");
-
+        StringReader sr =
+            new StringReader( "netbeans_extraclusters=\"" + buff.toString() + "\"\n" + "extraclusters=\""
+                + buff.toString() + "\"\n" + "extra_clusters=\"" + buff.toString() + "\"" );
 
         //now check what the exec names are to figure the right XXX.clusters name
         File binDir = new File( netbeansInstallation, "bin" );
@@ -118,7 +121,8 @@ public class RunNetBeansMojo
             for ( File f : execs )
             {
                 String name = f.getName();
-                if ( name.contains( "_w.exe" ) ) {
+                if ( name.contains( "_w.exe" ) )
+                {
                     continue;
                 }
                 if ( name.contains( ".exe" ) )
@@ -135,13 +139,15 @@ public class RunNetBeansMojo
                     {
                         if ( !clust.equals( name ) )
                         {
-                            getLog().debug( "When examining executable names, found clashing results " + f.getName() + " " + clust);
+                            getLog().debug( "When examining executable names, found clashing results " + f.getName()
+                                                + " " + clust );
                         }
                     }
                 }
             }
         }
-        if ( clust == null) {
+        if ( clust == null )
+        {
             clust = "netbeans";
         }
 
@@ -154,10 +160,12 @@ public class RunNetBeansMojo
         {
             conf = new FileOutputStream( confFile );
             IOUtil.copy( sr, conf );
-        } catch ( IOException ex )
+        }
+        catch ( IOException ex )
         {
             throw new MojoExecutionException( "Error writing " + confFile, ex );
-        } finally
+        }
+        finally
         {
             IOUtil.close( conf );
         }
@@ -165,15 +173,19 @@ public class RunNetBeansMojo
         boolean windows = Os.isFamily( "windows" );
         Commandline cmdLine = new Commandline();
         File exec;
-        if (windows) {
+        if ( windows )
+        {
             exec = new File( netbeansInstallation, "bin\\nb.exe" );
-            if (!exec.exists()) {
+            if ( !exec.exists() )
+            {
                 // in 6.7 and onward, there's no nb.exe file.
                 exec = new File( netbeansInstallation, "bin\\" + clust + ".exe" );
                 cmdLine.addArguments( new String[] { "--console", "suppress" } );
             }
-        } else {
-            exec = new File(netbeansInstallation, "bin/" + clust );
+        }
+        else
+        {
+            exec = new File( netbeansInstallation, "bin/" + clust );
         }
         cmdLine.setExecutable( exec.getAbsolutePath() );
 
@@ -189,8 +201,7 @@ public class RunNetBeansMojo
             };
             cmdLine.addArguments( args );
             getLog().info( "Additional arguments=" + additionalArguments );
-            cmdLine.addArguments( CommandLineUtils.translateCommandline(
-                    additionalArguments ) );
+            cmdLine.addArguments( CommandLineUtils.translateCommandline( additionalArguments ) );
             for ( int i = 0; i < cmdLine.getArguments().length; i++ )
             {
                 getLog().info( "      " + cmdLine.getArguments()[i] );
@@ -206,7 +217,8 @@ public class RunNetBeansMojo
             };
             CommandLineUtils.executeCommandLine( cmdLine, out, out );
 
-        } catch ( Exception e )
+        }
+        catch ( Exception e )
         {
             throw new MojoExecutionException( "Failed executing NetBeans", e );
         }

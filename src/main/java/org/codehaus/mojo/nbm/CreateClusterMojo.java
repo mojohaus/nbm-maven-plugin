@@ -69,7 +69,8 @@ public class CreateClusterMojo
      */
     private List<MavenProject> reactorProjects;
 
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void execute()
+        throws MojoExecutionException, MojoFailureException
     {
         Project antProject = registerNbmAntTasks();
 
@@ -98,64 +99,70 @@ public class CreateClusterMojo
                     try
                     {
                         copyTask.execute();
-                    } catch ( BuildException ex )
+                    }
+                    catch ( BuildException ex )
                     {
                         getLog().error( "Cannot merge modules into cluster" );
                         throw new MojoExecutionException(
                                 "Cannot merge modules into cluster", ex );
                     }
-                } else
+                }
+                else
                 {
                     if ( "nbm".equals( proj.getPackaging() ) )
                     {
-                        String error = "The NetBeans binary directory structure for " + proj.getId() + " is not created yet." +
-                                "\n Please execute 'mvn install nbm:cluster' to build all relevant projects in the reactor.";
+                        String error =
+                            "The NetBeans binary directory structure for "
+                                + proj.getId()
+                                + " is not created yet."
+                                + "\n Please execute 'mvn install nbm:cluster' to build all relevant projects in the reactor.";
                         throw new MojoFailureException( error );
                     }
-                    if ("bundle".equals(  proj.getPackaging() ))
+                    if ( "bundle".equals( proj.getPackaging() ) )
                     {
                         Artifact art = proj.getArtifact();
                         ExamineManifest mnf = new ExamineManifest( getLog() );
 
-                        File jar = new File(proj.getBuild().getDirectory(), proj.getBuild().getFinalName() + ".jar");
+                        File jar = new File( proj.getBuild().getDirectory(), proj.getBuild().getFinalName() + ".jar" );
                         if ( !jar.exists() )
                         {
-                            getLog().error( "Skipping " + proj.getId() + ". Cannot find the main artifact in output directory.");
+                            getLog().error( "Skipping " + proj.getId()
+                                                + ". Cannot find the main artifact in output directory." );
                             continue;
                         }
                         mnf.setJarFile( jar );
                         mnf.checkFile();
 
-                        File cluster = new File(nbmBuildDir, defaultCluster);
+                        File cluster = new File( nbmBuildDir, defaultCluster );
                         getLog().debug( "Copying " + art.getId() + " to cluster " + defaultCluster );
-                        File modules = new File(cluster, "modules");
+                        File modules = new File( cluster, "modules" );
                         modules.mkdirs();
-                        File config = new File(cluster, "config");
-                        File confModules = new File(config, "Modules");
+                        File config = new File( cluster, "config" );
+                        File confModules = new File( config, "Modules" );
                         confModules.mkdirs();
-                        File updateTracting = new File(cluster, "update_tracking");
+                        File updateTracting = new File( cluster, "update_tracking" );
                         updateTracting.mkdirs();
 
                         final String cnb = mnf.getModule();
-                        final String cnbDashed = cnb.replace( ".", "-");
-                        final File moduleArt = new File(modules, cnbDashed + ".jar" ); //do we need the file in some canotical name pattern?
+                        final String cnbDashed = cnb.replace( ".", "-" );
+                        final File moduleArt = new File( modules, cnbDashed + ".jar" ); //do we need the file in some canotical name pattern?
                         final String specVer = mnf.getSpecVersion();
                         try
                         {
                             FileUtils.copyFile( jar, moduleArt );
-                            final File moduleConf = new File(confModules, cnbDashed + ".xml");
+                            final File moduleConf = new File( confModules, cnbDashed + ".xml" );
                             FileUtils.copyStreamToFile( new InputStreamFacade() {
                                 public InputStream getInputStream() throws IOException
                                 {
-                                    return new StringInputStream( CreateClusterAppMojo.createBundleConfigFile(cnb), "UTF-8");
+                                    return new StringInputStream( CreateClusterAppMojo.createBundleConfigFile( cnb ), "UTF-8" );
                                 }
-                            }, moduleConf);
+                            }, moduleConf );
                             FileUtils.copyStreamToFile( new InputStreamFacade() {
                                 public InputStream getInputStream() throws IOException
                                 {
-                                    return new StringInputStream( CreateClusterAppMojo.createBundleUpdateTracking(cnb, moduleArt, moduleConf, specVer), "UTF-8");
+                                    return new StringInputStream( CreateClusterAppMojo.createBundleUpdateTracking( cnb, moduleArt, moduleConf, specVer ), "UTF-8" );
                                 }
-                            }, new File(updateTracting, cnbDashed + ".xml"));
+                            }, new File( updateTracting, cnbDashed + ".xml" ) );
                         }
                         catch ( IOException exc )
                         {
@@ -177,7 +184,8 @@ public class CreateClusterMojo
                         try
                         {
                             stamp.createNewFile();
-                        } catch ( IOException ex )
+                        }
+                        catch ( IOException ex )
                         {
                             ex.printStackTrace();
                         }
@@ -185,12 +193,11 @@ public class CreateClusterMojo
                     stamp.setLastModified( new Date().getTime() );
                 }
             }
-            getLog().info(
-                    "Created NetBeans module cluster(s) at " + nbmBuildDir );
-        } else
+            getLog().info( "Created NetBeans module cluster(s) at " + nbmBuildDir );
+        }
+        else
         {
-            throw new MojoExecutionException(
-                    "This goal only makes sense on reactor projects." );
+            throw new MojoExecutionException( "This goal only makes sense on reactor projects." );
         }
     }
 }

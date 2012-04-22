@@ -84,13 +84,15 @@ public class BrandingMojo
      */
     private MavenProject project;
 
-    public void execute() throws MojoExecutionException
+    public void execute()
+        throws MojoExecutionException
     {
         if ( !"nbm".equals( project.getPackaging() ) ) 
         {
-            getLog().error( "The nbm:branding goal shall be used within a NetBeans module project only (packaging 'nbm')");
+            getLog().error( "The nbm:branding goal shall be used within a NetBeans module project only (packaging 'nbm')" );
         }
-        if ( ! brandingSources.isDirectory() ) {
+        if ( !brandingSources.isDirectory() )
+        {
             getLog().info( "No branding to process." );
             return;
         }
@@ -110,18 +112,15 @@ public class BrandingMojo
             scanner.setBasedir( brandingSources );
             scanner.scan();
 
-            File clusterDir = new File( nbmBuildDir,
-                    "netbeans" + File.separator + cluster );
+            File clusterDir = new File( nbmBuildDir, "netbeans" + File.separator + cluster );
             clusterDir.mkdirs();
 
             // copy all files and see to it that they get the correct names
             for ( String brandingFilePath : scanner.getIncludedFiles() )
             {
                 File brandingFile = new File( brandingSources, brandingFilePath );
-                String destinationFilePath = destinationFileName(
-                        brandingFilePath );
-                File brandingDestination = new File( clusterDir,
-                        destinationFilePath );
+                String destinationFilePath = destinationFileName( brandingFilePath );
+                File brandingDestination = new File( clusterDir, destinationFilePath );
                 if ( !brandingDestination.getParentFile().exists() )
                 {
                     brandingDestination.getParentFile().mkdirs();
@@ -145,10 +144,8 @@ public class BrandingMojo
 
                 // jars should be placed in locales/ under the same directory the jar-directories are
                 File destinationJar =
-                        new File( jarDirectory.getParentFile().getAbsolutePath() +
-                        File.separator + "locale" +
-                        File.separator + destinationFileName(
-                        jarDirectory.getName() ) );
+                    new File( jarDirectory.getParentFile().getAbsolutePath() + File.separator + "locale"
+                        + File.separator + destinationFileName( jarDirectory.getName() ) );
 
                 // create nnn.jar archive of contents
                 JarArchiver archiver = new JarArchiver();
@@ -159,7 +156,8 @@ public class BrandingMojo
                 FileUtils.deleteDirectory( jarDirectory );
             }
 
-        } catch ( Exception ex )
+        }
+        catch ( Exception ex )
         {
             throw new MojoExecutionException( "Error creating branding", ex );
         }
@@ -173,14 +171,12 @@ public class BrandingMojo
 
         if ( firstUnderscore != -1 )
         {
-            return brandingFilePath.substring( 0, firstUnderscore ) + "_" +
-                    brandingToken + "_" +
-                    brandingFilePath.substring( firstUnderscore + 1 );
+            return brandingFilePath.substring( 0, firstUnderscore ) + "_" + brandingToken + "_"
+                + brandingFilePath.substring( firstUnderscore + 1 );
         }
 
         // no underscores, use dot
         int lastDot = brandingFilePath.lastIndexOf( "." );
-        return brandingFilePath.substring( 0, lastDot ) +
-                "_" + brandingToken + brandingFilePath.substring( lastDot );
+        return brandingFilePath.substring( 0, lastDot ) + "_" + brandingToken + brandingFilePath.substring( lastDot );
     }
 }

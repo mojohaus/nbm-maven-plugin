@@ -80,7 +80,8 @@ public class RunPlatformAppMojo
      * @throws org.apache.maven.plugin.MojoExecutionException 
      * @throws org.apache.maven.plugin.MojoFailureException 
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void execute()
+        throws MojoExecutionException, MojoFailureException
     {
         if ( !"nbm-application".equals( project.getPackaging() ) )
         {
@@ -91,22 +92,28 @@ public class RunPlatformAppMojo
 
         File appbasedir = new File( outputDirectory, brandingToken );
 
-        if (!appbasedir.exists()) {
-            throw new MojoExecutionException( "The directory that shall contain built application, doesn't exist (" + appbasedir.getAbsolutePath()  + ")\n Please invoke 'mvn install' on the project first");
+        if ( !appbasedir.exists() )
+        {
+            throw new MojoExecutionException( "The directory that shall contain built application, doesn't exist ("
+                + appbasedir.getAbsolutePath() + ")\n Please invoke 'mvn install' on the project first" );
         }
 
         boolean windows = Os.isFamily( "windows" );
 
         Commandline cmdLine = new Commandline();
         File exec;
-        if (windows) {
-            exec = new File(appbasedir, "bin" + brandingToken + "_w.exe");
-            if (!exec.exists()) { // Was removed as of nb 6.7
-                exec = new File(appbasedir, "bin\\" + brandingToken + ".exe");
+        if ( windows )
+        {
+            exec = new File( appbasedir, "bin" + brandingToken + "_w.exe" );
+            if ( !exec.exists() )
+            { // Was removed as of nb 6.7
+                exec = new File( appbasedir, "bin\\" + brandingToken + ".exe" );
                 cmdLine.addArguments( new String[] { "--console", "suppress" } );
             }
-        } else {
-            exec = new File(appbasedir, "bin/" + brandingToken);
+        }
+        else
+        {
+            exec = new File( appbasedir, "bin/" + brandingToken );
         }
 
         cmdLine.setExecutable( exec.getAbsolutePath() );
@@ -115,22 +122,22 @@ public class RunPlatformAppMojo
         {
 
             List<String> args = new ArrayList<String>();
-            args.add("--userdir");
+            args.add( "--userdir" );
             args.add( netbeansUserdir.getAbsolutePath() );
-            args.add("-J-Dnetbeans.logger.console=true");
-            args.add("-J-ea");
-            args.add("--branding");
-            args.add(brandingToken);
+            args.add( "-J-Dnetbeans.logger.console=true" );
+            args.add( "-J-ea" );
+            args.add( "--branding" );
+            args.add( brandingToken );
 
             // use JAVA_HOME if set
-            if (System.getenv("JAVA_HOME") != null) {
-                args.add("--jdkhome");
-                args.add(System.getenv("JAVA_HOME"));
+            if ( System.getenv( "JAVA_HOME" ) != null )
+            {
+                args.add( "--jdkhome" );
+                args.add( System.getenv( "JAVA_HOME" ) );
             }
 
-            cmdLine.addArguments( args.toArray(new String[0]) );
-            cmdLine.addArguments( CommandLineUtils.translateCommandline(
-                    additionalArguments ) );
+            cmdLine.addArguments( args.toArray( new String[0] ) );
+            cmdLine.addArguments( CommandLineUtils.translateCommandline( additionalArguments ) );
             getLog().info( "Executing: " + cmdLine.toString() );
             StreamConsumer out = new StreamConsumer()
             {
@@ -141,7 +148,8 @@ public class RunPlatformAppMojo
                 }
             };
             CommandLineUtils.executeCommandLine( cmdLine, out, out );
-        } catch ( Exception e )
+        }
+        catch ( Exception e )
         {
             throw new MojoExecutionException( "Failed executing NetBeans", e );
         }

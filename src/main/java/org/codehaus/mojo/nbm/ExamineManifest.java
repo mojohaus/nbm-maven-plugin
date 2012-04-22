@@ -66,7 +66,8 @@ public class ExamineManifest
         this.logger = logger;
     }
 
-    public void checkFile() throws MojoExecutionException
+    public void checkFile()
+        throws MojoExecutionException
     {
 
         resetExamination();
@@ -79,40 +80,47 @@ public class ExamineManifest
             {
                 jar = new JarFile( jarFile );
                 mf = jar.getManifest();
-            } catch ( Exception exc )
+            }
+            catch ( Exception exc )
             {
                 throw new MojoExecutionException( "Could not open " + jarFile + ": " + exc.getMessage(), exc );
-            } finally
+            }
+            finally
             {
                 if ( jar != null )
                 {
                     try
                     {
                         jar.close();
-                    } catch ( IOException io )
+                    }
+                    catch ( IOException io )
                     {
                         throw new MojoExecutionException( io.getMessage(), io );
                     }
                 }
             }
-        } else if ( manifestFile != null )
+        }
+        else if ( manifestFile != null )
         {
             InputStream stream = null;
             try
             {
                 stream = new FileInputStream( manifestFile );
                 mf = new Manifest( stream );
-            } catch ( Exception exc )
+            }
+            catch ( Exception exc )
             {
                 throw new MojoExecutionException( exc.getMessage(), exc );
-            } finally
+            }
+            finally
             {
                 if ( stream != null )
                 {
                     try
                     {
                         stream.close();
-                    } catch ( IOException io )
+                    }
+                    catch ( IOException io )
                     {
                         throw new MojoExecutionException( io.getMessage(), io );
                     }
@@ -122,7 +130,8 @@ public class ExamineManifest
         if ( mf != null )
         {
             processManifest( mf );
-        } else
+        }
+        else
         {
             //MNBMODULE-22
             File source = manifestFile;
@@ -161,16 +170,14 @@ public class ExamineManifest
         if ( isNetBeansModule() )
         {
             this.locBundle = attrs.getValue( "OpenIDE-Module-Localizing-Bundle" );
-            this.localized = (locBundle == null ? false : true);
-            this.specVersion = attrs.getValue(
-                       "OpenIDE-Module-Specification-Version" );
-            this.implVersion = attrs.getValue(
-                       "OpenIDE-Module-Implementation-Version" );
+            this.localized = ( locBundle == null ? false : true );
+            this.specVersion = attrs.getValue( "OpenIDE-Module-Specification-Version" );
+            this.implVersion = attrs.getValue( "OpenIDE-Module-Implementation-Version" );
             String cp = attrs.getValue( Attributes.Name.CLASS_PATH );
             classpath = cp == null ? "" : cp;
             String value = attrs.getValue( "OpenIDE-Module-Public-Packages" );
             String frList = attrs.getValue( "OpenIDE-Module-Friends" );
-            if (value == null || value.trim().equals( "-" ) )
+            if ( value == null || value.trim().equals( "-" ) )
             {
                 this.publicPackages = false;
             }
@@ -179,7 +186,7 @@ public class ExamineManifest
                 if ( frList != null )
                 {
                     this.publicPackages = false;
-                    String[] friendList = StringUtils.stripAll( StringUtils.split( frList, ",") );
+                    String[] friendList = StringUtils.stripAll( StringUtils.split( frList, "," ) );
                     friendPackages = true;
                     friends = Arrays.asList( friendList );
                 }
@@ -187,13 +194,12 @@ public class ExamineManifest
                 {
                     this.publicPackages = true;
                 }
-                String[] packageList = StringUtils.stripAll( StringUtils.split( value, ",") );
+                String[] packageList = StringUtils.stripAll( StringUtils.split( value, "," ) );
                 packages = Arrays.asList( packageList );
             }
             if ( populateDependencies )
             {
-                String deps = attrs.getValue(
-                        "OpenIDE-Module-Module-Dependencies" );
+                String deps = attrs.getValue( "OpenIDE-Module-Module-Dependencies" );
                 if ( deps != null )
                 {
                     StringTokenizer tokens = new StringTokenizer( deps, "," );
@@ -203,7 +209,7 @@ public class ExamineManifest
                         String tok = tokens.nextToken();
                         //we are just interested in specification and loose dependencies.
                         int spec = tok.indexOf( '>' );
-                        if ( spec > 0 || (tok.indexOf( '=' ) == -1 && spec == -1) )
+                        if ( spec > 0 || ( tok.indexOf( '=' ) == -1 && spec == -1 ) )
                         {
                             if ( spec > 0 )
                             {
@@ -221,16 +227,19 @@ public class ExamineManifest
                 }
             }
 
-        } else
+        }
+        else
         {
         
             //check osgi headers first, let nb stuff override it, making nb default
-            String bndName = attrs.getValue("Bundle-SymbolicName");
-            if (bndName != null) {
+            String bndName = attrs.getValue( "Bundle-SymbolicName" );
+            if ( bndName != null )
+            {
                 this.osgiBundle = true;
-                this.module = bndName./*MNBMODULE-125*/replaceFirst(" *;.+", "")./*MNBMODULE-96*/replace('-', '_');
-                this.specVersion = attrs.getValue("Bundle-Version");
-                String exp = attrs.getValue("Export-Package");
+                this.module =
+                    bndName./* MNBMODULE-125 */replaceFirst( " *;.+", "" )./* MNBMODULE-96 */replace( '-', '_' );
+                this.specVersion = attrs.getValue( "Bundle-Version" );
+                String exp = attrs.getValue( "Export-Package" );
                 this.publicPackages = exp != null;
                 if ( populateDependencies )
                 {
@@ -246,22 +255,26 @@ public class ExamineManifest
                         this.dependencyTokens = depList;
                     }
                 }
-            } else {
+            }
+            else
+            {
 
                 // for non-netbeans, non-osgi jars.
-                this.specVersion = attrs.getValue("Specification-Version");
-                this.implVersion = attrs.getValue("Implementation-Version");
-                this.module = attrs.getValue("Package");
+                this.specVersion = attrs.getValue( "Specification-Version" );
+                this.implVersion = attrs.getValue( "Implementation-Version" );
+                this.module = attrs.getValue( "Package" );
                 this.publicPackages = false;
                 classpath = "";
-                /*    if (module != null) {
+                /*    if ( module != null )
+                {
                 // now we have the package to make it a module definition, add the version there..
                 module = module + "/1";
                 }
                  */
-                if (getModule() == null) {
+                if ( getModule() == null )
+                {
                     // do we want to do that?
-                    this.module = attrs.getValue("Extension-Name");
+                    this.module = attrs.getValue( "Extension-Name" );
                 }
             }
         }
@@ -271,7 +284,7 @@ public class ExamineManifest
     /**
      * The jar file to examine. It is exclusive with manifestFile.
      */
-    public void setJarFile( java.io.File jarFileLoc )
+    public void setJarFile( File jarFileLoc )
     {
         jarFile = jarFileLoc;
     }
@@ -396,7 +409,8 @@ public class ExamineManifest
         return packages;
     }
 
-    public boolean isOsgiBundle() {
+    public boolean isOsgiBundle()
+    {
         return osgiBundle;
     }
 

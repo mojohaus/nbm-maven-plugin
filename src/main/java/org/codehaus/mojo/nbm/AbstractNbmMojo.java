@@ -178,7 +178,7 @@ public abstract class AbstractNbmMojo
         {
             return false;
         }
-        if ( depExaminator.isNetBeansModule()  || (useOsgiDependencies && depExaminator.isOsgiBundle()) )
+        if ( depExaminator.isNetBeansModule() || ( useOsgiDependencies && depExaminator.isOsgiBundle() ) )
         {
             //TODO I can see how someone might want to include an osgi bundle as library, not dependency.
             // I guess it won't matter much in 6.9+, in older versions it could be a problem.
@@ -306,8 +306,10 @@ public abstract class AbstractNbmMojo
     }
 
     static List<Artifact> getLibraryArtifacts( DependencyNode treeRoot, NetBeansModule module,
-        List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
-        Log log, boolean useOsgiDependencies ) throws MojoExecutionException
+                                               List<Artifact> runtimeArtifacts,
+                                               Map<Artifact, ExamineManifest> examinerCache, Log log,
+                                               boolean useOsgiDependencies )
+        throws MojoExecutionException
     {
         List<Artifact> include = new ArrayList<Artifact>();
         if ( module != null )
@@ -326,8 +328,11 @@ public abstract class AbstractNbmMojo
     }
 
     static List<ModuleWrapper> getModuleDependencyArtifacts( DependencyNode treeRoot, NetBeansModule module,
-        MavenProject project, Map<Artifact, ExamineManifest> examinerCache,
-        List<Artifact> libraryArtifacts, Log log, boolean useOsgiDependencies ) throws MojoExecutionException
+                                                             MavenProject project,
+                                                             Map<Artifact, ExamineManifest> examinerCache,
+                                                             List<Artifact> libraryArtifacts, Log log,
+                                                             boolean useOsgiDependencies )
+        throws MojoExecutionException
     {
         List<ModuleWrapper> include = new ArrayList<ModuleWrapper>();
         if ( module != null )
@@ -349,8 +354,7 @@ public abstract class AbstractNbmMojo
                     depExaminator.checkFile();
                     examinerCache.put( artifact, depExaminator );
                 }
-                Dependency dep = resolveNetBeansDependency( artifact, deps,
-                    depExaminator, log );
+                Dependency dep = resolveNetBeansDependency( artifact, deps, depExaminator, log );
                 if ( dep != null )
                 {
                     ModuleWrapper wr = new ModuleWrapper();
@@ -366,7 +370,9 @@ public abstract class AbstractNbmMojo
 
                     }
                     include.add( wr );
-                } else {
+                }
+                else
+                {
                     if ( useOsgiDependencies && depExaminator.isOsgiBundle() )
                     {
                         ModuleWrapper wr = new ModuleWrapper();
@@ -379,7 +385,7 @@ public abstract class AbstractNbmMojo
                             }
                         }
                         boolean print = false;
-                        if ( wr.dependency == null)
+                        if ( wr.dependency == null )
                         {
                             Dependency depe = new Dependency();
                             depe.setId( id );
@@ -397,8 +403,13 @@ public abstract class AbstractNbmMojo
                                 artifact.getId() + " omitted as NetBeans module OSGi dependency, not a direct one. Declare it in the pom for inclusion." );
                             wr.transitive = true;
 
-                        } else {
-                            if (print)  log.info( "Adding OSGi bundle dependency - " + id );
+                        }
+                        else
+                        {
+                            if ( print )
+                            {
+                                log.info( "Adding OSGi bundle dependency - " + id );
+                            }
                         }
 
                         include.add( wr );
@@ -421,11 +432,11 @@ public abstract class AbstractNbmMojo
     }
 
     //copied from dependency:tree mojo
-    protected DependencyNode createDependencyTree( MavenProject project,
-        DependencyTreeBuilder dependencyTreeBuilder, ArtifactRepository localRepository,
-        ArtifactFactory artifactFactory, ArtifactMetadataSource artifactMetadataSource,
-        ArtifactCollector artifactCollector,
-        String scope ) throws MojoExecutionException
+    protected DependencyNode createDependencyTree( MavenProject project, DependencyTreeBuilder dependencyTreeBuilder,
+                                                   ArtifactRepository localRepository, ArtifactFactory artifactFactory,
+                                                   ArtifactMetadataSource artifactMetadataSource,
+                                                   ArtifactCollector artifactCollector, String scope )
+        throws MojoExecutionException
     {
         ArtifactFilter artifactFilter = createResolvingArtifactFilter( scope );
 
@@ -469,7 +480,9 @@ public abstract class AbstractNbmMojo
     }
 
     protected final ArtifactResult turnJarToNbmFile( Artifact art, ArtifactFactory artifactFactory,
-        ArtifactResolver artifactResolver, MavenProject project, ArtifactRepository localRepository ) throws MojoExecutionException
+                                                     ArtifactResolver artifactResolver, MavenProject project,
+                                                     ArtifactRepository localRepository )
+        throws MojoExecutionException
     {
         if ( "jar".equals( art.getType() ) || "nbm".equals( art.getType() ) )
         {
@@ -479,12 +492,12 @@ public abstract class AbstractNbmMojo
             // that would be a timesaver
             ExamineManifest mnf = new ExamineManifest( getLog() );
             File jar = art.getFile();
-            if ( ! jar.isFile() )
+            if ( !jar.isFile() )
             {
                 getLog().warn( "MNBMODULE-131: need to at least run package phase on " + jar );
-                return new ArtifactResult(null, null);
+                return new ArtifactResult( null, null );
             }
-            mnf.setJarFile( jar);
+            mnf.setJarFile( jar );
             mnf.checkFile();
             if ( mnf.isNetBeansModule() )
             {
@@ -504,7 +517,8 @@ public abstract class AbstractNbmMojo
                 {
                     //shall be check before actually resolving from repos?
                     checkReactor( art, nbmArt );
-                    if (!nbmArt.isResolved()) {
+                    if ( !nbmArt.isResolved() )
+                    {
                         throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
                     }
                 }
@@ -512,42 +526,49 @@ public abstract class AbstractNbmMojo
                 {
                     //shall be check before actually resolving from repos?
                     checkReactor( art, nbmArt );
-                    if (!nbmArt.isResolved()) {
+                    if ( !nbmArt.isResolved() )
+                    {
                         throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
                     }
                 }
-                return new ArtifactResult(nbmArt, mnf);
+                return new ArtifactResult( nbmArt, mnf );
             }
             if ( mnf.isOsgiBundle() )
             {
-                return new ArtifactResult(null, mnf);
+                return new ArtifactResult( null, mnf );
             }
         }
-        return new ArtifactResult(null, null);
+        return new ArtifactResult( null, null );
     }
 
-    protected static final class ArtifactResult {
+    protected static final class ArtifactResult
+    {
         private final Artifact converted;
         private final ExamineManifest manifest;
 
-        ArtifactResult(Artifact conv, ExamineManifest manifest) {
+        ArtifactResult( Artifact conv, ExamineManifest manifest )
+        {
             converted = conv;
             this.manifest = manifest;
         }
 
-        boolean hasConvertedArtifact() {
+        boolean hasConvertedArtifact()
+        {
             return converted != null;
         }
 
-        Artifact getConvertedArtifact() {
+        Artifact getConvertedArtifact()
+        {
             return converted;
         }
 
-        public boolean isOSGiBundle() {
+        public boolean isOSGiBundle()
+        {
             return manifest != null && manifest.isOsgiBundle();
         }
 
-        public ExamineManifest getExaminedManifest() {
+        public ExamineManifest getExaminedManifest()
+        {
             return manifest;
         }
     }

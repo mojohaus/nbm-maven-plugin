@@ -97,11 +97,12 @@ public class CreateNbmMojo
     // end of component params custom code folding
     // </editor-fold>
 
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void execute()
+        throws MojoExecutionException, MojoFailureException
     {
         if ( skipNbm )
         {
-            getLog().info( "Skipping generation of NBM file.");
+            getLog().info( "Skipping generation of NBM file." );
             return;
         }
 
@@ -120,8 +121,7 @@ public class CreateNbmMojo
         nbmTask.setFile( nbmFile );
         nbmTask.setProductDir( clusterDir );
 
-        nbmTask.setModule(
-                "modules" + File.separator + moduleJarName + ".jar" );
+        nbmTask.setModule( "modules" + File.separator + moduleJarName + ".jar" );
         nbmTask.setNeedsrestart( Boolean.toString( module.isRequiresRestart() ) );
         String moduleAuthor = module.getAuthor();
         if ( moduleAuthor == null )
@@ -134,17 +134,18 @@ public class CreateNbmMojo
             File ks = new File( keystore );
             if ( !ks.exists() )
             {
-                getLog().warn(
-                        "Cannot find keystore file at " + ks.getAbsolutePath() );
-            } else
+                getLog().warn( "Cannot find keystore file at " + ks.getAbsolutePath() );
+            }
+            else
             {
                 Signature sig = nbmTask.createSignature();
                 sig.setKeystore( ks );
                 sig.setAlias( keystorealias );
                 sig.setStorepass( keystorepassword );
-                getLog().debug( "Setup the Ant task to sign the NBM file.");
+                getLog().debug( "Setup the Ant task to sign the NBM file." );
             }
-        } else if ( keystore != null || keystorepassword != null || keystorealias != null )
+        }
+        else if ( keystore != null || keystorepassword != null || keystorealias != null )
         {
             getLog().warn(
                     "If you want to sign the nbm file, you need to define all three keystore related parameters." );
@@ -156,19 +157,21 @@ public class CreateNbmMojo
             File lf = new File( project.getBasedir(), licenseFile );
             if ( !lf.exists() || !lf.isFile() )
             {
-                getLog().warn(
-                        "Cannot find license file at " + lf.getAbsolutePath() );
-            } else
+                getLog().warn( "Cannot find license file at " + lf.getAbsolutePath() );
+            }
+            else
             {
                 Blurb lb = nbmTask.createLicense();
                 lb.setFile( lf );
                 lb.addText( licenseName );
             }
-        } else if ( licenseName != null || licenseFile != null )
+        }
+        else if ( licenseName != null || licenseFile != null )
         {
             getLog().warn(
                     "To add a license to the nbm, you need to specify both licenseName and licenseFile parameters" );
-        } else
+        }
+        else
         {
             Blurb lb = nbmTask.createLicense();
             lb.addText( "<Here comes the license>" );
@@ -192,29 +195,34 @@ public class CreateNbmMojo
             {
                 if ( !module.getDistributionUrl().contains( "::" ) )
                 {
-                    dist = module.getDistributionUrl() + (module.getDistributionUrl().endsWith(
-                            "/" ) ? "" : "/") + nbmFile.getName();
+                    dist =
+                        module.getDistributionUrl() + ( module.getDistributionUrl().endsWith( "/" ) ? "" : "/" )
+                            + nbmFile.getName();
                 }
-            } else
+            }
+            else
             {
                 Artifact art = artifactFactory.createArtifact(
                         project.getGroupId(), project.getArtifactId(),
                         project.getVersion(), null, "nbm-file" );
 
-                dist = distRepository.getUrl() + (distRepository.getUrl().endsWith( 
-                        "/" ) ? "" : "/") + distRepository.pathOf( art );
+                dist =
+                    distRepository.getUrl() + ( distRepository.getUrl().endsWith( "/" ) ? "" : "/" )
+                        + distRepository.pathOf( art );
 
             }
             nbmTask.setDistribution( dist );
-        } else
+        }
+        else
         {
-            nbmTask.setDistribution(nbmFile.getName() );
+            nbmTask.setDistribution( nbmFile.getName() );
         }
         nbmTask.setTargetcluster( cluster );
         try
         {
             nbmTask.execute();
-        } catch ( BuildException e )
+        }
+        catch ( BuildException e )
         {
             throw new MojoExecutionException( "Cannot Generate nbm file:" + e.getMessage(), e );
         }
@@ -223,18 +231,16 @@ public class CreateNbmMojo
             File nbmfile = new File( buildDir, nbmFile.getName() );
             FileUtils.getFileUtils().copyFile( nbmFile, nbmfile );
             projectHelper.attachArtifact( project, "nbm-file", null, nbmfile );
-
-        } catch ( IOException ex )
+        }
+        catch ( IOException ex )
         {
-            throw new MojoExecutionException(
-                    "Cannot copy nbm to build directory", ex );
+            throw new MojoExecutionException( "Cannot copy nbm to build directory", ex );
         }
     }
 
     public void contextualize( Context context )
             throws ContextException
     {
-        this.container = (PlexusContainer) context.get(
-                PlexusConstants.PLEXUS_KEY );
+        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 }

@@ -72,7 +72,8 @@ public class AdaptNbVersion
                 {
                     Integer intValue = Integer.valueOf( token );
                     token = intValue.toString();
-                } catch ( NumberFormatException exc )
+                }
+                catch ( NumberFormatException exc )
                 {
                     // ignore, will just not be added to the
                     token = "";

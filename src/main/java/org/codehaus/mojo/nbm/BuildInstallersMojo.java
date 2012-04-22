@@ -171,7 +171,8 @@ public class BuildInstallersMojo
 
     // </editor-fold>
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void execute()
+        throws MojoExecutionException, MojoFailureException
     {
         Project antProject = antProject();
 
@@ -188,10 +189,7 @@ public class BuildInstallersMojo
         }
 
         File suiteLocation = outputDirectory.getParentFile();
-        String zipName = project.getArtifactId()
-                + "-"
-                + project.getVersion()
-                + ".zip";
+        String zipName = project.getArtifactId() + "-" + project.getVersion() + ".zip";
         File zipFile = new File( suiteLocation, "target" + File.separatorChar + zipName );
         getLog().info( String.format( "Running Build Installers action for (existing=%2$s) zip file %1$s",
                 zipFile, zipFile.exists() ) );
@@ -208,7 +206,8 @@ public class BuildInstallersMojo
         fu.copyResourcesRecursively( getClass().getClassLoader().getResource( "harness" ), harnessDir );
 
         // Overwrite template file with modified version to accept branded images etc.
-        if (templateFile != null) {
+        if ( templateFile != null )
+        {
             File template = new File( harnessDir, "nbi/stub/template.xml" );
             fu.copyFile( templateFile, template );
         }
@@ -257,8 +256,7 @@ public class BuildInstallersMojo
         if ( installerLicenseFile != null )
         {
             getLog().info( String.format( "License file is at %1s, exist = %2$s", installerLicenseFile, installerLicenseFile.exists() ) );
-            props.put(
-                    "nbi.license.file", installerLicenseFile.getAbsolutePath() );
+            props.put( "nbi.license.file", installerLicenseFile.getAbsolutePath() );
         }
 
         List<String> platforms = new ArrayList<String>();
@@ -266,26 +264,26 @@ public class BuildInstallersMojo
         if ( this.installerOsLinux )
         {
             platforms.add( "linux" );
-            File linuxFile = new File(outputDirectory, installersFilePrefix + "-linux.sh");
-            projectHelper.attachArtifact( project, "sh", "linux", linuxFile);
+            File linuxFile = new File( outputDirectory, installersFilePrefix + "-linux.sh" );
+            projectHelper.attachArtifact( project, "sh", "linux", linuxFile );
         }
         if ( this.installerOsSolaris )
         {
             platforms.add( "solaris" );
-            File solarisFile = new File(outputDirectory, installersFilePrefix + "-solaris.sh");
-            projectHelper.attachArtifact( project, "sh", "solaris", solarisFile);
+            File solarisFile = new File( outputDirectory, installersFilePrefix + "-solaris.sh" );
+            projectHelper.attachArtifact( project, "sh", "solaris", solarisFile );
         }
         if ( this.installerOsWindows )
         {
             platforms.add( "windows" );
-            File windowsFile = new File(outputDirectory, installersFilePrefix + "-windows.exe");
-            projectHelper.attachArtifact( project, "exe", "windows", windowsFile);
+            File windowsFile = new File( outputDirectory, installersFilePrefix + "-windows.exe" );
+            projectHelper.attachArtifact( project, "exe", "windows", windowsFile );
         }
         if ( this.installerOsMacosx )
         {
             platforms.add( "macosx" );
-            File macosxFile = new File(outputDirectory, installersFilePrefix + "-macosx.tgz");
-            projectHelper.attachArtifact( project, "tgz", "macosx", macosxFile);
+            File macosxFile = new File( outputDirectory, installersFilePrefix + "-macosx.tgz" );
+            projectHelper.attachArtifact( project, "tgz", "macosx", macosxFile );
         }
 
         StringBuilder sb = new StringBuilder();
@@ -303,25 +301,20 @@ public class BuildInstallersMojo
             getLog().warn( "Nothing to build." );
         }
 
-        props.put( "generate.installer.for.platforms",
-                sb.toString() );
+        props.put( "generate.installer.for.platforms", sb.toString() );
 
         File javaHome = new File( System.getProperty( "java.home" ) );
-        if ( new File( javaHome,
-                "lib/rt.jar" ).exists() && javaHome.getName().equals( "jre" ) )
+        if ( new File( javaHome, "lib/rt.jar" ).exists() && javaHome.getName().equals( "jre" ) )
         {
             javaHome = javaHome.getParentFile();
         }
-        props.put(
-                "generator-jdk-location-forward-slashes", javaHome.getAbsolutePath().replace( "\\", "/" ) );
+        props.put( "generator-jdk-location-forward-slashes", javaHome.getAbsolutePath().replace( "\\", "/" ) );
 
-        props.put(
-                "pack200.enabled", "" + usePack200 );
+        props.put( "pack200.enabled", "" + usePack200 );
 
         if ( appIconIcnsFile != null )
         {
-            props.put(
-                    "nbi.dock.icon.file", appIconIcnsFile.getAbsolutePath() );
+            props.put( "nbi.dock.icon.file", appIconIcnsFile.getAbsolutePath() );
         }
 
         try
@@ -334,7 +327,8 @@ public class BuildInstallersMojo
             {
                 antProject.setProperty( e.getKey(), e.getValue() );
             }
-            if (userSettings != null) {
+            if ( userSettings != null )
+            {
                 for ( Map.Entry<String, String> e : userSettings.entrySet() )
                 {
                     antProject.setProperty( e.getKey(), e.getValue() );
@@ -349,21 +343,21 @@ public class BuildInstallersMojo
     }
 
     @Override
-    public void contextualize( Context context ) throws ContextException
+    public void contextualize( Context context )
+        throws ContextException
     {
-        this.container = ( PlexusContainer ) context.get(
-                PlexusConstants.PLEXUS_KEY );
+        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
     private class FileUrlUtils
     {
 
-        boolean copyFile( final File toCopy, final File destFile ) throws MojoExecutionException
+        boolean copyFile( final File toCopy, final File destFile )
+            throws MojoExecutionException
         {
             try
             {
-                return copyStream( new FileInputStream( toCopy ),
-                        new FileOutputStream( destFile ) );
+                return copyStream( new FileInputStream( toCopy ), new FileOutputStream( destFile ) );
             }
             catch ( final FileNotFoundException e )
             {
@@ -371,8 +365,8 @@ public class BuildInstallersMojo
             }
         }
 
-        boolean copyFilesRecusively( final File toCopy,
-                final File destDir ) throws MojoExecutionException
+        boolean copyFilesRecusively( final File toCopy, final File destDir )
+            throws MojoExecutionException
         {
             assert destDir.isDirectory();
 
@@ -398,8 +392,8 @@ public class BuildInstallersMojo
             return true;
         }
 
-        boolean copyJarResourcesRecursively( final File destDir,
-                final JarURLConnection jarConnection ) throws IOException, MojoExecutionException
+        boolean copyJarResourcesRecursively( final File destDir, final JarURLConnection jarConnection )
+            throws IOException, MojoExecutionException
         {
 
             final JarFile jarFile = jarConnection.getJarFile();
@@ -435,21 +429,19 @@ public class BuildInstallersMojo
             return true;
         }
 
-        boolean copyResourcesRecursively( //
-                final URL originUrl, final File destination ) throws MojoExecutionException
+        boolean copyResourcesRecursively( final URL originUrl, final File destination )
+            throws MojoExecutionException
         {
             try
             {
                 final URLConnection urlConnection = originUrl.openConnection();
                 if ( urlConnection instanceof JarURLConnection )
                 {
-                    return copyJarResourcesRecursively( destination,
-                            ( JarURLConnection ) urlConnection );
+                    return copyJarResourcesRecursively( destination, (JarURLConnection) urlConnection );
                 }
                 else
                 {
-                    return copyFilesRecusively( new File( originUrl.getPath() ),
-                            destination );
+                    return copyFilesRecusively( new File( originUrl.getPath() ), destination );
                 }
             }
             catch ( final IOException e )
@@ -458,7 +450,8 @@ public class BuildInstallersMojo
             }
         }
 
-        boolean copyStream( final InputStream is, final File f ) throws MojoExecutionException
+        boolean copyStream( final InputStream is, final File f )
+            throws MojoExecutionException
         {
             try
             {
@@ -470,7 +463,8 @@ public class BuildInstallersMojo
             }
         }
 
-        boolean copyStream( final InputStream is, final OutputStream os ) throws MojoExecutionException
+        boolean copyStream( final InputStream is, final OutputStream os )
+            throws MojoExecutionException
         {
             try
             {

@@ -243,8 +243,7 @@ public abstract class CreateNetBeansFileStructure
         }
 
         File jarFile = new File( buildDir, finalName + ".jar" );
-        clusterDir = new File( nbmBuildDir,
-                "netbeans" + File.separator + cluster );
+        clusterDir = new File( nbmBuildDir, "netbeans" + File.separator + cluster );
         File moduleJarLocation = new File( clusterDir, "modules" );
         moduleJarLocation.mkdirs();
 
@@ -332,8 +331,7 @@ public abstract class CreateNetBeansFileStructure
 
                     try
                     {
-                        FileUtils.getFileUtils().copyFile( source, target, null,
-                                true, false );
+                        FileUtils.getFileUtils().copyFile( source, target, null, true, false );
                         if ( trackedInCentral( source ) ) // MNBMODULE-138
                         {
                             getLog().info( "Using *.external replacement for " + name );
@@ -347,15 +345,16 @@ public abstract class CreateNetBeansFileStructure
                                 external.close();
                             }
                         }
-                    } catch ( IOException ex )
+                    }
+                    catch ( IOException ex )
                     {
                         getLog().error( "Cannot copy library jar" );
-                        throw new MojoExecutionException(
-                                "Cannot copy library jar", ex );
+                        throw new MojoExecutionException( "Cannot copy library jar", ex );
                     }
                 }
             }
-            if (nbmResources != null) {
+            if ( nbmResources != null )
+            {
                 copyNbmResources();
             }
             copyDeprecatedNbmResources();
@@ -390,7 +389,8 @@ public abstract class CreateNetBeansFileStructure
             try
             {
                 jhTask.execute();
-            } catch ( BuildException e )
+            }
+            catch ( BuildException e )
             {
                 getLog().error( "Cannot generate JavaHelp index." );
                 throw new MojoExecutionException( e.getMessage(), e );
@@ -405,11 +405,9 @@ public abstract class CreateNetBeansFileStructure
             jar.execute();
         }
 
-        File configDir = new File( clusterDir,
-                "config" + File.separator + "Modules" );
+        File configDir = new File( clusterDir, "config" + File.separator + "Modules" );
         configDir.mkdirs();
-        CreateModuleXML moduleXmlTask = (CreateModuleXML) antProject.createTask(
-                "createmodulexml" );
+        CreateModuleXML moduleXmlTask = (CreateModuleXML) antProject.createTask( "createmodulexml" );
         moduleXmlTask.setXmldir( configDir );
         FileSet fs = new FileSet();
         fs.setDir( clusterDir );
@@ -417,36 +415,38 @@ public abstract class CreateNetBeansFileStructure
         if ( autoload )
         {
             moduleXmlTask.addAutoload( fs );
-        } else if ( eager )
+        }
+        else if ( eager )
         {
             moduleXmlTask.addEager( fs );
-        } else
+        }
+        else
         {
             moduleXmlTask.addEnabled( fs );
         }
         try
         {
             moduleXmlTask.execute();
-        } catch ( BuildException e )
+        }
+        catch ( BuildException e )
         {
             getLog().error( "Cannot generate config file." );
             throw new MojoExecutionException( e.getMessage(), e );
         }
-        MakeListOfNBM makeTask = (MakeListOfNBM) antProject.createTask(
-                "genlist" );
+        MakeListOfNBM makeTask = (MakeListOfNBM) antProject.createTask( "genlist" );
         antProject.setNewProperty( "module.name", finalName );
         antProject.setProperty( "cluster.dir", cluster );
         FileSet set = makeTask.createFileSet();
         set.setDir( clusterDir );
         PatternSet pattern = set.createPatternSet();
         pattern.setIncludes( "**" );
-        makeTask.setModule(
-                "modules" + File.separator + moduleJarName + ".jar" );
+        makeTask.setModule( "modules" + File.separator + moduleJarName + ".jar" );
         makeTask.setOutputfiledir( clusterDir );
         try
         {
             makeTask.execute();
-        } catch ( BuildException e )
+        }
+        catch ( BuildException e )
         {
             getLog().error( "Cannot Generate nbm list" );
             throw new MojoExecutionException( e.getMessage(), e );
@@ -454,58 +454,76 @@ public abstract class CreateNetBeansFileStructure
 
     }
 
-    private void copyDeprecatedNbmResources() throws BuildException, MojoExecutionException {
+    private void copyDeprecatedNbmResources()
+        throws BuildException, MojoExecutionException
+    {
         // copy additional resources..
         List<NbmResource> ress = module.getNbmResources();
-        if (ress.size() > 0) {
-            getLog().warn("NBM resources defined in module descriptor are deprecated. Please configure NBM resources in plugin configuration.");
+        if ( ress.size() > 0 )
+        {
+            getLog().warn( "NBM resources defined in module descriptor are deprecated. Please configure NBM resources in plugin configuration." );
             Copy cp = (Copy) antProject.createTask( "copy" );
-            cp.setTodir(clusterDir);
+            cp.setTodir( clusterDir );
             HashMap<File, Collection<FileSet>> customPaths = new HashMap<File, Collection<FileSet>>();
             boolean hasStandard = false;
-            for (NbmResource res : ress) {
-                if (res.getBaseDirectory() != null) {
-                    File base = new File(project.getBasedir(), res.getBaseDirectory());
+            for ( NbmResource res : ress )
+            {
+                if ( res.getBaseDirectory() != null )
+                {
+                    File base = new File( project.getBasedir(), res.getBaseDirectory() );
                     FileSet set = new FileSet();
-                    set.setDir(base);
-                    for (String inc : res.getIncludes()) {
-                        set.createInclude().setName(inc);
+                    set.setDir( base );
+                    for ( String inc : res.getIncludes() )
+                    {
+                        set.createInclude().setName( inc );
                     }
-                    for (String exc : res.getExcludes()) {
-                        set.createExclude().setName(exc);
+                    for ( String exc : res.getExcludes() )
+                    {
+                        set.createExclude().setName( exc );
                     }
 
-                    if (res.getRelativeClusterPath() != null) {
-                        File path = new File(clusterDir, res.getRelativeClusterPath());
+                    if ( res.getRelativeClusterPath() != null )
+                    {
+                        File path = new File( clusterDir, res.getRelativeClusterPath() );
                         Collection<FileSet> col = customPaths.get( path );
-                        if (col == null) {
+                        if ( col == null )
+                        {
                             col = new ArrayList<FileSet>();
-                            customPaths.put(path, col);
+                            customPaths.put( path, col );
                         }
-                        col.add(set);
-                    } else {
-                        cp.addFileset(set);
+                        col.add( set );
+                    }
+                    else
+                    {
+                        cp.addFileset( set );
                         hasStandard = true;
                     }
                 }
             }
-            try {
-                if (hasStandard) {
+            try
+            {
+                if ( hasStandard )
+                {
                     cp.execute();
                 }
-                if (customPaths.size() > 0) {
-                    for (Map.Entry<File, Collection<FileSet>> ent : customPaths.entrySet()) {
+                if ( customPaths.size() > 0 )
+                {
+                    for ( Map.Entry<File, Collection<FileSet>> ent : customPaths.entrySet() )
+                    {
                         cp = (Copy) antProject.createTask( "copy" );
-                        cp.setTodir(ent.getKey());
-                        for (FileSet set : ent.getValue()) {
-                            cp.addFileset(set);
+                        cp.setTodir( ent.getKey() );
+                        for ( FileSet set : ent.getValue() )
+                        {
+                            cp.addFileset( set );
                         }
                         cp.execute();
                     }
                 }
-            } catch (BuildException e) {
-                getLog().error("Cannot copy additional resources into the nbm file");
-                throw new MojoExecutionException(e.getMessage(), e);
+            }
+            catch ( BuildException e )
+            {
+                getLog().error( "Cannot copy additional resources into the nbm file" );
+                throw new MojoExecutionException( e.getMessage(), e );
             }
         }
     }
@@ -538,31 +556,44 @@ public abstract class CreateNetBeansFileStructure
         catch ( IllegalArgumentException ex )
         {
             Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
-        }        catch ( IllegalAccessException ex )
+        }
+        catch ( IllegalAccessException ex )
         {
             Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
-        }        catch ( NoSuchFieldException ex )
+        }
+        catch ( NoSuchFieldException ex )
         {
             Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
-        }        catch ( SecurityException ex )
+        }
+        catch ( SecurityException ex )
         {
             Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
-        }        catch ( ClassNotFoundException ex )
+        }
+        catch ( ClassNotFoundException ex )
         {
             Logger.getLogger( CreateNetBeansFileStructure.class.getName() ).log( Level.SEVERE, null, ex );
         }
     }
 
-    private void copyNbmResources() throws MojoExecutionException {
-        try {
-            if (StringUtils.isEmpty(encoding) && isFilteringEnabled(nbmResources)) {
-                getLog().warn("File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING + ", i.e. build is platform dependent!");
+    private void copyNbmResources()
+        throws MojoExecutionException
+    {
+        try
+        {
+            if ( StringUtils.isEmpty( encoding ) && isFilteringEnabled( nbmResources ) )
+            {
+                getLog().warn( "File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING
+                                   + ", i.e. build is platform dependent!" );
             }
-            MavenResourcesExecution mavenResourcesExecution = new MavenResourcesExecution(Arrays.asList(nbmResources), clusterDir, project, encoding, Collections.EMPTY_LIST, Collections.EMPTY_LIST, session);
-            mavenResourcesExecution.setEscapeWindowsPaths(true);
-            mavenResourcesFiltering.filterResources(mavenResourcesExecution);
-        } catch (MavenFilteringException ex) {
-            throw new MojoExecutionException(ex.getMessage(), ex);
+            MavenResourcesExecution mavenResourcesExecution =
+                new MavenResourcesExecution( Arrays.asList( nbmResources ), clusterDir, project, encoding,
+                                             Collections.EMPTY_LIST, Collections.EMPTY_LIST, session );
+            mavenResourcesExecution.setEscapeWindowsPaths( true );
+            mavenResourcesFiltering.filterResources( mavenResourcesExecution );
+        }
+        catch ( MavenFilteringException ex )
+        {
+            throw new MojoExecutionException( ex.getMessage(), ex );
         }
     }
 
@@ -584,7 +615,8 @@ public abstract class CreateNetBeansFileStructure
         return false;
     }
 
-    private static boolean trackedInCentral( File source ) throws IOException
+    private static boolean trackedInCentral( File source )
+        throws IOException
     {
         // Cf. EnhancedLocalRepositoryManager, TrackingFileManager
         File trackingFile = new File( source.getParentFile(), "_maven.repositories" );
@@ -605,7 +637,8 @@ public abstract class CreateNetBeansFileStructure
         }
     }
 
-    private static void writeExternal( PrintWriter w, Artifact artifact ) throws IOException
+    private static void writeExternal( PrintWriter w, Artifact artifact )
+        throws IOException
     {
         w.write( "CRC:" );
         w.write( Long.toString( CreateClusterAppMojo.crcForFile( artifact.getFile() ).getValue() ) );

@@ -208,7 +208,8 @@ public class CollectLibrariesNodeVisitor
      * 
      * @return the list of collected dependency nodes
      */
-    public List<Artifact> getArtifacts() throws MojoExecutionException
+    public List<Artifact> getArtifacts()
+        throws MojoExecutionException
     {
         if ( throwable != null )
         {
@@ -217,4 +218,3 @@ public class CollectLibrariesNodeVisitor
         return nodes;
     }
 }
-

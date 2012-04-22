@@ -275,8 +275,7 @@ public class NetBeansManifestUpdateMojo
             Reader reader = null;
             try
             {
-                reader = new InputStreamReader( new FileInputStream(
-                    specialManifest ) );
+                reader = new InputStreamReader( new FileInputStream( specialManifest ) );
                 manifest = new Manifest( reader );
             }
             catch ( IOException exc )
@@ -313,23 +312,32 @@ public class NetBeansManifestUpdateMojo
             timestamp );
         String projectCNB = conditionallyAddAttribute( mainSection, "OpenIDE-Module", moduleName );
         String packagesValue;
-        if (publicPackages != null && publicPackages.size() > 0) {
+        if ( publicPackages != null && publicPackages.size() > 0 )
+        {
             StringBuilder sb = new StringBuilder();
-            for (String pub : publicPackages) {
-                if (pub.endsWith( ".**")) {
+            for ( String pub : publicPackages )
+            {
+                if ( pub.endsWith( ".**" ) )
+                {
                     // well, just sort of wrong value but accept
-                    sb.append(pub);
-                } else if (pub.endsWith(".*")) {
-                    //multipackage value
-                    sb.append(pub).append("*");
-                } else {
-                    sb.append(pub).append(".*");
+                    sb.append( pub );
                 }
-                sb.append(", ");
+                else if ( pub.endsWith( ".*" ) )
+                {
+                    //multipackage value
+                    sb.append( pub ).append( "*" );
+                }
+                else
+                {
+                    sb.append( pub ).append( ".*" );
+                }
+                sb.append( ", " );
             }
-            sb.setLength( sb.length() - 2); //cut the last 2 ", " characters
+            sb.setLength( sb.length() - 2 ); //cut the last 2 ", " characters
             packagesValue = sb.toString();
-        } else {
+        }
+        else
+        {
             // no packages available
             packagesValue = "-";
         }
@@ -370,7 +378,8 @@ public class NetBeansManifestUpdateMojo
             for ( Artifact a : libArtifacts )
             {
                 classPath = classPath + " ext/" + a.getGroupId() + "/" + a.getFile().getName();
-                if ( mavenClassPath.length() > 0 ) {
+                if ( mavenClassPath.length() > 0 )
+                {
                     mavenClassPath.append( ' ' );
                 }
                 mavenClassPath.append( a.getGroupId() ).append( ':' ).append( a.getArtifactId() ).append( ':' ).append( a.getVersion() );
@@ -395,17 +404,21 @@ public class NetBeansManifestUpdateMojo
                     }
                     else if ( "spec".equals( type ) )
                     {
-                        depToken = depExaminator.getModuleWithRelease() + " > " +
-                            ( depExaminator.isNetBeansModule() ? depExaminator.getSpecVersion() : AdaptNbVersion.adaptVersion(
-                            depExaminator.getSpecVersion(),
-                            AdaptNbVersion.TYPE_SPECIFICATION, date ) );
+                        depToken =
+                            depExaminator.getModuleWithRelease()
+                                + " > "
+                                + ( depExaminator.isNetBeansModule() ? depExaminator.getSpecVersion()
+                                                : AdaptNbVersion.adaptVersion( depExaminator.getSpecVersion(),
+                                                                               AdaptNbVersion.TYPE_SPECIFICATION, date ) );
                     }
                     else if ( "impl".equals( type ) )
                     {
-                        depToken = depExaminator.getModuleWithRelease() + " = " +
-                            ( depExaminator.isNetBeansModule() ? depExaminator.getImplVersion() : AdaptNbVersion.adaptVersion(
-                            depExaminator.getImplVersion(),
-                            AdaptNbVersion.TYPE_IMPLEMENTATION, date ) );
+                        depToken =
+                            depExaminator.getModuleWithRelease()
+                                + " = "
+                                + ( depExaminator.isNetBeansModule() ? depExaminator.getImplVersion()
+                                                : AdaptNbVersion.adaptVersion( depExaminator.getImplVersion(),
+                                                                               AdaptNbVersion.TYPE_IMPLEMENTATION, date ) );
                     }
                     else
                     {
@@ -445,8 +458,7 @@ public class NetBeansManifestUpdateMojo
 
             if ( classPath.length() > 0 )
             {
-                conditionallyAddAttribute( mainSection, "X-Class-Path",
-                    classPath.trim() );
+                conditionallyAddAttribute( mainSection, "X-Class-Path", classPath.trim() );
             }
             if ( mavenClassPath.length() > 0)
             {
@@ -454,8 +466,7 @@ public class NetBeansManifestUpdateMojo
             }
             if ( dependencies.length() > 0 )
             {
-                conditionallyAddAttribute( mainSection,
-                    "OpenIDE-Module-Module-Dependencies", dependencies );
+                conditionallyAddAttribute( mainSection, "OpenIDE-Module-Module-Dependencies", dependencies );
             }
 //            if ( librList.size() > 0 )
 //            {
@@ -606,7 +617,7 @@ public class NetBeansManifestUpdateMojo
                         deps.removeAll( classes[0] );
                     }
                     classes[1].retainAll( deps );
-                    if (classes[1].size() > 0)
+                    if ( classes[1].size() > 0 )
                     {
                         getLog().info( "Private classes referenced in transitive module: " + Arrays.toString( classes[1].toArray() ) );
                         getLog().error(
@@ -615,9 +626,9 @@ public class NetBeansManifestUpdateMojo
                     }
                 }
             }
-            for ( Map.Entry<Artifact,Set<String>> e : moduleAllClasses.entrySet() )
+            for ( Map.Entry<Artifact, Set<String>> e : moduleAllClasses.entrySet() )
             {
-                List<String> strs = new ArrayList<String>(deps);
+                List<String> strs = new ArrayList<String>( deps );
                 if ( deps.removeAll( e.getValue() ) )
                 {
                     strs.retainAll( e.getValue() );
