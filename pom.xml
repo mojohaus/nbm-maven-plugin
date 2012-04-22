@@ -6,14 +6,16 @@
         <version>1.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+
     <artifactId>nbm-maven-plugin</artifactId>
+    <version>3.8-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
+
     <name>NBM Maven Plugin</name>
     <description>Maven plugin for creating NetBeans modules. It defines a custom lifecycle called "nbm". During packaging, the module JAR is enhanced with NetBeans-specific manifest entries and, along with other required files, packed into a *.nbm file, ready for distribution. Additionally the plugin provides aggregator goals to create an update site or cluster for your module projects.
     </description>
-    <version>3.8-SNAPSHOT</version>
-     <inceptionYear>2005</inceptionYear>
-   <url>http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin/</url>
+    <inceptionYear>2005</inceptionYear>
+    <url>http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin/</url>
     <issueManagement>
         <system>jira</system>
         <url>http://jira.codehaus.org/browse/MNBMODULE</url>
@@ -77,6 +79,7 @@
             </roles>
         </contributor>
     </contributors>
+
     <build>
         <plugins>
             <plugin>
@@ -119,27 +122,28 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-          <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>animal-sniffer-maven-plugin</artifactId>
-              <executions>
-                  <execution>
-                      <phase>package</phase>
-                      <goals>
-                          <goal>check</goal>
-                      </goals>
-                      <configuration>
-                          <signature>
-                              <groupId>org.codehaus.mojo.signature</groupId>
-                              <artifactId>java16</artifactId>
-                              <version>1.0</version>
-                          </signature>
-                      </configuration>
-                  </execution>
-              </executions>
-          </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                           <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <signature>
+                                <groupId>org.codehaus.mojo.signature</groupId>
+                                <artifactId>java16</artifactId>
+                                <version>1.0</version>
+                            </signature>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
     <profiles>
         <profile>
             <id>tools.jar</id>
@@ -183,6 +187,7 @@
             </build>
         </profile>
     </profiles>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.maven</groupId>
