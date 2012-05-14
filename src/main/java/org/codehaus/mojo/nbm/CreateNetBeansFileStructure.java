@@ -641,7 +641,10 @@ public abstract class CreateNetBeansFileStructure
         throws IOException
     {
         w.write( "CRC:" );
-        w.write( Long.toString( CreateClusterAppMojo.crcForFile( artifact.getFile() ).getValue() ) );
+        File file = artifact.getFile();
+        w.write( Long.toString( CreateClusterAppMojo.crcForFile( file ).getValue() ) );
+        w.write( "SIZE:" );
+        w.write( Long.toString( file.length() ) );
         w.write( "\nURL:m2:/" );
         w.write( artifact.getGroupId() );
         w.write( ':' );

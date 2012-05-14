@@ -641,6 +641,7 @@ public class CreateClusterAppMojo
         // Cf. org.netbeans.nbbuild.AutoUpdate
         BufferedReader r = new BufferedReader( new InputStreamReader( is, "UTF-8" ) );
         long crc = -1;
+        long size = -1;
         boolean found = false;
         String line;
         while ( ( line = r.readLine() ) != null )
@@ -692,6 +693,10 @@ public class CreateClusterAppMojo
                     }
                 }
             }
+            else if ( line.startsWith( "SIZE:" ) )
+            {
+                size = Long.parseLong( line.substring( 5 ).trim() );
+            }
             else
             {
                 getLog().warn( "Unrecognized line: " + line );
@@ -704,6 +709,10 @@ public class CreateClusterAppMojo
         if ( crc != -1 && crc != crcForFile( f ).getValue() )
         {
             throw new IOException( "CRC-32 of " + f + " does not match declared " + crc );
+        }
+        if ( size != -1 && size != f.length() )
+        {
+            throw new IOException( "Size of " + f + " does not match declared " + size );
         }
     }
 
