@@ -273,8 +273,7 @@ public class CreateClusterAppMojo
                                                 IOUtil.close( outstream );
                                             }
                                             // now figure which one of the jars is the module jar..
-                                            if ( path.endsWith( ".jar" ) && !path.contains( "locale/" )
-                                                && !path.contains( "docs/" ) )
+                                            if ( part.matches("(modules|core|lib)/[^/]+[.]jar") )
                                             {
                                                 ExamineManifest ex = new ExamineManifest( getLog() );
                                                 ex.setJarFile( fl );
@@ -298,7 +297,7 @@ public class CreateClusterAppMojo
                                 }
                                 catch ( BuildException e )
                                 {
-                                    getLog().error( "Cannot Generate update_tracking xml file" );
+                                    getLog().error( "Cannot Generate update_tracking XML file from " + art.getFile() );
                                     throw new MojoExecutionException( e.getMessage(), e );
                                 }
 
