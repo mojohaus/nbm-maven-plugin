@@ -519,6 +519,7 @@ public class CreateClusterAppMojo
         File binDir;
         File destExeW = new File( destBinDir, brandingToken + "_w.exe" );
         File destExe = new File( destBinDir, brandingToken + ".exe" );
+        File destExe64 = new File( destBinDir, brandingToken + "64.exe" );
         File destSh = new File( destBinDir, brandingToken );
 
         if ( binDirectory != null )
@@ -540,6 +541,10 @@ public class CreateClusterAppMojo
                 else if ( name.endsWith( ".exe" ) )
                 {
                     dest = destExe;
+                }
+                else if ( name.endsWith( "64.exe" ) )
+                {
+                    dest = destExe64;
                 }
                 else if ( !name.contains( "." ) || name.endsWith( ".sh" ) )
                 {
@@ -564,6 +569,11 @@ public class CreateClusterAppMojo
                     harnessDir.getAbsolutePath() + File.separator + "launchers" );
                 File exe = new File( binDir, "app.exe" );
                 FileUtils.copyFile( exe, destExe );
+                File exe64 = new File( binDir, "app64.exe" );
+                if ( exe64.isFile() )
+                {
+                    FileUtils.copyFile( exe64, destExe64 );
+                }
                 File exew = new File( binDir, "app_w.exe" );
                 if ( exew.exists() ) //in 6.7 the _w.exe file is no more.
                 {
@@ -577,6 +587,7 @@ public class CreateClusterAppMojo
                 getLog().debug( "Using fallback executables bundled with the nbm-maven-plugin." );
                 writeFile( "harness/launchers/app.sh", destSh );
                 writeFile( "harness/launchers/app.exe", destExe );
+                writeFile( "harness/launchers/app64.exe", destExe64 );
             }
         }
 
@@ -599,6 +610,10 @@ public class CreateClusterAppMojo
         try
         {
             instream = getClass().getClassLoader().getResourceAsStream( path );
+            if ( instream == null )
+            {
+                throw new FileNotFoundException( path );
+            }
             destSh.createNewFile();
             output = new BufferedOutputStream( new FileOutputStream( destSh ) );
             IOUtil.copy( instream, output );

@@ -108,6 +108,19 @@ public class RunPlatformAppMojo
             if ( !exec.exists() )
             { // Was removed as of nb 6.7
                 exec = new File( appbasedir, "bin\\" + brandingToken + ".exe" );
+                // if jdk is 32 or 64-bit
+                String jdkHome = System.getenv( "JAVA_HOME" );
+                if ( jdkHome != null )
+                {
+                    if ( new File( jdkHome, "jre\\lib\\amd64\\jvm.cfg" ).exists() )
+                    {
+                        File exec64 = new File( appbasedir, "bin\\" + brandingToken + "64.exe" );
+                        if ( exec64.isFile() )
+                        {
+                            exec = exec64;
+                        }
+                    }
+                }
                 cmdLine.addArguments( new String[] { "--console", "suppress" } );
             }
         }

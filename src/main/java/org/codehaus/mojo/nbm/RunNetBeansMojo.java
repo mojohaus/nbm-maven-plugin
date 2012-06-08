@@ -125,10 +125,7 @@ public class RunNetBeansMojo
                 {
                     continue;
                 }
-                if ( name.contains( ".exe" ) )
-                {
-                    name = name.substring( 0, name.length() - ".exe".length() );
-                }
+                name = name.replaceFirst( "(64)?([.]exe)?$", "" );
                 if ( !name.contains( "." ) )
                 {
                     if ( clust == null )
@@ -180,6 +177,18 @@ public class RunNetBeansMojo
             {
                 // in 6.7 and onward, there's no nb.exe file.
                 exec = new File( netbeansInstallation, "bin\\" + clust + ".exe" );
+                String jdkHome = System.getenv( "JAVA_HOME" );
+                if ( jdkHome != null )
+                {
+                    if ( new File( jdkHome, "jre\\lib\\amd64\\jvm.cfg" ).exists() )
+                    {
+                        File exec64 = new File( netbeansInstallation, "bin\\" + clust + "64.exe" );
+                        if ( exec64.isFile() )
+                        {
+                            exec = exec64;
+                        }
+                    }
+                }
                 cmdLine.addArguments( new String[] { "--console", "suppress" } );
             }
         }
