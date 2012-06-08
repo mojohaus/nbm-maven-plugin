@@ -148,14 +148,15 @@ public abstract class CreateNetBeansFileStructure
     private String distributionUrl;
 
     /**
-     * The list of nbmResources we want to include in the nbm file (not in module jar,
-     * but as external content within the nbm. Replaces the same configuration in the module
-     * descriptor file. For example to include external dll files in the nbm:
+     * A list of additional resources to include in the NBM file.
+     * (Not in the module JAR; see <code>InstalledFileLocator</code> for retrieval.)
+     * Supersedes similarly-named configuration in the module descriptor file.
+     * <p>For example, to include native libraries:</p>
      *
      <code>
             &lt;nbmResource&gt;<br/>
             &nbsp;&nbsp;&lt;directory&gt;src/main/libs&lt;/directory&gt;<br/>
-            &nbsp;&nbsp;&lt;targetPath&gt;lib&lt;/targetPath&gt;<br/>
+            &nbsp;&nbsp;&lt;targetPath&gt;modules/lib&lt;/targetPath&gt;<br/>
             &nbsp;&nbsp;&lt;includes&gt;<br/>
             &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.dll&lt;/include&gt;<br/>
             &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.so&lt;/include&gt;<br/>

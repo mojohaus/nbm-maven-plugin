@@ -108,7 +108,7 @@
                 </field>
                 <field>
                     <name>nbmResources</name>
-                    <description>List of resources that shall be also included into the Nbm file along with the module jar and library jars.</description>
+                    <description>DEPRECATED, use the plugin configuration instead. List of resources that shall be also included into the Nbm file along with the module jar and library jars.</description>
                     <version>1.0.0+</version>
                     <association>
                         <type>NbmResource</type>
