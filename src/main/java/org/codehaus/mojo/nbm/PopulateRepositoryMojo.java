@@ -833,7 +833,7 @@ public class PopulateRepositoryMojo
                     if ( dep != null )
                     {
                         deps.add( dep );
-                        // XXX MNBMODULE-138: repack NBM with *.external
+                        // XXX MNBMODULE-170: repack NBM with *.external
                     }
                     else
                     {
