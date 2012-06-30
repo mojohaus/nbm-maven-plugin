@@ -79,11 +79,32 @@
             </roles>
         </contributor>
     </contributors>
+   <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
+        <reporting>
+    <plugins>
+      <!-- Apache plugins in alphabetical order -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <requirements>
+            <!--
+            NOTE: Maven 2.x does not interpolate properties of the form project.*|pom.* so the Maven Plugin Plugin
+            gets garbage when manually examining the config of the Maven Compiler Plugin.
+            -->
+            <jdk>${mojo.java.target}</jdk>
+          </requirements>
+        </configuration>
+      </plugin>
+    
+    </plugins>
+        </reporting>
 
     <build>
         <plugins>
             <plugin>
-                <!-- I suppose this will eventually end up in mojo parent pom, check regularly -->
+   <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.0</version>
