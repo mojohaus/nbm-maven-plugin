@@ -24,6 +24,9 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -37,36 +40,29 @@ import org.codehaus.plexus.util.io.InputStreamFacade;
  * Create the NetBeans module clusters from reactor.
  * Semi-deprecated; used only for standalone modules and "suites".
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal cluster
- * @aggregator
- * @requiresDependencyResolution runtime
- *
  */
+@Mojo(name="cluster",aggregator=true, requiresDependencyResolution= ResolutionScope.RUNTIME )
 public class CreateClusterMojo
         extends AbstractNbmMojo
 {
 
     /**
      * directory where the the NetBeans cluster will be created.
-     * @parameter default-value="${project.build.directory}/netbeans_clusters"
-     * @required
      */
+    @Parameter(defaultValue="${project.build.directory}/netbeans_clusters", required=true)
     protected File nbmBuildDir;
 
     /**
      * default cluster value for reactor projects without cluster information,
      * typically OSGi bundles
-     * @parameter default-value="extra"
      * @since 3.2
      */
+    @Parameter(defaultValue="extra")
     private String defaultCluster;
     /**
      * If the executed project is a reactor project, this will contains the full list of projects in the reactor.
-     *
-     * @parameter expression="${reactorProjects}"
-     * @required
-     * @readonly
      */
+    @Parameter(required=true, readonly=true, property="reactorProjects")
     private List<MavenProject> reactorProjects;
 
     public void execute()

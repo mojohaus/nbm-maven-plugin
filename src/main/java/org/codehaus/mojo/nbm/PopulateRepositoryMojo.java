@@ -69,6 +69,9 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.artifact.AttachedArtifact;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.apache.tools.ant.BuildException;
@@ -98,10 +101,8 @@ import org.codehaus.plexus.util.StringUtils;
  * maven metadata.
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal populate-repository
- * @requiresProject false
- * @aggregator
  */
+@Mojo(name="populate-repository", aggregator=true, requiresProject=false)
 public class PopulateRepositoryMojo
     extends AbstractNbmMojo
 {
@@ -113,39 +114,38 @@ public class PopulateRepositoryMojo
     /**
      * an url where to deploy the NetBeans artifacts. Optional, if not specified, the artifacts will be only installed
      * in local repository, if you need to give credentials to access remote repo, the id of the server is hardwired to "netbeans".
-     * @parameter expression="${deployUrl}"
      */
+    @Parameter(property="deployUrl")
     private String deployUrl;
 
     /**
      * Optional parameter, by default the generated metadata is installed in local repository.
      * Setting this parameter to false will avoid installing the bits. Only meaningful together with
      * a defined "deployUrl" parameter.
-     * @parameter expression="${skipInstall}" default-value="false"
      * @since 3.0
      */
+    @Parameter(defaultValue="false", property="skipInstall")
     private boolean skipLocalInstall;
 
 
     /**
      * Location of NetBeans installation
-     *
-     * @parameter expression="${netbeansInstallDirectory}"
      */
+    @Parameter(property="netbeansInstallDirectory")
     protected File netbeansInstallDirectory;
 
     /**
      * If you want to install/deploy also NetBeans api javadocs, download the javadoc zip file from netbeans.org
      * expand it to a directory, it should contain multiple zip files. Define this parameter as absolute path to the zip files folder.
      *
-     * @parameter expression="${netbeansJavadocDirectory}"
      */
+    @Parameter(property="netbeansJavadocDirectory")
     protected File netbeansJavadocDirectory;
 
     /**
      * Assumes a folder with &lt;code-name-base&gt;.zip files containing sources for modules.
-     * @parameter expression="${netbeansSourcesDirectory}"
      */
+    @Parameter(property="netbeansSourcesDirectory")
     protected File netbeansSourcesDirectory;
 
     /**
@@ -153,9 +153,9 @@ public class PopulateRepositoryMojo
      * and upload the nbm file next to the module jar in local and remote repositories.
      *
      * Assumes a folder with &lt;code-name-base&gt;.nbm files containing nbm files for modules.
-     * @parameter expression="${netbeansNbmDirectory}"
      * @since 3.0
      */
+    @Parameter(property="netbeansNbmDirectory")
     protected File netbeansNbmDirectory;
 
     /**
@@ -165,8 +165,8 @@ public class PopulateRepositoryMojo
      * derived from the OpenIDE-Module-Specification-Version manifest attribute.
      * <p/>
      * Highly Recommended!
-     * @parameter expression="${forcedVersion}"
      */
+    @Parameter(property="forcedVersion")
     protected String forcedVersion;
 
     /**
@@ -179,17 +179,17 @@ public class PopulateRepositoryMojo
      * The Nexus Lucene index zip file for central repository can be found here:
      * http://repo1.maven.org/maven2/.index/nexus-maven-repository-index.zip
      * Unzip it to a directory and use this parameter to point to it.
-     * @parameter expression="${nexusIndexDirectory}"
      * @since 3.0
      */
+    @Parameter(property="nexusIndexDirectory")
     private File nexusIndexDirectory;
 
     /**
      * Whether to create cluster POMs in the {@code org.netbeans.cluster} group.
      * Only meaningful when {@code forcedVersion} is defined.
-     * @parameter expression="${defineCluster}" default-value="true"
      * @since 3.7
      */
+    @Parameter(defaultValue="true", property="defineCluster")   
     private boolean defineCluster;
 
     /**
@@ -197,72 +197,63 @@ public class PopulateRepositoryMojo
      * This may be used to populate just part of an installation,
      * when base modules are already available in Maven format.
      * Currently only supported when {@code forcedVersion} is defined.
-     * @parameter expression="${dependencyRepositoryUrl}"
      * @since 3.7
      */
+    @Parameter(property="dependencyRepositoryUrl")
     private String dependencyRepositoryUrl;
 
     /**
      * Repository ID to use when inspecting remote dependencies.
      * Only meaningful when {@code dependencyRepositoryUrl} is defined.
-     * @parameter expression="${dependencyRepositoryId}" default-value="temp"
      * @since 3.7
      */
+    @Parameter(defaultValue="temp", property="dependencyRepositoryId")
     private String dependencyRepositoryId;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
     /**
      * Local maven repository.
-     *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
      */
+    @Parameter(required=true, readonly=true, defaultValue="${localRepository}")
     protected ArtifactRepository localRepository;
 
     /**
      * Maven ArtifactFactory.
-     *
-     * @component
      */
+    @Component
     private ArtifactFactory artifactFactory;
 
     /**
      * Maven ArtifactInstaller.
-     *
-     * @component
      */
+    @Component
     private ArtifactInstaller artifactInstaller;
 
     /**
      * Maven ArtifactDeployer.
      *
-     * @component
      */
+    @Component
     private ArtifactDeployer artifactDeployer;
 
     /**
      * Maven ArtifactHandlerManager
      *
-     * @component
      */
+    @Component
     private ArtifactHandlerManager artifactHandlerManager;
 
     /**
      * Maven ArtifactRepositoryFactory.
      *
-     * @component
      */
+    @Component
     private ArtifactRepositoryFactory repositoryFactory;
 
-    /**
-     * @component
-     */
+    @Component
     private ArtifactResolver artifactResolver;
 
-    /**
-     * @component
-     */
+    @Component
     private ArtifactRepositoryLayout artifactRepositoryLayout;
 // </editor-fold>
 

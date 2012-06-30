@@ -18,6 +18,9 @@ package org.codehaus.mojo.nbm;
 
 import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.util.DirectoryScanner;
@@ -43,45 +46,43 @@ import org.codehaus.plexus.util.FileUtils;
  * eg. org/openide/windows/ui/Bundle.properties and place the changed bundle keys there.
  * </li></ul>
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal branding
- * @phase package
- * @requiresProject
+ *
  *
  */
+@Mojo(name="branding",
+        requiresProject=true,
+        defaultPhase= LifecyclePhase.PACKAGE)
 public class BrandingMojo
         extends AbstractNbmMojo
 {
 
     /**
      * directory where the the binary content is created.
-     * @parameter expression="${project.build.directory}/nbm"
-     * @required
      */
+    @Parameter(required=true, defaultValue="${project.build.directory}/nbm")
     protected File nbmBuildDir;
     /**
      * Location of the branded resources.
-     * @parameter expression="${basedir}/src/main/nbm-branding"
-     * @required
      */
+    @Parameter(required=true, defaultValue="${basedir}/src/main/nbm-branding")
     private File brandingSources;
     /**
      * The branding token used by the application.
      * Required unless {@code nbmBuildDir} does not exist and the mojo is thus skipped.
-     * @parameter expression="${netbeans.branding.token}"
      */
+    @Parameter(property="netbeans.branding.token")
     private String brandingToken;
     /**
      * cluster of the branding.
-     *
-     * @parameter default-value="extra"
-     * @required
      */
+    @Parameter(required=true, defaultValue="extra")
     protected String cluster;
     /**
      * @parameter expression="${project}"
      * @required
      * @readonly
      */
+    @Parameter(required=true, readonly=true, property="project")
     private MavenProject project;
 
     public void execute()

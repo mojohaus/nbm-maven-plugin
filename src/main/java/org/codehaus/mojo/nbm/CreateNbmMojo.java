@@ -23,6 +23,11 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.util.FileUtils;
@@ -40,12 +45,11 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
  * <p/>
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal nbm
- * @phase package
- * @requiresDependencyResolution runtime
- * @requiresProject
- *
  */
+@Mojo(name="nbm", 
+        requiresProject=true, 
+        requiresDependencyResolution= ResolutionScope.RUNTIME, 
+        defaultPhase= LifecyclePhase.PACKAGE )
 public class CreateNbmMojo
         extends CreateNetBeansFileStructure
         implements Contextualizable
@@ -53,26 +57,26 @@ public class CreateNbmMojo
 
     /**
      * keystore location for signing the nbm file
-     * @parameter expression="${keystore}"
      */
+    @Parameter(property="keystore")
     private String keystore;
     /**
      * keystore password
-     * @parameter expression="${keystorepass}"
      */
+    @Parameter(property="keystorepass")
     private String keystorepassword;
     /**
      * keystore alias
-     * @parameter expression="${keystorealias}"
      */
+    @Parameter(property="keystorealias")
     private String keystorealias;
 
     /**
      * Boolean parameter denoting if creation of NBM file shall be skipped or not.
      * If skipped, just the expanded directory for cluster is created
-     * @parameter expression="${maven.nbm.skip}" default-value="false"
      * @since 3.0
      */
+    @Parameter(defaultValue="false", property="maven.nbm.skip")
     private boolean skipNbm;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
@@ -81,17 +85,13 @@ public class CreateNbmMojo
      * Contextualized.
      */
     private PlexusContainer container;
-    /**
-     * @component
-     * @readonly
-     */
+
+    @Component
     private ArtifactFactory artifactFactory;
     /**
      * Used for attaching the artifact in the project
-     *
-     * @component
-     * @readonly
      */
+    @Component
     private MavenProjectHelper projectHelper;
 
     // end of component params custom code folding

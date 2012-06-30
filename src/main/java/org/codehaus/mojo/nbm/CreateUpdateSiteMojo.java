@@ -31,6 +31,11 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.BuildException;
@@ -49,12 +54,12 @@ import org.netbeans.nbbuild.MakeUpdateDesc;
 /**
  * Create the NetBeans auto update site definition.
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal autoupdate
- * @phase package
- * @aggregator
- * @requiresDependencyResolution runtime
  *
  */
+@Mojo(name="autoupdate", 
+        defaultPhase= LifecyclePhase.PACKAGE, 
+        aggregator=true, 
+        requiresDependencyResolution= ResolutionScope.RUNTIME )
 public class CreateUpdateSiteMojo
         extends AbstractNbmMojo
         implements Contextualizable
@@ -62,14 +67,13 @@ public class CreateUpdateSiteMojo
 
     /**
      * output directory.
-     * @parameter default-value="${project.build.directory}"
-     * @required
      */
+    @Parameter(required=true, defaultValue="${project.build.directory}")
     protected File outputDirectory;
     /**
      * autoupdate site xml file name.
-     * @parameter expression="${maven.nbm.updatesitexml}" default-value="updates.xml"
      */
+    @Parameter( defaultValue="updates.xml", property="maven.nbm.updatesitexml")
     protected String fileName;
     /**
      * A custom distribution base for the nbms in the update site.
@@ -90,34 +94,27 @@ public class CreateUpdateSiteMojo
      * If the value doesn't contain :: characters,
      * it's assumed to be the flat structure and the value is just the URL.
      * 
-     * @parameter expression="${maven.nbm.customDistBase}" default-value="."
      * @since 3.0 it's also possible to add remote repository as base
      */
+    @Parameter(defaultValue=".", property="maven.nbm.customDistBase")
     private String distBase;
 
     /**
      * The Maven Project.
      *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(required=true, readonly=true, property="project")
     private MavenProject project;
 
     /**
      * If the executed project is a reactor project, this will contains the full list of projects in the reactor.
-     *
-     * @parameter expression="${reactorProjects}"
-     * @required
-     * @readonly
      */
+    @Parameter(required=true, readonly=true, defaultValue="${reactorProjects}")
     private List reactorProjects;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
-    /**
-     * @component
-     */
+    @Component
     private ArtifactFactory artifactFactory;
     /**
      * Contextualized.
@@ -126,23 +123,18 @@ public class CreateUpdateSiteMojo
     /**
      * Used for attaching the artifact in the project
      *
-     * @component
      */
+    @Component
     private MavenProjectHelper projectHelper;
 
-    /**
-     * @component
-     * @readonly
-     */
+    @Component
     private ArtifactResolver artifactResolver;
 
     /**
      * Local maven repository.
      *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
      */
+    @Parameter(readonly=true, required=true, defaultValue="${localRepository}")
     protected ArtifactRepository localRepository;
 
     // </editor-fold>

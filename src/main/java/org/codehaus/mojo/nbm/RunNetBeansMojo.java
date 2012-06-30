@@ -25,6 +25,9 @@ import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -36,11 +39,9 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  * to be used in conjunction with nbm:cluster.
  * Semi-deprecated; used only for standalone modules and "suites".
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal run-ide
- * @aggregator
- * @requiresDependencyResolution runtime
  *
  */
+@Mojo(name="run-ide", aggregator=true, requiresDependencyResolution= ResolutionScope.RUNTIME )
 public class RunNetBeansMojo
         extends AbstractMojo
 {
@@ -48,29 +49,26 @@ public class RunNetBeansMojo
     /**
      * directory where the module(s)' NetBeans cluster(s) are located.
      * is related to nbm:cluster goal.
-     * @parameter default-value="${project.build.directory}/netbeans_clusters"
-     * @required
      */
+    @Parameter(required=true, defaultValue="${project.build.directory}/netbeans_clusters")
     protected File clusterBuildDir;
     /**
      * directory where the the NetBeans platform/IDE installation is,
      * denotes the root directory of NetBeans installation.
-     * @parameter expression="${netbeans.installation}"
-     * @required
      */
+    @Parameter(required=true, property="netbeans.installation")
     protected File netbeansInstallation;
     /**
      * NetBeans user directory for the executed instance.
-     * @parameter default-value="${project.build.directory}/userdir" expression="${netbeans.userdir}"
-     * @required
      */
+    @Parameter(required=true, defaultValue="${project.build.directory}/userdir", property="netbeans.userdir")
     protected File netbeansUserdir;
     /**
      * additional command line arguments. Eg. 
      * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
      * can be used to debug the IDE.
-     * @parameter expression="${netbeans.run.params}"
      */
+    @Parameter(property="netbeans.run.params")
     protected String additionalArguments;
 
     /**

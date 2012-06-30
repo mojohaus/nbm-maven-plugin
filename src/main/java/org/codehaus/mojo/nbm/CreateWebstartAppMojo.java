@@ -33,6 +33,9 @@ import java.util.StringTokenizer;
 import java.util.jar.JarFile;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.Project;
@@ -58,63 +61,54 @@ import org.netbeans.nbbuild.VerifyJNLP;
  * Create webstartable binaries for a 'nbm-application'.
  * @author <a href="mailto:johan.andren@databyran.se">Johan Andrén</a>
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal webstart-app
- * @phase package
  * @since 3.0
  */
+@Mojo(name="webstart-app", defaultPhase= LifecyclePhase.PACKAGE )
 public class CreateWebstartAppMojo
     extends AbstractNbmMojo
 {
 
     /**
      * The Maven project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
+
      */
+    @org.apache.maven.plugins.annotations.Parameter(required=true, readonly=true, property="project")
     private MavenProject project;
 
-    /**
-     * @component
-     */
+    @Component
     protected MavenProjectHelper projectHelper;
 
     /**
      * The branding token for the application based on NetBeans platform.
-     * @parameter expression="${netbeans.branding.token}"
-     * @required
      */
+    @org.apache.maven.plugins.annotations.Parameter(required=true, property="netbeans.branding.token")
     protected String brandingToken;
 
     /**
      * output directory where the the NetBeans application will be created.
-     * @parameter default-value="${project.build.directory}"
-     * @required
      */
+    @org.apache.maven.plugins.annotations.Parameter(required=true, defaultValue="${project.build.directory}")
     private File outputDirectory;
 
     /**
      * Ready-to-deploy WAR containing application in JNLP packaging.
      * 
-     * @parameter default-value="${project.build.directory}/${project.artifactId}-${project.version}-jnlp.war"
-     * @required
      */
+    @org.apache.maven.plugins.annotations.Parameter(required=true, defaultValue="${project.build.directory}/${project.artifactId}-${project.version}-jnlp.war")
     private File destinationFile;
 
     /**
      * Artifact Classifier to use for the webstart distributable zip file.
-     *
-     * @parameter expression="${nbm.webstart.classifier}" default-value="webstart"
      * @since 3.1
      */
+    @org.apache.maven.plugins.annotations.Parameter(defaultValue="webstart", property="nbm.webstart.classifier")
     private String webstartClassifier;
 
     /**
      * Codebase value within *.jnlp files.
      * <strong>Defining this parameter is generally a bad idea.</strong>
-     * @parameter expression="${nbm.webstart.codebase}"
      */
+    @org.apache.maven.plugins.annotations.Parameter(property="nbm.webstart.codebase")
     private String codebase;
 
     /**
@@ -132,42 +126,42 @@ public class CreateWebstartAppMojo
      * <li>${branding.token} - the 'brandingToken' parameter value is passed in.</li>
      * <li>${netbeans.jnlp.fixPolicy}</li>
      * </ul>
-     * @parameter 
      */
+    @org.apache.maven.plugins.annotations.Parameter
     private File masterJnlpFile;
     
     /**
      * The basename (minus .jnlp extension) of the master JNLP file in the output.
      * This file will be the entry point for javaws.
      * Defaults to the branding token.
-     * @parameter expression="${master.jnlp.file.name}"
      * @since 3.5
      */
+    @org.apache.maven.plugins.annotations.Parameter(property="master.jnlp.file.name")
     private String masterJnlpFileName;
 
     /**
      * keystore location for signing the nbm file
-     * @parameter expression="${keystore}"
      */
+    @org.apache.maven.plugins.annotations.Parameter(property="keystore")
     private String keystore;
 
     /**
      * keystore password
-     * @parameter expression="${keystorepass}"
      */
+    @org.apache.maven.plugins.annotations.Parameter(property="keystorepass")
     private String keystorepassword;
 
     /**
      * keystore alias
-     * @parameter expression="${keystorealias}"
      */
+    @org.apache.maven.plugins.annotations.Parameter(property="keystorealias")
     private String keystorealias;
 
     /**
      * keystore type
-     * @parameter expression="${keystoretype}"
      * @since 3.5
      */
+    @org.apache.maven.plugins.annotations.Parameter(property="keystoretype")
     private String keystoretype;
 
     /**
@@ -178,15 +172,15 @@ public class CreateWebstartAppMojo
      * info is not generated (see
      * http://java.sun.com/j2se/1.5.0/docs/guide/javaws/developersguide/downloadservletguide.html#resources).
      *
-     * @parameter expression="${nbm.webstart.versions}" default-value="false"
      */
+    @org.apache.maven.plugins.annotations.Parameter(defaultValue="false", property="nbm.webstart.versions")
     private boolean processJarVersions;
     /**
      * additional command line arguments. Eg.
      * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
      * can be used to debug the IDE.
-     * @parameter expression="${netbeans.run.params}"
      */
+    @org.apache.maven.plugins.annotations.Parameter(property="netbeans.run.params")
     private String additionalArguments;
 
     /**

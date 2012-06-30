@@ -28,6 +28,11 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.Project;
@@ -45,11 +50,11 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * and packages each installer as a deployable artifact.
  * <p>See a <a href="buildinstexample.html">how-to</a> on customizing the installer.
  * @author <a href="mailto:frantisek@mantlik.cz">Frantisek Mantlik</a>
- * @goal build-installers
- * @phase package
- * @requiresDependencyResolution runtime
- * @requiresProject
  */
+@Mojo(name="build-installers", 
+        requiresProject=true, 
+        requiresDependencyResolution=ResolutionScope.RUNTIME,
+        defaultPhase=LifecyclePhase.PACKAGE )
 public class BuildInstallersMojo
         extends AbstractNbmMojo
         implements Contextualizable
@@ -57,94 +62,76 @@ public class BuildInstallersMojo
 
     /**
     * output directory.
-    *
-    * @parameter default-value="${project.build.directory}" 
-    * @required
     */
+    @Parameter(defaultValue="${project.build.directory}", required=true)
     protected File outputDirectory;
     /**
     * The branding token for the application based on NetBeans platform.
-    *
-    * @parameter expression="${netbeans.branding.token}" 
-    * @required
     */
+    @Parameter(property="netbeans.branding.token", required=true)
     protected String brandingToken;
     /**
     * Installation directory name at the destination system
-    *
-    * @parameter expression="${netbeans.branding.token}"
     */
+    @Parameter(property="netbeans.branding.token")
     protected String installDirName;
     /**
     * The Maven Project.
-    *
-    * @parameter expression="${project}" 
-    * @required 
-    * @readonly
     */
+    @Parameter(required=true, readonly=true, property="project")    
     private MavenProject project;
     /**
     * Prefix of all generated installers files
-    *
-    * @parameter expression="${project.name}-${project.version}"
     */
+    @Parameter(defaultValue="${project.name}-${project.version}")
     private String installersFilePrefix;
     /**
      * Create installer for Windows
-     *
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue="true")
     private boolean installerOsWindows;
     /**
      * Create installer for Solaris
-     *
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue="true")
     private boolean installerOsSolaris;
     /**
      * Create installer for Linux
-     *
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue="true")    
     private boolean installerOsLinux;
     /**
      * Create installer for MacOSx
-     *
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue="true")    
     private boolean installerOsMacosx;
     /**
      * Enable Pack200 compression
-     *
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue="true")
     private boolean installerPack200Enable;
     /**
      * License file
-     *
-     * @parameter default-value="license.txt"
      */
+    @Parameter(defaultValue="${basedir}/license.txt")
     private File installerLicenseFile;
     /**
      * Custom installer template.
      * This file, if provided, will replace default template from
      * &lt;NetBeansInstallation&gt;/harness/nbi/stub/template.xml
-     * 
-     * @parameter
      */
+    @Parameter
     private File templateFile;
     /**
      * Parameters passed to templateFile 
      * or to installer/nbi/stub/template.xml 
      * to customize generated installers.
      *
-     * @parameter
      */
+    @Parameter
     private Map<String, String> userSettings;
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
-    /**
-     * @component
-     */
+    @Component
     private ArtifactFactory artifactFactory;
     /**
      * Contextualized.
@@ -152,21 +139,17 @@ public class BuildInstallersMojo
     private PlexusContainer container;
     /**
      * Used for attaching the artifact in the project
-     *
-     * @component
      */
+    @Component
     private MavenProjectHelper projectHelper;
-    /**
-     * @component @readonly
-     */
+    
+    @Component
     private ArtifactResolver artifactResolver;
     /**
      * Local maven repository.
      *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
      */
+    @Parameter(readonly=true, required=true, defaultValue="${localRepository}")
     protected ArtifactRepository localRepository;
 
     // </editor-fold>

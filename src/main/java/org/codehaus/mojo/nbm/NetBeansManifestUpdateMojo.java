@@ -43,6 +43,11 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.codehaus.mojo.nbm.model.Dependency;
 import org.codehaus.mojo.nbm.model.NetBeansModule;
 import org.apache.maven.project.MavenProject;
@@ -72,11 +77,11 @@ import org.codehaus.plexus.util.IOUtil;
  * </code>
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal manifest
- * @phase process-classes
- * @requiresDependencyResolution runtime
- * @requiresProject
  */
+@Mojo(name="manifest", 
+        defaultPhase= LifecyclePhase.PROCESS_CLASSES, 
+        requiresProject=true, 
+        requiresDependencyResolution= ResolutionScope.RUNTIME )
 public class NetBeansManifestUpdateMojo
     extends AbstractNbmMojo
 {
@@ -84,23 +89,20 @@ public class NetBeansManifestUpdateMojo
     /**
      * NetBeans module assembly build directory.
      * directory where the the NetBeans jar and nbm file get constructed.
-     * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      */
+    @Parameter(defaultValue="${project.build.directory}/nbm", property="maven.nbm.buildDir")
     protected File nbmBuildDir;
 
     /**
      * a NetBeans module descriptor containing dependency information and more
-     *
-     * @parameter default-value="${basedir}/src/main/nbm/module.xml"
      */
+    @Parameter(defaultValue="${basedir}/src/main/nbm/module.xml")
     protected File descriptor;
 
     /**
      * maven project
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(required=true, readonly=true, property="project")
     private MavenProject project;
 
     /**
@@ -109,28 +111,24 @@ public class NetBeansManifestUpdateMojo
      * eg. if your codenamebase is "org.netbeans.modules.apisupport", then the actual docs
      * files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs.
      * Obsolete as of NetBeans 7.0 with &#64;HelpSetRegistration.
-     * @parameter default-value="${basedir}/src/main/javahelp"
      * @since 2.7
      */
+    @Parameter(defaultValue="${basedir}/src/main/javahelp")
     protected File nbmJavahelpSource;
 
     /**
-     * Path to manifest file that will be used as base for the 
-     *
-     * @parameter default-value="${basedir}/src/main/nbm/manifest.mf"
+     * Path to manifest file that will be used as base and enhanced with generated content. Any entry specified in the original file
+     * will not be overwritten
      * @since 3.0
-     * @required
      */
+    @Parameter(required=true, defaultValue="${basedir}/src/main/nbm/manifest.mf")
     private File sourceManifestFile;
 
     /**
      * Path to the generated MANIFEST file to use. It will be used by jar:jar plugin.
-     *
-     * @parameter expression="${project.build.outputDirectory}/META-INF/MANIFEST.MF"
      * @since 3.0
-     * @readonly
-     * @required
      */
+    @Parameter(required=true, readonly=true, defaultValue="${project.build.outputDirectory}/META-INF/MANIFEST.MF")
     private File targetManifestFile;
 
     /**
@@ -140,9 +138,9 @@ public class NetBeansManifestUpdateMojo
      * The default is "fail" in which case the validation failure results in a failed build,
      * in the vast majority of cases the module would fail at runtime anyway.
      *
-     * @parameter expression="${maven.nbm.verify}" default-value="fail"
      * @since 3.0
      */
+    @Parameter(property="maven.nbm.verify", defaultValue="fail")
     private String verifyRuntime;
     
     private static final String FAIL = "fail";
@@ -156,9 +154,9 @@ public class NetBeansManifestUpdateMojo
      * <p/>
      * Eg. "org.kleint.milos.api" designates just the one package, while "org.kleint.milos.spi.*"
      * denotes the spi package an all it's subpackages.
-     * @parameter
      * @since 3.0
      */
+    @Parameter
     private List<String> publicPackages;
 
     /**
@@ -170,50 +168,42 @@ public class NetBeansManifestUpdateMojo
      * as part of the module but will include a modular dependency on the bundle. Modules depending on these old wrappers
      * shall depend directly on the bundle, eventually rendering the old library wrapper module obsolete.
      *
-     * @parameter default-value="false"
      * @since 3.2
-     *
      */
-
+    @Parameter(defaultValue="false")
     private boolean useOSGiDependencies;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
     /**
      * The artifact repository to use.
-     *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
+
      */
+    @Parameter(required=true, readonly=true, defaultValue="${localRepository}")
     private ArtifactRepository localRepository;
 
     /**
      * The artifact factory to use.
-     *
-     * @component
      */
+    @Component
     private ArtifactFactory artifactFactory;
 
     /**
      * The artifact metadata source to use.
-     *
-     * @component
      */
+    @Component
     private ArtifactMetadataSource artifactMetadataSource;
 
     /**
      * The artifact collector to use.
-     *
-     * @component
      */
+    @Component
     private ArtifactCollector artifactCollector;
 
     /**
      * The dependency tree builder to use.
-     *
-     * @component
      */
+    @Component
     private DependencyTreeBuilder dependencyTreeBuilder;
 
 // end of component params custom code folding

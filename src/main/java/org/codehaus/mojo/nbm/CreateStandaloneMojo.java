@@ -20,6 +20,8 @@ import java.io.File;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.util.DefaultFileSet;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
@@ -29,37 +31,31 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  *
  * @author <a href="mailto:johan.andren@databyran.se">Johan Andrén</a>
  * @author Milos Kleint
- * @goal standalone-zip
- * @requiresProject
  */
+@Mojo(name="standalone-zip", requiresProject=true)
 public class CreateStandaloneMojo
         extends AbstractMojo
 {
 
     /**
      * The branding token for the application based on NetBeans platform.
-     * @parameter expression="${netbeans.branding.token}"
-     * @required
      */
+    @Parameter(property="netbeans.branding.token", required=true)
     protected String brandingToken;
     /**
      * output directory where the the NetBeans application will be created.
-     * @parameter default-value="${project.build.directory}"
-     * @required
      */
+    @Parameter(required=true, defaultValue="${project.build.directory}")
     private File outputDirectory;
     /**
      * Name of the jar packaged by the jar:jar plugin
-     * @parameter expression="${project.build.finalName}"
      */
+    @Parameter(defaultValue="${project.build.finalName}")
     private String finalName;
     /**
      * The Maven project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(required=true, readonly=true, property="project")
     private MavenProject project;
 
     /**

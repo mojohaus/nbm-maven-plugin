@@ -40,6 +40,11 @@ import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -56,50 +61,45 @@ import org.netbeans.nbbuild.MakeListOfNBM;
  * projects
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
- * @goal cluster-app
- * @phase package
- * @requiresDependencyResolution runtime
- * @requiresProject
  */
+@Mojo(name="cluster-app", 
+        defaultPhase= LifecyclePhase.PACKAGE, 
+        requiresProject=true, 
+        requiresDependencyResolution= ResolutionScope.RUNTIME )
 public class CreateClusterAppMojo
     extends AbstractNbmMojo
 {
 
     /**
      * output directory where the the NetBeans application will be created.
-     * @parameter default-value="${project.build.directory}"
-     * @required
      */
+    @Parameter(defaultValue="${project.build.directory}", required=true)
     private File outputDirectory;
 
     /**
      * The Maven Project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(required=true, readonly=true, property="project")
     private MavenProject project;
 
     /**
      * The branding token for the application based on NetBeans platform.
-     * @parameter expression="${netbeans.branding.token}"
-     * @required
      */
+    @Parameter(property="netbeans.branding.token", required=true)
     protected String brandingToken;
 
     /**
      * Optional path to custom etc/${brandingToken}.conf file. If not defined,
      * a default template will be used.
-     * @parameter expression="${netbeans.conf.file}"
      */
+    @Parameter( property="netbeans.conf.file")
     private File etcConfFile;
 
     /**
      * Optional path to custom etc/${brandingToken}.clusters file. If not defined,
      * a default one will be generated.
-     * @parameter expression="${netbeans.clusters.file}"
      */
+    @Parameter(property="netbeans.clusters.file")
     private File etcClustersFile;
 
     /**
@@ -107,46 +107,39 @@ public class CreateClusterAppMojo
      * the final application's bin/ directory.
      * Please note that the name of the executables shall generally
      * match the brandingToken parameter. Otherwise the application can be wrongly branded.
-     * @parameter expression="${netbeans.bin.directory}"
      */
+    @Parameter(property="netbeans.bin.directory")
     private File binDirectory;
 
     /**
      * If the depending NBM file doesn't contain any application cluster information,
      * use this value as default location for such module NBMs.
-     * @parameter default-value="extra"
      * @since 3.2
      */
+    @Parameter(defaultValue="extra")
     private String defaultCluster;
 
     /**
      * Process OSGi dependencies.
      * These will all go into <code>defaultCluster</code>.
-     * @parameter default-value="false"
      * @since 3.6
      */
+    @Parameter(defaultValue="false")
     private boolean useOSGiDependencies;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
-    /**
-     * @component
-     * @readonly
-     */
+    
+    @Component
     private ArtifactFactory artifactFactory;
 
-    /**
-     * @component
-     * @readonly
-     */
+    @Component
     private ArtifactResolver artifactResolver;
 
     /**
      * Local maven repository.
      *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
      */
+    @Parameter(required=true, readonly=true, property="localRepository")
     protected ArtifactRepository localRepository;
 
 // end of component params custom code folding

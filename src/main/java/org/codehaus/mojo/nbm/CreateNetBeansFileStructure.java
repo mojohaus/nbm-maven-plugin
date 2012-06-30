@@ -41,6 +41,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.filtering.MavenFilteringException;
 import org.codehaus.mojo.nbm.model.NbmResource;
 import org.apache.maven.project.MavenProject;
@@ -75,33 +77,29 @@ public abstract class CreateNetBeansFileStructure
     /**
      * NetBeans module assembly build directory.
      * directory where the the NetBeans jar and nbm file get constructed.
-     * @parameter default-value="${project.build.directory}/nbm" expression="${maven.nbm.buildDir}"
      */
+    @Parameter(defaultValue="${project.build.directory}/nbm", property="maven.nbm.buildDir")
     protected File nbmBuildDir;
     /**
      * Build directory
-     * @parameter expression="${project.build.directory}"
-     * @required
-     * @readonly
      */
+    @Parameter(required=true, readonly=true, property="project.build.directory")
     protected File buildDir;
     /**
      * Name of the jar packaged by the jar:jar plugin
-     * @parameter alias="jarName" expression="${project.build.finalName}"
      */
+    @Parameter(alias="jarname", property="project.build.finalName")
     protected String finalName;
     /**
      * a NetBeans module descriptor containing dependency information and more..
-     *
-     * @parameter default-value="${basedir}/src/main/nbm/module.xml"
      */
+    @Parameter(defaultValue="${basedir}/src/main/nbm/module.xml")
     protected File descriptor;
     /**
      * NetBeans module's cluster. Replaces the cluster element in module descriptor.
      *
-     * @parameter default-value="extra"
-     * @required
      */
+    @Parameter(required=true, defaultValue="extra")
     protected String cluster;
     /**
      * The location of JavaHelp sources for the project. The documentation
@@ -109,16 +107,13 @@ public abstract class CreateNetBeansFileStructure
      * eg. if your codenamebase is "org.netbeans.modules.apisupport", then the actual docs
      * files shall go to ${basedir}/src/main/javahelp/org/netbeans/modules/apisupport/docs.
      * @deprecated Obsolete as of NetBeans 7.0 with &#64;HelpSetRegistration.
-     * @parameter default-value="${basedir}/src/main/javahelp"
      * @since 2.7
      */
     @Deprecated
+    @Parameter(defaultValue="${basedir}/src/main/javahelp")
     protected File nbmJavahelpSource;
-    /**
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
+
+    @Parameter(required=true, readonly=true, property="project")
     protected MavenProject project;
     /**
      * Distribution base URL for the NBM at runtime deployment time.
@@ -143,8 +138,8 @@ public abstract class CreateNetBeansFileStructure
      * If the value doesn't contain :: characters,
      * it's assumed to be the flat structure and the value is just the URL.
      * 
-     * @parameter expression="${maven.nbm.distributionURL}"
      */
+    @Parameter(property="maven.nbm.distributionURL")
     private String distributionUrl;
 
     /**
@@ -164,31 +159,25 @@ public abstract class CreateNetBeansFileStructure
             &lt;/nbmResource&gt;<br/>
      </code>
      *
-     * @parameter
      * @since 3.2
      */
+    @Parameter
     protected Resource[] nbmResources;
 
     /**
      * The character encoding scheme to be applied when filtering nbm resources.
      *
-     * @parameter expression="${encoding}" default-value="${project.build.sourceEncoding}"
      * @since 3.2
      */
+    @Parameter(property="encoding", defaultValue="${project.build.sourceEncoding}")
+    
     protected String encoding;
 
-    /**
-     *
-     * @component
-     * @required
-     */
+
+    @Component
     protected MavenResourcesFiltering mavenResourcesFiltering;
 
-    /**
-     * @parameter default-value="${session}"
-     * @readonly
-     * @required
-     */
+    @Parameter(property="session", readonly=true, required=true)
     protected MavenSession session;
 
 
