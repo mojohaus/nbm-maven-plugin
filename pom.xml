@@ -143,8 +143,8 @@
                                 </delete>
                                 <!-- patch product.xml - unable to delete temp files after build finishes -->
                                 <replace file="${project.build.directory}/classes/harness/nbi/.common/product.xml">
-                                    <replacetoken expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}"]]></replacetoken>
-                                    <replacevalue expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}" deleteonexit="true"]]></replacevalue>
+                                    <replacetoken expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}>"]]></replacetoken>
+                                    <replacevalue expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}" deleteonexit="true">]]></replacevalue>
                                 </replace>
                                 <!-- patch replace exec with ant task in common.xml -->
                                 <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" flags="s" />
