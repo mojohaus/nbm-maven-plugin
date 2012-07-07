@@ -23,9 +23,6 @@ import java.net.URLConnection;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -38,11 +35,6 @@ import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.util.StringUtils;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
  * Build installers for Mavenized NetBeans application.
@@ -57,7 +49,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
         defaultPhase=LifecyclePhase.PACKAGE )
 public class BuildInstallersMojo
         extends AbstractNbmMojo
-        implements Contextualizable
 {
 
     /**
@@ -75,11 +66,6 @@ public class BuildInstallersMojo
     */
     @Parameter(property="netbeans.branding.token")
     protected String installDirName;
-    /**
-    * The Maven Project.
-    */
-    @Parameter(required=true, readonly=true, property="project")    
-    private MavenProject project;
     /**
     * Prefix of all generated installers files
     */
@@ -136,23 +122,21 @@ public class BuildInstallersMojo
      */
     @Parameter(defaultValue="${project.build.finalName}")
     private String finalName;
-    
-    @Parameter(defaultValue="${basedir}", readonly=true, required=true)
-    private File basedir;
-    
+
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
-    /**
-     * Contextualized.
-     */
-    private PlexusContainer container;
     /**
      * Used for attaching the artifact in the project
      */
     @Component
     private MavenProjectHelper projectHelper;
-    
-    @Parameter(readonly=true, required=true, defaultValue="${localRepository}")
-    protected ArtifactRepository localRepository;
+        
+    @Parameter(readonly=true, required=true, property="basedir")
+    private File basedir;
+    /**
+    * The Maven Project.
+    */
+    @Parameter(required=true, readonly=true, property="project")    
+    private MavenProject project;    
 
     // </editor-fold>
     @Override
@@ -161,12 +145,6 @@ public class BuildInstallersMojo
     {
         Project antProject = antProject();
 
-        File nbmBuildDirFile = new File( outputDirectory, "netbeans_site" );
-        if ( !nbmBuildDirFile.exists() )
-        {
-            nbmBuildDirFile.mkdirs();
-        }
-
         if ( !"nbm-application".equals( project.getPackaging() ) )
         {
             throw new MojoExecutionException(
@@ -174,16 +152,12 @@ public class BuildInstallersMojo
         }
 
         String zipName = finalName + ".zip";
-        File zipFile = new File( outputDirectory,  File.separatorChar + zipName );
+        File zipFile = new File( outputDirectory, zipName );
         getLog().info( String.format( "Running Build Installers action for (existing=%2$s) zip file %1$s",
                 zipFile, zipFile.exists() ) );
 
-        //mkleint: this is a totally flawed pattern!!!! cannot make any assumption on multimodule layout
-        String appName = project.getParent().getArtifactId().replace( ".", "" ).replace( "-", "" ).replace( "_", "" ).replaceAll( "[0-9]+", "" );
 
         File appIconIcnsFile;
-
-        boolean usePack200 = this.installerPack200Enable;
 
         // Copy Netbeans Installer resources
         FileUrlUtils fu = new FileUrlUtils();
@@ -202,6 +176,7 @@ public class BuildInstallersMojo
 
         Map<String, String> props = new HashMap<String, String> ();
 
+        //TODO mkleint: this is wrong.. why reference the parent directory of current project? what guarantees that something is there.
         props.put( "suite.location", basedir.getParentFile().getAbsolutePath().replace( "\\", "/" ) );
         props.put( "suite.dist.zip", zipFile.getAbsolutePath().replace( "\\", "/" ) );
         props.put( "suite.dist.directory", outputDirectory.getAbsolutePath().replace( "\\", "/" ) );
@@ -211,6 +186,8 @@ public class BuildInstallersMojo
 
         props.put( "install.dir.name", installDirName );
 
+        //mkleint: this is a flawed pattern! cannot make any assumption on multimodule layout
+        String appName = project.getParent().getArtifactId().replace( ".", "" ).replace( "-", "" ).replace( "_", "" ).replaceAll( "[0-9]+", "" );
         props.put( "suite.nbi.product.uid", appName.toLowerCase( Locale.ENGLISH ) );
 
         props.put( "suite.props.app.title", ( project.getName() + " " + project.getVersion() ).replaceAll( "-SNAPSHOT", "" ) );
@@ -236,7 +213,7 @@ public class BuildInstallersMojo
         if ( installerLicenseFile != null )
         {
             getLog().info( String.format( "License file is at %1s, exist = %2$s", installerLicenseFile, installerLicenseFile.exists() ) );
-            props.put( "nbi.license.file", installerLicenseFile.getAbsolutePath() );
+            props.put( "nbi.license.file", installerLicenseFile.getAbsolutePath() ); //mkleint: no path replacement here??
         }
 
         List<String> platforms = new ArrayList<String>();
@@ -284,13 +261,13 @@ public class BuildInstallersMojo
         props.put( "generate.installer.for.platforms", sb.toString() );
 
         File javaHome = new File( System.getProperty( "java.home" ) );
-        if ( new File( javaHome, "lib/rt.jar" ).exists() && javaHome.getName().equals( "jre" ) )
+        if ( new File( javaHome, "lib/rt.jar" ).exists() && javaHome.getName().equals( "jre" ) ) //mkleint: does this work on mac? no rt.jar there
         {
             javaHome = javaHome.getParentFile();
         }
         props.put( "generator-jdk-location-forward-slashes", javaHome.getAbsolutePath().replace( "\\", "/" ) );
 
-        props.put( "pack200.enabled", "" + usePack200 );
+        props.put( "pack200.enabled", "" + installerPack200Enable );
 
         if ( appIconIcnsFile != null )
         {
@@ -322,13 +299,7 @@ public class BuildInstallersMojo
         }
     }
 
-    @Override
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
-    }
-
+    //mkleint: could this be replaced by something from plexus-utils?
     private class FileUrlUtils
     {
 
