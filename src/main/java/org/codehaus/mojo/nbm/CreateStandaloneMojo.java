@@ -48,7 +48,7 @@ public class CreateStandaloneMojo
     @Parameter(required=true, defaultValue="${project.build.directory}")
     private File outputDirectory;
     /**
-     * Name of the jar packaged by the jar:jar plugin
+     * Name of the zip artifact produced by the goal (without .zip extension)
      */
     @Parameter(defaultValue="${project.build.finalName}")
     private String finalName;

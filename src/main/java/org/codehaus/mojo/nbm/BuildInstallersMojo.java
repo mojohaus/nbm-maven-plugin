@@ -83,7 +83,7 @@ public class BuildInstallersMojo
     /**
     * Prefix of all generated installers files
     */
-    @Parameter(defaultValue="${project.name}-${project.version}")
+    @Parameter(defaultValue="${project.build.finalName}")
     private String installersFilePrefix;
     /**
      * Create installer for Windows
@@ -130,9 +130,17 @@ public class BuildInstallersMojo
      */
     @Parameter
     private Map<String, String> userSettings;
+    
+    /**
+     * Name of the zip artifact used to produce installers from (without .zip extension)
+     */
+    @Parameter(defaultValue="${project.build.finalName}")
+    private String finalName;
+    
+    @Parameter(defaultValue="${basedir}", readonly=true, required=true)
+    private File basedir;
+    
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
-    @Component
-    private ArtifactFactory artifactFactory;
     /**
      * Contextualized.
      */
@@ -143,12 +151,6 @@ public class BuildInstallersMojo
     @Component
     private MavenProjectHelper projectHelper;
     
-    @Component
-    private ArtifactResolver artifactResolver;
-    /**
-     * Local maven repository.
-     *
-     */
     @Parameter(readonly=true, required=true, defaultValue="${localRepository}")
     protected ArtifactRepository localRepository;
 
@@ -171,12 +173,12 @@ public class BuildInstallersMojo
                     "This goal only makes sense on project with 'nbm-application' packaging." );
         }
 
-        File suiteLocation = outputDirectory.getParentFile();
-        String zipName = project.getArtifactId() + "-" + project.getVersion() + ".zip";
-        File zipFile = new File( suiteLocation, "target" + File.separatorChar + zipName );
+        String zipName = finalName + ".zip";
+        File zipFile = new File( outputDirectory,  File.separatorChar + zipName );
         getLog().info( String.format( "Running Build Installers action for (existing=%2$s) zip file %1$s",
                 zipFile, zipFile.exists() ) );
 
+        //mkleint: this is a totally flawed pattern!!!! cannot make any assumption on multimodule layout
         String appName = project.getParent().getArtifactId().replace( ".", "" ).replace( "-", "" ).replace( "_", "" ).replaceAll( "[0-9]+", "" );
 
         File appIconIcnsFile;
@@ -200,16 +202,11 @@ public class BuildInstallersMojo
 
         Map<String, String> props = new HashMap<String, String> ();
 
-        props.put( "suite.location", suiteLocation.getParentFile().getAbsolutePath().replace( "\\", "/" ) );
+        props.put( "suite.location", basedir.getParentFile().getAbsolutePath().replace( "\\", "/" ) );
         props.put( "suite.dist.zip", zipFile.getAbsolutePath().replace( "\\", "/" ) );
-        props.put( "suite.dist.directory", new File( suiteLocation, "target" ).getAbsolutePath().replace( "\\", "/" ) );
-        props.put( "installer.build.dir", new File( suiteLocation, "target/installerbuild" ).getAbsolutePath().replace( "\\", "/" ) );
-
-        if ( installersFilePrefix == null )
-        {
-            installersFilePrefix = project.getParent().getArtifactId()
-                    + "-" + project.getVersion();
-        }
+        props.put( "suite.dist.directory", outputDirectory.getAbsolutePath().replace( "\\", "/" ) );
+        props.put( "installer.build.dir", new File( outputDirectory, "installerbuild" ).getAbsolutePath().replace( "\\", "/" ) );
+        
         props.put( "installers.file.prefix", installersFilePrefix );
 
         props.put( "install.dir.name", installDirName );
