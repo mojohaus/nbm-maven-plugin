@@ -373,6 +373,9 @@ public class NetBeansManifestUpdateMojo
                     mavenClassPath.append( ' ' );
                 }
                 mavenClassPath.append( a.getGroupId() ).append( ':' ).append( a.getArtifactId() ).append( ':' ).append( a.getBaseVersion() );
+                if (a.getClassifier() != null) {
+                    mavenClassPath.append(":").append(a.getClassifier());
+            }
             }
 
             for ( ModuleWrapper wr : moduleArtifacts )
