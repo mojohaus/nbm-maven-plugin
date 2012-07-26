@@ -18,9 +18,15 @@ package org.codehaus.mojo.nbm;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Developer;
+import org.apache.maven.model.License;
+import org.apache.maven.model.Organization;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -174,8 +180,8 @@ public class CreateNbmMojo
         else
         {
             Blurb lb = nbmTask.createLicense();
-            lb.addText( "<Here comes the license>" );
-            lb.addText( "Unknown license agreement" );
+            lb.addText( createDefaultLicenseHeader() );
+            lb.addText( createDefaultLicenseText() );
         }
         String homePageUrl = module.getHomepageUrl();
         if ( homePageUrl == null )
@@ -242,5 +248,63 @@ public class CreateNbmMojo
             throws ContextException
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
+
+    private String createDefaultLicenseHeader()
+    {
+        String organization = "";
+        Organization org = project.getOrganization();
+        if (org != null) {
+            organization = org.getName();
+}
+        if (organization == null) {
+            List devs = project.getDevelopers();
+            if (devs.size() > 0) {
+                Iterator dvs = devs.iterator();
+                String devsString = "";
+                while (dvs.hasNext()) {
+                    Developer d = ( Developer )dvs.next();
+                    devsString = devsString + "," + d.getName() != null ? d.getName() : d.getId();
+                }
+                organization = devsString.substring( 1 );    
+            }
+        }
+        if (organization == null) {
+            organization = ""; //what's a good default value?
+        }
+        String date = "";
+        if (project.getInceptionYear() != null) {
+            date = project.getInceptionYear();
+        }
+        String year = Integer.toString( Calendar.getInstance().get( Calendar.YEAR ));
+        if (!year.equals( date ) ) {
+            date = date.length() == 0 ? year : date + "-" + year;
+        }
+        return "Copyright " + organization + " " + date;
+    }
+    
+    private String createDefaultLicenseText() {
+        String toRet = "License terms:\n";
+        
+        List licenses = project.getLicenses();
+        if (licenses != null && licenses.size() > 0) {
+            Iterator lic = licenses.iterator();
+            while (lic.hasNext()) {
+                License ll = ( License )lic.next();
+                
+                if (ll.getName() != null) {
+                   toRet = toRet + ll.getName() + " - "; 
+                }
+                if (ll.getUrl() != null) {
+                    toRet = toRet + ll.getUrl();
+                }
+                if (lic.hasNext()) {
+                    toRet = toRet + ",\n";
+                }
+            }
+        } else {
+           toRet = toRet + "Unknown";
+        }
+        return toRet;
     }
 }
