@@ -53,6 +53,7 @@ import org.apache.tools.ant.taskdefs.Chmod;
 import org.apache.tools.ant.types.FileSet;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.io.InputStreamFacade;
 import org.netbeans.nbbuild.MakeListOfNBM;
 
@@ -194,12 +195,17 @@ public class CreateClusterAppMojo
                                 FileSet set = makeTask.createFileSet();
                                 set.setDir( cluster.location );
                                 makeTask.setOutputfiledir( cluster.location );
-
+                                String[] executables = null;
                                 while ( enu.hasMoreElements() )
                                 {
                                     JarEntry ent = enu.nextElement();
                                     String name = ent.getName();
-                                    if ( name.startsWith( "netbeans/" ) )
+                                    //MNBMODULE-176
+                                    if ( name.equals("Info/executables.list")) {
+                                        InputStream is = jf.getInputStream( ent );
+                                        executables = StringUtils.split( IOUtil.toString( is, "UTF-8" ), "\n");
+                                    }
+                                    else if ( name.startsWith( "netbeans/" ) )
                                     { // ignore everything else.
                                         String path = clusterName + name.substring( "netbeans".length() );
                                         boolean ispack200 = path.endsWith( ".jar.pack.gz" );
@@ -293,7 +299,19 @@ public class CreateClusterAppMojo
                                     getLog().error( "Cannot Generate update_tracking XML file from " + art.getFile() );
                                     throw new MojoExecutionException( e.getMessage(), e );
                                 }
-
+                                
+                                if ( executables != null ) 
+                                {
+                                    //MNBMODULE-176
+                                    for ( String exec : executables )
+                                    {
+                                        exec = exec.replace( "/", File.separator);
+                                        File execFile = new File(cluster.location, exec);
+                                        if (execFile.exists()) {
+                                            execFile.setExecutable( true, false);
+                                        }
+                                    }
+                                }
                             }
                         }
                         finally
