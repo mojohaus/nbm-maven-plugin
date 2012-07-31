@@ -89,6 +89,9 @@
                     <version>1.0.0+</version>
                     <description>Author of the module. Is used when generating the NBM file.</description>
                     <type>String</type>
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
         
                 <field>
