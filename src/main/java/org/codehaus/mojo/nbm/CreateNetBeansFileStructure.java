@@ -179,6 +179,16 @@ public abstract class CreateNetBeansFileStructure
      */ 
     @Parameter(defaultValue="normal")
     protected String moduleType;
+    
+    /**
+     * codename base of the module, uniquely identifying the module within the NetBeans runtime. usually the package name equivalent.
+     * Can include the major release version.
+     * see http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest
+     * @Since 3.8
+     */
+    @Parameter(defaultValue="${project.groupid}.${project.artifactId}")
+    private String codeNameBase;
+    
 
 
     @Component
@@ -220,12 +230,12 @@ public abstract class CreateNetBeansFileStructure
         boolean autoload = "autoload".equals( type );
         boolean eager = "eager".equals( type );
         // 1. initialization
-        String moduleName = module.getCodeNameBase();
-        if ( moduleName == null )
-        {
-            moduleName = project.getGroupId() + "." + project.getArtifactId();
-            moduleName = moduleName.replaceAll( "-", "." );
+        String moduleName = codeNameBase;
+        if (module.getCodeNameBase() != null) {
+            moduleName = module.getCodeNameBase();
+            getLog().warn( "codeNameBase in module descriptor is deprecated, use the plugin's parameter codeNameBase");
         }
+        moduleName = NetBeansManifestUpdateMojo.stripVersionFromCodebaseName( moduleName.replaceAll( "-", "." ) );
         moduleJarName = moduleName.replace( '.', '-' );
         if ( "extra".equals( cluster ) && module.getCluster() != null )
         {
@@ -233,13 +243,6 @@ public abstract class CreateNetBeansFileStructure
                     "Parameter cluster in module descriptor is deprecated, use the plugin configuration element." );
             cluster = module.getCluster();
         }
-        // it can happen the moduleName is in format org.milos/1
-        int index = moduleJarName.indexOf( '/' );
-        if ( index > -1 )
-        {
-            moduleJarName = moduleJarName.substring( 0, index ).trim();
-        }
-
         File jarFile = new File( buildDir, finalName + ".jar" );
         clusterDir = new File( nbmBuildDir, "netbeans" + File.separator + cluster );
         File moduleJarLocation = new File( clusterDir, "modules" );

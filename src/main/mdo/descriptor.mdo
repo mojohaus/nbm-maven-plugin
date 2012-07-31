@@ -37,6 +37,9 @@
                     <description>Codenamebase of the module. Primary identification of the module. Usually the package name. Eg. "org.codehaus.mevenide.project". 
                     If not defined here, the default value is constructed from groupId and artifactId.</description>
                     <type>String</type>
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
                 <field>
                     <name>cluster</name>

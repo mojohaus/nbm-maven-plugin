@@ -172,6 +172,15 @@ public class NetBeansManifestUpdateMojo
      */
     @Parameter(defaultValue="false")
     private boolean useOSGiDependencies;
+    
+    /**
+     * codename base of the module, uniquely identifying the module within the NetBeans runtime. usually the package name equivalent.
+     * Can include the major release version.
+     * see http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest
+     * @Since 3.8
+     */
+    @Parameter(defaultValue="${project.groupid}.${project.artifactId}")
+    private String codeNameBase;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
@@ -230,12 +239,12 @@ public class NetBeansManifestUpdateMojo
             module = createDefaultDescriptor( project, false );
         }
 
-        String moduleName = module.getCodeNameBase();
-        if ( moduleName == null )
-        {
-            moduleName = project.getGroupId() + "." + project.getArtifactId();
-            moduleName = moduleName.replaceAll( "-", "." );
+        String moduleName = codeNameBase;
+        if (module.getCodeNameBase() != null) {
+            moduleName = module.getCodeNameBase();
+            getLog().warn( "codeNameBase in module descriptor is deprecated, use the plugin's parameter codeNameBase");
         }
+        moduleName = moduleName.replaceAll( "-", "." );
 //<!-- if a NetBeans specific manifest is defined, examine this one, otherwise the already included one.
 // ignoring the case when some of the NetBeans attributes are already defined in the jar and more is included.
         File specialManifest = sourceManifestFile;
@@ -510,7 +519,7 @@ public class NetBeansManifestUpdateMojo
         return timestamp;
     }
 
-    private String stripVersionFromCodebaseName( String cnb )
+    static String stripVersionFromCodebaseName( String cnb )
     {
         // it can happen the moduleName is in format org.milos/1
         String base = cnb;
