@@ -91,6 +91,15 @@ public class CreateNbmMojo
      */
     @Parameter(defaultValue="false")
     private boolean requiresRestart;
+    
+    /**
+     * Get homepage URL of the module. Is accessible from NetBeans
+     * UI upon installation, should point to place with additional
+     * information about the functionality. 
+     * @since 3.8
+     */
+    @Parameter(defaultValue="${project.url}")
+    private String homePageUrl;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
@@ -195,14 +204,14 @@ public class CreateNbmMojo
             lb.addText( createDefaultLicenseHeader() );
             lb.addText( createDefaultLicenseText() );
         }
-        String homePageUrl = module.getHomepageUrl();
-        if ( homePageUrl == null )
-        {
-            homePageUrl = project.getUrl();
+        String hpUrl = homePageUrl;
+        if (module.getHomepageUrl() != null) {
+            getLog().warn( "Module descriptor's homePageUrl field is deprecated, use plugin's configuration in pom.xml");
+            hpUrl = module.getHomepageUrl();
         }
-        if ( homePageUrl != null )
+        if ( hpUrl != null )
         {
-            nbmTask.setHomepage( homePageUrl );
+            nbmTask.setHomepage( hpUrl );
         }
         if ( module.getDistributionUrl() != null )
         {

@@ -74,6 +74,9 @@
                     <version>1.0.0+</version>
                     <description>Homepage URL of the module. Is accessible from NetBeans UI upon installation, should point to place with additional information about the functionality. If not defined, it defaults to POM's url element.</description>
                     <type>String</type>
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
                 <field>
                     <name>distributionUrl</name>
