@@ -282,7 +282,6 @@ public abstract class AbstractNbmMojo
                 "No Module Descriptor defined, trying to fallback to generated values:" );
         }
         NetBeansModule module = new NetBeansModule();
-        module.setAuthor( "Nobody" );
         return module;
     }
 
