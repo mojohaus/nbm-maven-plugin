@@ -8,13 +8,13 @@
 
 NetBeans Module plugin
 
- This m2 plugin is able to create NetBeans module(plugin) artifacts. It registers a new packaging type "nbm". Any project with
+ This m2 plugin is able to create NetBeans module(plugin) artifacts. It registers a new packaging type <<<nbm>>>. Any project with
 this packaging will be automatically turned into a NetBeans module project. Additionally it allows to create clusters of modules, generate
 an autoupdate site content or build and assemble an application on top of NetBeans platform.
 
  The plugin is also capable of populating the local maven repository with module jars and NBM files from a given NetBeans installation. Useful for
 module development, modules with public APIs are separated from those without a public API.
-See the {{{./populate-repository-mojo.html}nbm:populate-repository}} goal and the {{{./repository.html}HOWTO document}} for details.
+See the {{{./populate-repository-mojo.html}<<<nbm:populate-repository>>>}} goal and the {{{./repository.html}HOWTO document}} for details.
 
  To get access to a repository with NetBeans.org module artifacts and metadata, add {{{http://bits.netbeans.org/maven2/}http://bits.netbeans.org/maven2/}} repository to your project POM
 or the repository manager you are using. The repository hosts binaries of NetBeans 6.5 and later.
@@ -24,15 +24,15 @@ For explanation why it's like this, see {{{http://netbeans.org/bugzilla/show_bug
 
  Also see: {{{http://wiki.netbeans.org/NetBeansDeveloperFAQ#Mavenized_Builds}Maven NBM development FAQs}}
 
- Sample pom.xml excerpts for creation of a NetBeans module:
+ Sample <<<pom.xml>>> excerpts for creation of a NetBeans module:
 
-------
++-----+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>example-netbeans-module</artifactId>
   <groupId>org.mycompany.myproject</groupId>
-  <!--here is the packaging and lifecycle defined>
+  <!--here is the packaging and lifecycle defined-->
   <packaging>nbm</packaging>
 
 ....
@@ -70,8 +70,7 @@ For explanation why it's like this, see {{{http://netbeans.org/bugzilla/show_bug
             </snapshots>
         </repository>
     </repositories>
-
-------
++-----+
 
  To build the project then, just type
 
@@ -101,21 +100,21 @@ and classpath libraries.
         * It's a direct dependency (non-transitive) and is a NetBeans module itself. Preferred way of declaring
 module dependencies. 
 
-        * It's defined in existing (though optional) module.xml file in <dependencies> section.
+        * It's defined in existing (though optional) module.xml file in <<<dependencies>>> section.
 Try to avoid this, but still useful if one wants to put an explicit dependency value on the module, or use implementation dependency.
 
-        * When the dependency is of type "nbm". Deprecated in 3.0.x, only helpful in older versions.
+        * When the dependency is of type <<<nbm>>>. Deprecated in 3.0.x, only helpful in older versions.
 Such dependencies don't include their transitive deps on compilation classpath.
 That should allow one to simulate the rumtime dependencies at compilation time in maven, however there's one major drawback. Not only are the nbm's module dependencies hidden, but the libraries associated with the
-given nbm module are also hidden. So you can end up with less stuff on classpath  as opposed to more stuff with "jar typed dependencies.
+given nbm module are also hidden. So you can end up with less stuff on classpath  as opposed to more stuff with <<<jar typed dependencies>>>.
 
     * for module libraries (jars that are packed together with the module and appear on it's classpath directly, not by a dependency relationship.)
 
-        * It's a direct dependency and is not of "provided" scope.
+        * It's a direct dependency and is not of <<<provided>>> scope.
 
-        * It's a transitive dependency, pulled in by a direct dependency (only non-module one - see first bullet) This is new in 3.0+
+        * It's a transitive dependency, pulled in by a direct dependency (only non-module one - see first bullet) This is new in <<3.0+>>
 
-        * It's defined in existing (though optional) module.xml file in <libraries> section. Consider this deprecated in 3.0+.
+        * It's defined in existing (though optional) module.xml file in <libraries> section. Consider this deprecated in <<3.0+>>.
 
 
  The complete {{{./nbm.html}nbm descriptor format}} documentation, and {{{./descriptor.html}example descriptors}} are also available.
@@ -129,19 +128,19 @@ system constructs the classpath for the module based on our metadata generated.
 
 Using OSGi bundles in NetBeans platform based applications
 
- Starting with version 3.2, it's possible for the NetBeans modules to depend on OSGi bundles. A proper module dependency section will be generated.
+ Starting with version <<3.2>>, it's possible for the NetBeans modules to depend on OSGi bundles. A proper module dependency section will be generated.
 To include the bundle in the application, add dependency on the bundle from nbm-application.
 There are a few prerequisites.
 
    * It works only in NetBeans 6.9 and later which support the embedding of bundles at runtime
 
-   * Add \<useOSGiDependencies\>true\</useOSGiDependencies\> configuration entry to all the modules depending on OSGi bundles.
+   * Add <<<\<useOSGiDependencies\>true\</useOSGiDependencies\>>>> configuration entry to all the modules depending on OSGi bundles.
      Existing applications/modules need to check modules wrapping
      external libraries for library jars that are also OSGi bundles. Such modules will no longer include the OSGi bundles
      as part of the module NBM but will include a modular dependency reference on the bundle only. Modules depending on these old wrapper modules
      shall depend directly on the bundle, eventually rendering the old library wrapper module obsolete.
 
-   * in the distribution, all bundles will be included in the default cluster ("extra" if not configured otherwise)
+   * in the distribution, all bundles will be included in the default cluster (<<<extra>>> if not configured otherwise)
 
    * all bundles will be autoload, thus requiring at least one depending regular module to enable them.
 
@@ -152,17 +151,17 @@ Multi module setup
 you will make use of the additional goals provided by the plugin.
 
  If you are building a Platform-based application, use a project
-with "nbm-application" packaging to perform the final application assembly.
+with <<<nbm-application>>> packaging to perform the final application assembly.
 This packaging type (defined in nbm-maven-plugin) should have your module projects
 and all dependencies of the target NetBeans Platform included as dependencies.
 
  For the NetBeans Platform/IDE modules, there are artifacts that aggregate modules in clusters.
-These are put in the org.netbeans.clusters groupId (on bits.netbeans.org or in your own repository).
+These are put in the <<<org.netbeans.clusters>>> groupId (on <<<bits.netbeans.org>>> or in your own repository).
 The following snippet will include the basic NetBeans platform cluster and your own
 module in the application. You can use standard dependency exclusion lists to cut out modules from the Platform that
 you don't need.
 
-------
++-----+
     <artifactId>application</artifactId>
     <packaging>nbm-application</packaging>
     <version>1.0-SNAPSHOT</version>
@@ -180,14 +179,14 @@ you don't need.
         </dependency>
     </dependencies>
     ....
-------
++-----+
 
  The nbm-application project/packaging defines a build lifecycle that creates a final application
 from the NBM files in local/remote repotories and bundles them in a ZIP file (also uploadable to the repository).
 In addition to that you can configure the project to generate an autoupdate site and/or
 webstartable binaries of the applications (typically in a deployment profile):
 
-------
++-----+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
@@ -201,7 +200,7 @@ webstartable binaries of the applications (typically in a deployment profile):
                     </execution>
                 </executions>
             </plugin>
-------
++-----+
 
  See the {{{./autoupdate-mojo.html}autoupdate}} and {{{./webstart-app-mojo.html}webstart-app}} goals
 for more details.
@@ -230,7 +229,7 @@ NetBeans Platform-based application.
  For more detailed tutorial, check the {{{http://netbeans.dzone.com/videos/screencast-maven-and-netbeans}Screencast: Maven and the NetBeans Platform}}
 video recorded by Fabrizio Giudici. It describes to Fabrizio's open source project {{{http://kenai.com/projects/forceten}ForceTen}} which can be used as reference setup for Maven NetBeans Platform based apps.
 
- The branding is included as part of a regular nbm subproject and cannot be attached to a "pom" packaged root project.
+ The branding is included as part of a regular nbm subproject and cannot be attached to a <<<pom>>> packaged root project.
 
 +-------------------------------------------------------------------------------+
 mvn nbm:run-ide nbm:run-platform
@@ -239,7 +238,7 @@ mvn nbm:run-ide nbm:run-platform
  These two goals do almost the same, they allow you to execute your projects content within
 the IDE or NetBeans platform.
 
- nbm:run-platform only makes sense to execute on projects with nbm-application packaging.
+ <<<nbm:run-platform>>> only makes sense to execute on projects with <<<nbm-application>>> packaging.
 
  For more information on plugin configuration and customization, see {{{./plugin-info.html}goal documentation}}.
 
@@ -247,13 +246,13 @@ the IDE or NetBeans platform.
 Public packages declaration
 
  By default all your module's packages (and classes) and private to the given module. If you want to expose
-any API to other modules, you will need to declare those public packages in your pom.xml. This includes
+any API to other modules, you will need to declare those public packages in your <<<pom.xml>>>. This includes
 not only your own classes but also any other 3rd party library classes that are packaged with your module
 and are to be exposed for reuse by other modules.
 
- For example,
+ For example:
 
-------
++-----+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
@@ -266,10 +265,10 @@ and are to be exposed for reuse by other modules.
                    </publicPackages>
                 </configuration>
             </plugin>
-------
++-----+
 
- there is a package org.foo.api made public (but not org.foo.api.impl package) and
-any package starting with org.apache.commons, so both org.apache.commons.io and org.apache.commons.exec packages are exposed to the outside
+ there is a package <<<org.foo.api>>> made public (but not <<<org.foo.api.impl>>> package) and
+any package starting with <<<org.apache.commons>>>, so both <<<org.apache.commons.io>>> and <<<org.apache.commons.exec>>> packages are exposed to the outside
 
 
 

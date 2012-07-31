@@ -92,7 +92,7 @@ import org.codehaus.plexus.util.StringUtils;
  * <a href="http://bits.netbeans.org/netbeans/trunk/maven-snapshot/">http://bits.netbeans.org/netbeans/trunk/maven-snapshot/</a>
  * may also be used for <code>SNAPSHOT</code> artifacts if you wish to test development builds.
  * <p/>
- * See this <a href="repository.html">HOWTO</a> on how to generate the NetBeans binaries required
+ * See this <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin/repository.html">HOWTO</a> on how to generate the NetBeans binaries required
  * by this goal.
  * <p/>
  * <b>Compatibility Note</b>: The 3.0+ version puts all unrecognized, non-module, 3rd party jars

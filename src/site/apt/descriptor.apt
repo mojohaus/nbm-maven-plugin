@@ -15,8 +15,7 @@ Example nbm descriptors
  A rather common module descriptor. Basic properties filled in, defines some libraries that ship with the module and
  declared dependencies on other NetBeans modules.
 
-------
-
++-----+
 <nbm>
    <moduleType>normal</moduleType>
    <codeNameBase>org.codehaus.mevenide.netbeans/2</codeNameBase>
@@ -63,15 +62,13 @@ Example nbm descriptors
       </dependency>
    </dependencies> 
 </nbm>
-
-------
++-----+
 
 *Additional custom files in module
 
  Apart from the usual properties, this one declares additional files that ought to be packed into the module.
 
-------
-
++-----+
 <nbm>
    <moduleType>eager</moduleType>
    <codeNameBase>org.codehaus.mevenide.netbeans.nbrepo/2</codeNameBase>
@@ -94,7 +91,4 @@ Example nbm descriptors
        </nbmResource>
    </nbmResources>
 </nbm>
-
-------
-
-
++-----+
