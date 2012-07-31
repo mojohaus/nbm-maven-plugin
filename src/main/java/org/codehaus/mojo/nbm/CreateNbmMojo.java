@@ -107,6 +107,34 @@ public class CreateNbmMojo
      */
     @Parameter(defaultValue="${project.organization.name}")
     private String author;
+    
+    /**
+     * Distribution base URL for the NBM at runtime deployment time.
+     * Note: Usefulness of the parameter is questionable, it doesn't allow for mirrors and
+     * usually when downloading the nbm, one already knows the location anyway.
+     * Please note that the netbeans.org Ant scripts put a dummy url here.
+     * The actual correct value used when constructing update site is
+     * explicitly set there. The general assumption there is that all modules from one update
+     * center come from one base URL. Also see <code>distBase</code> parameter in auto-update mojo.
+     * <p/>
+     * The value is either a direct http protocol based URL that points to
+     * the location under which nbm file will be located, or
+     * <p/>
+     * it allows to create an update site based on maven repository content.
+     * The later created autoupdate site document can use this information and
+     * compose the application from one or multiple maven repositories.
+     * <br/>
+     * Format: id::layout::url same as in maven-deploy-plugin
+     * <br/>
+     * with the 'default' and 'legacy' layouts. (maven2 vs maven1 layout)
+     * <br/>
+     * If the value doesn't contain :: characters,
+     * it's assumed to be the flat structure and the value is just the URL.
+     * 
+     */
+    @Parameter(property="maven.nbm.distributionURL")
+    private String distributionUrl;
+    
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
@@ -220,17 +248,22 @@ public class CreateNbmMojo
         {
             nbmTask.setHomepage( hpUrl );
         }
-        if ( module.getDistributionUrl() != null )
+        String distribUrl = distributionUrl;
+        if (module.getDistributionUrl() != null) {
+            distribUrl = module.getDistributionUrl();
+            getLog().warn( "Module descriptor's distributionUrl field is deprecated, use plugin's configuration in pom.xml");
+        }
+        if ( distribUrl != null )
         {
             ArtifactRepository distRepository = CreateUpdateSiteMojo.getDeploymentRepository(
-                    module.getDistributionUrl(), container, getLog() );
+                    distribUrl, container, getLog() );
             String dist = null;
             if ( distRepository == null )
             {
-                if ( !module.getDistributionUrl().contains( "::" ) )
+                if ( !distribUrl.contains( "::" ) )
                 {
                     dist =
-                        module.getDistributionUrl() + ( module.getDistributionUrl().endsWith( "/" ) ? "" : "/" )
+                        distribUrl + ( distribUrl.endsWith( "/" ) ? "" : "/" )
                             + nbmFile.getName();
                 }
             }

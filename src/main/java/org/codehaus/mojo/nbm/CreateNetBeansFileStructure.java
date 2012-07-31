@@ -115,32 +115,6 @@ public abstract class CreateNetBeansFileStructure
 
     @Parameter(required=true, readonly=true, property="project")
     protected MavenProject project;
-    /**
-     * Distribution base URL for the NBM at runtime deployment time.
-     * Note: Uselfulness of the parameter is questionable, it doesn't allow for mirrors and
-     * usually when downloading the nbm, one alreayd knows the location anyway.
-     * Please note that the netbeans.org Ant scripts put a dummy url here.
-     * The actual correct value used when constructing update site is
-     * explicitly set there. The general assuption there is that all modules from one update
-     * center come from one base URL.
-     * <p/>
-     * The value is either a direct http protocol based URL that points to
-     * the location under which nbm file will be located, or
-     * <p/>
-     * it allows to create an update site based on maven repository content.
-     * The later created autoupdate site document can use this information and
-     * compose the application from one or multiple maven repositories.
-     * <br/>
-     * Format: id::layout::url same as in maven-deploy-plugin
-     * <br/>
-     * with the 'default' and 'legacy' layouts. (maven2 vs maven1 layout)
-     * <br/>
-     * If the value doesn't contain :: characters,
-     * it's assumed to be the flat structure and the value is just the URL.
-     * 
-     */
-    @Parameter(property="maven.nbm.distributionURL")
-    private String distributionUrl;
 
     /**
      * A list of additional resources to include in the NBM file.
@@ -225,10 +199,6 @@ public abstract class CreateNetBeansFileStructure
         } else
         {
             module = createDefaultDescriptor( project, false );
-        }
-        if ( distributionUrl != null )
-        {
-            module.setDistributionUrl( distributionUrl );
         }
         String type = moduleType;
         if ("normal".equals(type) && module.getModuleType() != null) {

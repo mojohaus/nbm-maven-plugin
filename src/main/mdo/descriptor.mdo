@@ -33,7 +33,7 @@
                 <field>
                     <name>codeNameBase</name>
                     <version>1.0.0+</version>
-                    <description>Codenamebase of the module. Primary identification of the module. Usually the package name. Eg. "org.codehaus.mevenide.project". 
+                    <description>DEPRECATED, use the plugin configuration instead. Codenamebase of the module. Primary identification of the module. Usually the package name. Eg. "org.codehaus.mevenide.project". 
                     If not defined here, the default value is constructed from groupId and artifactId.</description>
                     <type>String</type>
                     <annotations>
@@ -52,7 +52,7 @@
                 <field>
                     <name>requiresRestart</name>
                     <version>1.0.0+</version>
-                    <description>DEPRECATED Determines if the module requires restart of the IDE/platform upon installation.</description>
+                    <description>DEPRECATED, use the plugin configuration instead. Determines if the module requires restart of the IDE/platform upon installation.</description>
                     <type>boolean</type>
                     <annotations>
                         <annotation>@Deprecated</annotation>
@@ -72,7 +72,7 @@
                 <field>
                     <name>homepageUrl</name>
                     <version>1.0.0+</version>
-                    <description>Homepage URL of the module. Is accessible from NetBeans UI upon installation, should point to place with additional information about the functionality. If not defined, it defaults to POM's url element.</description>
+                    <description>DEPRECATED, use the plugin configuration instead. Homepage URL of the module. Is accessible from NetBeans UI upon installation, should point to place with additional information about the functionality. If not defined, it defaults to POM's url element.</description>
                     <type>String</type>
                     <annotations>
                         <annotation>@Deprecated</annotation>
@@ -83,11 +83,14 @@
                     <version>1.0.0+</version>
                     <description>DEPRECATED, use the plugin configuration instead. Http URL of the location where the module can be downloaded from the internet. This value put into the NBM and used when generating the Autoupdate Site. Should point directly to the NBM download.</description>
                     <type>String</type>
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
                 <field>
                     <name>author</name>
                     <version>1.0.0+</version>
-                    <description>Author of the module. Is used when generating the NBM file.</description>
+                    <description>DEPRECATED, use the plugin configuration instead. Author of the module. Is used when generating the NBM file.</description>
                     <type>String</type>
                     <annotations>
                         <annotation>@Deprecated</annotation>
