@@ -174,7 +174,18 @@ public abstract class CreateNetBeansFileStructure
     protected String encoding;
     
     /**
-     * Deployment type of the module, allowed values are 'normal,eager,autoload'. For details, see http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement
+     * Deployment type of the module, allowed values are 'normal,eager,autoload'. 
+     * <p><b>autoload</b> - Such a module is
+     * automatically enabled when some other module requires it and
+     * automatically disabled otherwise.</p>
+     *                     <p><b>eager</b> - This module type gets
+     * automatically enabled when all it's dependencies are
+     * satisfied. Disabled otherwise.</p>
+     *                     <p><b>normal</b> - This is the default
+     * value. This kind of module is enabled/disabled manually by
+     * the user. It installs enabled.</p>
+     * 
+     * For details, see <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans Module system docs</a>
      * @since 3.8
      */ 
     @Parameter(defaultValue="normal")
@@ -183,8 +194,8 @@ public abstract class CreateNetBeansFileStructure
     /**
      * codename base of the module, uniquely identifying the module within the NetBeans runtime. usually the package name equivalent.
      * Can include the major release version.
-     * see http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest
-     * @Since 3.8
+     * See <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest"> NetBeans Module system docs</a>
+     * @since 3.8
      */
     @Parameter(defaultValue="${project.groupid}.${project.artifactId}")
     private String codeNameBase;
@@ -220,7 +231,7 @@ public abstract class CreateNetBeansFileStructure
             module.setDistributionUrl( distributionUrl );
         }
         String type = moduleType;
-        if ("normal".equals(type) && !"normal".equals(module.getModuleType())) {
+        if ("normal".equals(type) && module.getModuleType() != null) {
             type = module.getModuleType();
             getLog().warn( "moduleType in module descriptor is deprecated, use the plugin's parameter moduleType");
         }

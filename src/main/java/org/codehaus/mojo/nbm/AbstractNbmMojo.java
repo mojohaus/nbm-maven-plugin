@@ -283,17 +283,6 @@ public abstract class AbstractNbmMojo
         }
         NetBeansModule module = new NetBeansModule();
         module.setAuthor( "Nobody" );
-        module.setCluster( "maven" );
-        if ( log )
-        {
-            getLog().info( "   Cluster:" + module.getCluster() );
-        }
-        module.setModuleType( "normal" );
-        if ( log )
-        {
-            getLog().info( "   Type:" + module.getModuleType() );
-        }
-        module.setRequiresRestart( false );
         return module;
     }
 

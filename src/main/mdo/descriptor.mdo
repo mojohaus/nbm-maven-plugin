@@ -26,7 +26,6 @@
                     <p><b>normal</b> - This is the default value. This kind of module is enabled/disabled manually by the user. It installs enabled.</p>
                     ]]>        </description>
                     <type>String</type>
-                    <defaultValue>normal</defaultValue>
                     <annotations>
                         <annotation>@Deprecated</annotation>
                     </annotations>

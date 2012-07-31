@@ -176,8 +176,8 @@ public class NetBeansManifestUpdateMojo
     /**
      * codename base of the module, uniquely identifying the module within the NetBeans runtime. usually the package name equivalent.
      * Can include the major release version.
-     * see http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest
-     * @Since 3.8
+     * See <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest"> NetBeans Module system docs</a>
+     * @since 3.8
      */
     @Parameter(defaultValue="${project.groupid}.${project.artifactId}")
     private String codeNameBase;
