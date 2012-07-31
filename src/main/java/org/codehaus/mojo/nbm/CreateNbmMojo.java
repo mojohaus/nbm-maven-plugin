@@ -100,6 +100,13 @@ public class CreateNbmMojo
      */
     @Parameter(defaultValue="${project.url}")
     private String homePageUrl;
+    
+    /**
+     * Author of the module. Shown in the Module manager UI.
+     * @since 3.8
+     */
+    @Parameter(defaultValue="${project.organization.name}")
+    private String author;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
@@ -150,10 +157,10 @@ public class CreateNbmMojo
             getLog().warn( "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml");
         }
         nbmTask.setNeedsrestart( Boolean.toString( reqRestart ) );
-        String moduleAuthor = module.getAuthor();
-        if ( moduleAuthor == null )
-        {
-            moduleAuthor = project.getOrganization() != null ? project.getOrganization().getName() : null;
+        String moduleAuthor = author;
+        if (module.getAuthor() != null) {
+            moduleAuthor = module.getAuthor();
+            getLog().warn( "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml");
         }
         nbmTask.setModuleauthor( moduleAuthor );
         if ( keystore != null && keystorealias != null && keystorepassword != null )
