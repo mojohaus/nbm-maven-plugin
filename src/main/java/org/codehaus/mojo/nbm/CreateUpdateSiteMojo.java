@@ -78,7 +78,8 @@ public class CreateUpdateSiteMojo
     /**
      * A custom distribution base for the nbms in the update site.
      * If NOT defined, the update site will use a simple relative URL, which is generally what you want.
-     * Defining it as "auto" will pick up the distribution URL from each NBM, which is generally wrong.
+     * Defining it as "auto" will pick up the distribution URL from each NBM, which is generally wrong. 
+     * See <code>distributionUrl</code> in nbm mojo for what url will be used in that case.
      * <p/>
      * The value is either a direct http protocol based URL that points to
      * the location under which all nbm files are located, or
