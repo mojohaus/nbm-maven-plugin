@@ -102,12 +102,18 @@
                     <version>1.0.0+</version>
                     <description>Name of the license. If the user already agreed to the same license before, he/she won't be asked again to agree.</description>
                     <type>String</type>
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
                 <field>
                     <name>licenseFile</name>
                     <version>1.0.0+</version>
                     <description>Path to the license agreement file.</description>
                     <type>String</type>
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
         
                 <field>

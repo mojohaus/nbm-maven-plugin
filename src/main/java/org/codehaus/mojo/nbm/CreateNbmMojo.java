@@ -135,6 +135,22 @@ public class CreateNbmMojo
     @Parameter(property="maven.nbm.distributionURL")
     private String distributionUrl;
     
+    /**
+     * name of the license applicable to the NBM. The value should be equal across modules with the same license. If the user already agreed to the
+     * same license before, he/she won't be asked again to agree and for multiple one installed at the same time, just one license agreement is shown.
+     * When defined, <code>licenseFile</code> needs to be defined as well.
+     * @since 3.8
+     */
+    @Parameter
+    private String licenseName;
+    
+    /**
+     * path to the license agreement file that will be shown when installing the module. When defined, <code>licenseName</code> needs to be defined as well.
+     * @since 3.8
+     */
+    @Parameter
+    private File licenseFile;
+    
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
@@ -212,26 +228,35 @@ public class CreateNbmMojo
             getLog().warn(
                     "If you want to sign the nbm file, you need to define all three keystore related parameters." );
         }
-        String licenseName = module.getLicenseName();
-        String licenseFile = module.getLicenseFile();
-        if ( licenseName != null && licenseFile != null )
+        String licName = licenseName;
+        File licFile = licenseFile;
+        if (module.getLicenseName() != null) {
+            licName = module.getLicenseName();
+            getLog().warn( "Module descriptor's licenseName field is deprecated, use plugin's configuration in pom.xml");
+        }
+        if (module.getLicenseFile() != null) {
+            File lf = new File( project.getBasedir(), module.getLicenseFile() );
+            licFile = lf;
+            getLog().warn( "Module descriptor's licenseFile field is deprecated, use plugin's configuration in pom.xml");
+            
+        }
+        if ( licName != null && licFile != null )
         {
-            File lf = new File( project.getBasedir(), licenseFile );
-            if ( !lf.exists() || !lf.isFile() )
+            if ( !licFile.exists() || !licFile.isFile() )
             {
-                getLog().warn( "Cannot find license file at " + lf.getAbsolutePath() );
+                getLog().warn( "Cannot find license file at " + licFile.getAbsolutePath() );
             }
             else
             {
                 Blurb lb = nbmTask.createLicense();
-                lb.setFile( lf );
-                lb.addText( licenseName );
+                lb.setFile( licFile );
+                lb.addText( licName );
             }
         }
-        else if ( licenseName != null || licenseFile != null )
+        else if ( licName != null || licFile != null )
         {
             getLog().warn(
-                    "To add a license to the nbm, you need to specify both licenseName and licenseFile parameters" );
+                    "To set license for the nbm, you need to specify both licenseName and licenseFile parameters." );
         }
         else
         {
