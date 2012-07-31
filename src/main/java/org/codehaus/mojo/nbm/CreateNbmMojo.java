@@ -84,6 +84,13 @@ public class CreateNbmMojo
      */
     @Parameter(defaultValue="false", property="maven.nbm.skip")
     private boolean skipNbm;
+    
+    /**
+     * if true, upon installing the NBM the platform app/IDE restart is requested. Not necessary in most cases.
+     * @since 3.8
+     */
+    @Parameter(defaultValue="false")
+    private boolean requiresRestart;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
@@ -128,7 +135,12 @@ public class CreateNbmMojo
         nbmTask.setProductDir( clusterDir );
 
         nbmTask.setModule( "modules" + File.separator + moduleJarName + ".jar" );
-        nbmTask.setNeedsrestart( Boolean.toString( module.isRequiresRestart() ) );
+        boolean reqRestart = requiresRestart;
+        if (!reqRestart && module.isRequiresRestart()) {
+            reqRestart = module.isRequiresRestart();
+            getLog().warn( "Module descriptor's requiresRestart field is deprecated, use plugin's configuration in pom.xml");
+        }
+        nbmTask.setNeedsrestart( Boolean.toString( reqRestart ) );
         String moduleAuthor = module.getAuthor();
         if ( moduleAuthor == null )
         {

@@ -44,7 +44,7 @@
                 <field>
                     <name>requiresRestart</name>
                     <version>1.0.0+</version>
-                    <description>Determines if the module requires restart of the IDE/platform upon installation.</description>
+                    <description>DEPRECATED Determines if the module requires restart of the IDE/platform upon installation.</description>
                     <type>boolean</type>
                 </field>
                 <field>
