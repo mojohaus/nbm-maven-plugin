@@ -20,13 +20,16 @@
                     <name>moduleType</name>
                     <version>1.0.0+</version>
                     <description><![CDATA[
-                    <p>Type of the module. Possible values are </p>
+                    <p>DEPRECATED, use the plugin configuration instead. Type of the module. Possible values are </p>
                     <p><b>autoload</b> - Such a module is automatically enabled when some other module requires it and automatically disabled otherwise.</p>
                     <p><b>eager</b> - This module type gets automatically enabled when all it's dependencies are satisfied. Disabled otherwise.</p>
                     <p><b>normal</b> - This is the default value. This kind of module is enabled/disabled manually by the user. It installs enabled.</p>
                     ]]>        </description>
                     <type>String</type>
                     <defaultValue>normal</defaultValue>
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
                 <field>
                     <name>codeNameBase</name>
@@ -40,12 +43,18 @@
                     <version>1.0.0+</version>
                     <description>DEPRECATED, use the plugin configuration instead. Each modules should belong to a cluster. A cluster is a group of related modules. For individual modules it's not that important. Refer to netbeans.org documentation for more details.</description>
                     <type>String</type>
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
                 <field>
                     <name>requiresRestart</name>
                     <version>1.0.0+</version>
                     <description>DEPRECATED Determines if the module requires restart of the IDE/platform upon installation.</description>
                     <type>boolean</type>
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
                 <field>
                     <name>manifest</name>
@@ -54,6 +63,9 @@
                         </description>
                     <type>String</type>
                     <!--defaultValue>src/main/nbm/manifest.mf</defaultValue-->
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
                 <field>
                     <name>homepageUrl</name>
@@ -114,6 +126,9 @@
                         <type>NbmResource</type>
                         <multiplicity>*</multiplicity>
                     </association>
+                    <annotations>
+                        <annotation>@Deprecated</annotation>
+                    </annotations>
                 </field>
             </fields>
         </class>

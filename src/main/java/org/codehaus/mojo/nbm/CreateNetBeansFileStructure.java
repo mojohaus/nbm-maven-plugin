@@ -172,6 +172,13 @@ public abstract class CreateNetBeansFileStructure
     @Parameter(property="encoding", defaultValue="${project.build.sourceEncoding}")
     
     protected String encoding;
+    
+    /**
+     * Deployment type of the module, allowed values are 'normal,eager,autoload'. For details, see http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement
+     * @since 3.8
+     */ 
+    @Parameter(defaultValue="normal")
+    protected String moduleType;
 
 
     @Component
@@ -202,16 +209,17 @@ public abstract class CreateNetBeansFileStructure
         {
             module.setDistributionUrl( distributionUrl );
         }
-        String type = module.getModuleType();
+        String type = moduleType;
+        if ("normal".equals(type) && !"normal".equals(module.getModuleType())) {
+            type = module.getModuleType();
+            getLog().warn( "moduleType in module descriptor is deprecated, use the plugin's parameter moduleType");
+        }
+        if (!"normal".equals(type) && !"autoload".equals(type) && !"eager".equals(type)) {
+            getLog().error( "Only 'normal,autoload,eager' are allowed values in the moduleType parameter");
+        }
         boolean autoload = "autoload".equals( type );
         boolean eager = "eager".equals( type );
         // 1. initialization
-        if ( autoload && eager )
-        {
-            getLog().error( "Module cannot be both eager and autoload" );
-            throw new MojoExecutionException(
-                    "Module cannot be both eager and autoload" );
-        }
         String moduleName = module.getCodeNameBase();
         if ( moduleName == null )
         {
