@@ -12,7 +12,7 @@
   </fileSets>
   <requiredProperties>
     <requiredProperty key="netbeansVersion">
-      <defaultValue>RELEASE71</defaultValue>
+      <defaultValue>RELEASE72</defaultValue>
     </requiredProperty>
   </requiredProperties>
 </archetype-descriptor>
