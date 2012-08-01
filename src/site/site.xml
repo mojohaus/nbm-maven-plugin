@@ -6,8 +6,6 @@
     <menu name="Overview">
       <item name="Usage" href="index.html"/>
       <item name="Plugin Goals" href="plugin-info.html"/>
-      <item name="Descriptor Format" href="nbm.html"/>
-      <item name="Example Descriptor" href="descriptor.html"/>
       <!-- <item name="Javadoc" href="apidocs/index.html"/> -->
       <!--item name="FAQ" href="faq.html"/-->
     </menu>
@@ -19,6 +17,10 @@
       <item name="Populate repository" href="repository.html"/>
       <item name="Customize installers" href="buildinstexample.html"/>
       <item name="Upgrade from older versions" href="upgrade.html"/>
+    </menu>
+    <menu name="Deprecated">
+      <item name="Descriptor Format" href="nbm.html"/>
+      <item name="Example Descriptor" href="descriptor.html"/>
     </menu>
   </body>
 </project>

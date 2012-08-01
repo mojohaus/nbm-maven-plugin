@@ -6,9 +6,9 @@
  ------
  Jun 15, 2007
 
-Example nbm descriptors
+Example nbm descriptors - since 3.8 DEPRECATED.
 
- These descriptors are referenced from the {{{./nbm-mojo.html}nbm:nbm}} mojo.
+ These descriptors are referenced from the {{{./nbm-mojo.html}nbm:nbm}} mojo. The descriptor file is deprecated since version 3.8.
  
 *Usual case
 

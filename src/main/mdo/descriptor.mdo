@@ -100,7 +100,7 @@
                 <field>
                     <name>licenseName</name>
                     <version>1.0.0+</version>
-                    <description>Name of the license. If the user already agreed to the same license before, he/she won't be asked again to agree.</description>
+                    <description>DEPRECATED, use the plugin configuration instead. Name of the license. If the user already agreed to the same license before, he/she won't be asked again to agree.</description>
                     <type>String</type>
                     <annotations>
                         <annotation>@Deprecated</annotation>
@@ -109,7 +109,7 @@
                 <field>
                     <name>licenseFile</name>
                     <version>1.0.0+</version>
-                    <description>Path to the license agreement file.</description>
+                    <description>DEPRECATED, use the plugin configuration instead. Path to the license agreement file.</description>
                     <type>String</type>
                     <annotations>
                         <annotation>@Deprecated</annotation>
@@ -128,7 +128,7 @@
                 </field>
                  <field>
                     <name>dependencies</name>
-                    <description>List of module dependencies. The plugin will use it to Generate the OpenIDE-Module-Module-Dependencies manifest entry.</description>
+                    <description>DEPRECATED, use the plugin configuration instead. List of module dependencies. The plugin will use it to Generate the OpenIDE-Module-Module-Dependencies manifest entry.</description>
                     <version>1.0.0+</version>
                     <association>
                         <type>Dependency</type>

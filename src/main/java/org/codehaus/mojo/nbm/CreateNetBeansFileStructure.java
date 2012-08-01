@@ -92,6 +92,7 @@ public abstract class CreateNetBeansFileStructure
     protected String finalName;
     /**
      * a NetBeans module descriptor containing dependency information and more..
+     * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in 4.0 entirely
      */
     @Parameter(defaultValue="${basedir}/src/main/nbm/module.xml")
     protected File descriptor;
@@ -122,16 +123,16 @@ public abstract class CreateNetBeansFileStructure
      * Supersedes similarly-named configuration in the module descriptor file.
      * <p>For example, to include native libraries:</p>
      *
-     <code>
-            &lt;nbmResource&gt;<br/>
-            &nbsp;&nbsp;&lt;directory&gt;src/main/libs&lt;/directory&gt;<br/>
-            &nbsp;&nbsp;&lt;targetPath&gt;modules/lib&lt;/targetPath&gt;<br/>
-            &nbsp;&nbsp;&lt;includes&gt;<br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.dll&lt;/include&gt;<br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.so&lt;/include&gt;<br/>
-            &nbsp;&nbsp;&lt;/includes&gt;<br/>
-            &lt;/nbmResource&gt;<br/>
-     </code>
+     <pre>
+            &lt;nbmResource&gt;
+            &nbsp;&nbsp;&lt;directory&gt;src/main/libs&lt;/directory&gt;
+            &nbsp;&nbsp;&lt;targetPath&gt;modules/lib&lt;/targetPath&gt;
+            &nbsp;&nbsp;&lt;includes&gt;
+            &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.dll&lt;/include&gt;
+            &nbsp;&nbsp;&nbsp;&nbsp;&lt;include&gt;*.so&lt;/include&gt;
+            &nbsp;&nbsp;&lt;/includes&gt;
+            &lt;/nbmResource&gt;
+     </pre>
      *
      * @since 3.2
      */
@@ -148,14 +149,15 @@ public abstract class CreateNetBeansFileStructure
     protected String encoding;
     
     /**
-     * Deployment type of the module, allowed values are 'normal,eager,autoload'. 
-     * <p><b>autoload</b> - Such a module is
+     * Deployment type of the module, allowed values are <code>normal</code>,<code>eager</code>,<code>autoload</code>. 
+     * <p>
+     * <code>autoload</code> - Such a module is
      * automatically enabled when some other module requires it and
      * automatically disabled otherwise.</p>
-     *                     <p><b>eager</b> - This module type gets
+     *                     <p><code>eager</code> - This module type gets
      * automatically enabled when all it's dependencies are
      * satisfied. Disabled otherwise.</p>
-     *                     <p><b>normal</b> - This is the default
+     *                     <p><code>normal</code> - This is the default
      * value. This kind of module is enabled/disabled manually by
      * the user. It installs enabled.</p>
      * 

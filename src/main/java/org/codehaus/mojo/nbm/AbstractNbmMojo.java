@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.maven.artifact.Artifact;
@@ -308,16 +309,36 @@ public abstract class AbstractNbmMojo
     }
 
     static List<ModuleWrapper> getModuleDependencyArtifacts( DependencyNode treeRoot, NetBeansModule module,
-                                                             MavenProject project,
+                                                             Dependency[] customDependencies, MavenProject project,
                                                              Map<Artifact, ExamineManifest> examinerCache,
                                                              List<Artifact> libraryArtifacts, Log log,
                                                              boolean useOsgiDependencies )
         throws MojoExecutionException
     {
+        List<Dependency> deps = new ArrayList<Dependency>();
+        if (customDependencies != null) {
+            deps.addAll( Arrays.asList( customDependencies ));
+        }
+        if (module != null && !module.getDependencies().isEmpty()) {
+            log.warn( "dependencies in module descriptor are deprecated, use the plugin's parameter moduleDependencies");
+            //we need to make sure a dependency is not twice there, module deps override the config (as is the case with other
+            //configurations)
+            for (Dependency d : module.getDependencies()) {
+                Dependency found = null;
+                for (Dependency d2 : deps) {
+                    if (d2.getId().equals(d.getId())) {
+                        found = d2;
+                        break;
+                    }
+                }
+                if (found != null) {
+                    deps.remove( found );
+                }
+                deps.add(d);
+            }
+        }
         List<ModuleWrapper> include = new ArrayList<ModuleWrapper>();
-        if ( module != null )
-        {
-            List<Dependency> deps = module.getDependencies();
+        
             @SuppressWarnings( "unchecked" )
             List<Artifact> artifacts = project.getCompileArtifacts();
             for ( Artifact artifact : artifacts )
@@ -396,7 +417,6 @@ public abstract class AbstractNbmMojo
                     }
                 }
             }
-        }
         return include;
     }
 

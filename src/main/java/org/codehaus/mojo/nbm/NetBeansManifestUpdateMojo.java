@@ -60,21 +60,21 @@ import org.apache.tools.ant.taskdefs.ManifestException;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
- * Goal for generating NetBeans module system specific manifest entries, part of "nbm" lifecycle/packaging.
+ * Goal for generating NetBeans module system specific manifest entries, part of <code>nbm</code> lifecycle/packaging.
  *
  * In order to have the generated manifest picked up by the maven-jar-plugin,
  * one shall add the following configuration snippet to maven-jar-plugin.
  * <p/>
- * <code>
-    &lt;plugin&gt;<br/>
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;<br/>
-        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;<br/>
-        &lt;version&gt;2.2&lt;/version&gt;<br/>
-        &lt;configuration&gt;<br/>
-            &lt;useDefaultManifestFile&gt;true&lt;/useDefaultManifestFile&gt;<br/>
-        &lt;/configuration&gt;<br/>
-    &lt;/plugin&gt;<br/>
- * </code>
+ * <pre>
+    &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;
+        &lt;version&gt;2.2&lt;/version&gt;
+        &lt;configuration&gt;
+            &lt;useDefaultManifestFile&gt;true&lt;/useDefaultManifestFile&gt;
+        &lt;/configuration&gt;
+    &lt;/plugin&gt;
+ * </pre>
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  */
@@ -95,6 +95,7 @@ public class NetBeansManifestUpdateMojo
 
     /**
      * a NetBeans module descriptor containing dependency information and more
+     * @deprecated all content from the module descriptor can be defined as plugin configuration now, will be removed in 4.0 entirely
      */
     @Parameter(defaultValue="${basedir}/src/main/nbm/module.xml")
     protected File descriptor;
@@ -133,9 +134,9 @@ public class NetBeansManifestUpdateMojo
 
     /**
      * Verify the runtime NetBeans module dependencies and Class-Path items
-     * generated from Maven dependencies. The check is done by matcing classes used
-     * in current project. Allowed values for the parameter are "fail", "warn" and "skip".
-     * The default is "fail" in which case the validation failure results in a failed build,
+     * generated from Maven dependencies. The check is done by matching classes used
+     * in current project. Allowed values for the parameter are <code>fail</code>, <code>warn</code> and <code>skip</code>.
+     * The default is <code>fail</code> in which case the validation failure results in a failed build,
      * in the vast majority of cases the module would fail at runtime anyway.
      *
      * @since 3.0
@@ -181,6 +182,32 @@ public class NetBeansManifestUpdateMojo
      */
     @Parameter(defaultValue="${project.groupid}.${project.artifactId}")
     private String codeNameBase;
+    
+    /**
+     * List of explicit module dependency declarations overriding the default specification dependency. Useful when depending on a range of major versions,
+     * depending on implementation version etc.
+     * <p>The format is:
+     * <pre>
+     * &lt;dependency&gt;
+     *    &lt;id&gt;groupId:artifactId&lt;/id&gt;
+     *    &lt;type&gt;spec|impl|loose&lt;/type&gt;
+     *    &lt;explicitValue&gt;the entire dependency token&lt;/explicitValue&gt;
+     * &lt;/dependency&gt;
+     * </pre>
+     * </p>
+     * <p>
+     * where <code>id</code> is composed of grouId and artifactId of a dependency defined in effective pom, separated by double colon. This is mandatory.</p>
+     * <p>
+     * Then there are 2 exclusively optional fields <code>type</code> and <code>explicitValue</code>, if both are defined <code>explicitValue</code> gets applied.
+     * </p>
+     * <p><code>type</code> values: <code>spec</code> means specification dependency.That's the default. 
+     * <code>impl</code> means implementation dependency, only the exact version match will satisfy the constraint. 
+     * <code>loose</code> means loose dependency, no requirement on version, the module just has to be present. Not very common option.
+     * 
+     * @since 3.8
+     */
+    @Parameter
+    private Dependency[] moduleDependencies;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
@@ -233,6 +260,7 @@ public class NetBeansManifestUpdateMojo
         if ( descriptor != null && descriptor.exists() )
         {
             module = readModuleDescriptor( descriptor );
+            getLog().warn( "descriptor parameter is deprecated, use equivalent mojo parameters instead.");
         }
         else
         {
@@ -359,15 +387,14 @@ public class NetBeansManifestUpdateMojo
                 "OpenIDE-Module-Long-Description", project.getDescription() );
         }
         getLog().debug( "module =" + module );
-        if ( module != null )
-        {
+        
             DependencyNode treeroot = createDependencyTree( project, dependencyTreeBuilder, localRepository,
                 artifactFactory, artifactMetadataSource, artifactCollector, "compile" );
             Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
             @SuppressWarnings( "unchecked" )
             List<Artifact> libArtifacts = getLibraryArtifacts( treeroot, module, project.getRuntimeArtifacts(),
                 examinerCache, getLog(), useOSGiDependencies );
-            List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts( treeroot, module, project, examinerCache,
+            List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts( treeroot, module, moduleDependencies, project, examinerCache,
                 libArtifacts, getLog(), useOSGiDependencies );
             String classPath = "";
             StringBuilder mavenClassPath = new StringBuilder();
@@ -480,7 +507,6 @@ public class NetBeansManifestUpdateMojo
 //                getLog().warn(
 //                        "Some libraries could not be found in the dependency chain: " + list );
 //            }
-        }
         PrintWriter writer = null;
         try
         {

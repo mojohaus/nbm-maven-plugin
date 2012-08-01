@@ -117,7 +117,8 @@ given nbm module are also hidden. So you can end up with less stuff on classpath
         * It's defined in existing (though optional) module.xml file in <libraries> section. Consider this deprecated in <<3.0+>>.
 
 
- The complete {{{./nbm.html}nbm descriptor format}} documentation, and {{{./descriptor.html}example descriptors}} are also available.
+ The complete {{{./nbm.html}nbm descriptor format}} documentation, and {{{./descriptor.html}example descriptors}} are also available. 
+Please note that since 3.8 version, the descriptor is deprecated and replaced by plugin configuration parameters.
 
  Additionally we perform dependency analysis in order to warn the user when runtime dependencies are wrong.
 So project's own classes and it's classpath libraries' classes are checked against the module dependencies
