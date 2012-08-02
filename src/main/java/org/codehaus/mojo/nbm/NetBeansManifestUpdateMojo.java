@@ -180,7 +180,7 @@ public class NetBeansManifestUpdateMojo
      * See <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#how-manifest"> NetBeans Module system docs</a>
      * @since 3.8
      */
-    @Parameter(defaultValue="${project.groupid}.${project.artifactId}")
+    @Parameter(defaultValue="${project.groupId}.${project.artifactId}")
     private String codeNameBase;
     
     /**
