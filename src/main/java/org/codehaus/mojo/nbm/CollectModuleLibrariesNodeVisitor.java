@@ -25,8 +25,8 @@ import java.util.Stack;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.shared.dependency.tree.DependencyNode;
-import org.apache.maven.shared.dependency.tree.traversal.DependencyNodeVisitor;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
 
 /**
  * A dependency node visitor that collects visited nodes that are known libraries or are
@@ -99,16 +99,6 @@ public class CollectModuleLibrariesNodeVisitor
             {
                 //ignore non-runtime stuff..
                 return false;
-            }
-            if ( node.getState() != DependencyNode.INCLUDED )
-            {
-//                if (node.getState() == DependencyNode.OMITTED_FOR_DUPLICATE) {
-//                    duplicates.add( artifact.getDependencyConflictId() );
-//                }
-//                if (node.getState() == DependencyNode.OMITTED_FOR_CONFLICT) {
-//                    conflicts.add( artifact.getDependencyConflictId() );
-//                }
-                return true;
             }
             // somehow the transitive artifacts in the  tree are not always resolved?
             artifact = artifacts.get( artifact.getDependencyConflictId() );

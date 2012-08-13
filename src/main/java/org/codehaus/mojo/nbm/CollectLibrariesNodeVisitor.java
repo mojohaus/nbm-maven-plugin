@@ -25,8 +25,8 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.shared.dependency.tree.DependencyNode;
-import org.apache.maven.shared.dependency.tree.traversal.DependencyNodeVisitor;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
 
 /**
  * A dependency node visitor that collects visited nodes that are known libraries or are
@@ -106,18 +106,6 @@ public class CollectLibrariesNodeVisitor
                 //ignore non-runtime stuff..
                 return false;
             }
-            if ( node.getState() != DependencyNode.INCLUDED )
-            {
-                if ( node.getState() == DependencyNode.OMITTED_FOR_DUPLICATE )
-                {
-                    duplicates.add( artifact.getDependencyConflictId() );
-                }
-                if ( node.getState() == DependencyNode.OMITTED_FOR_CONFLICT )
-                {
-                    conflicts.add( artifact.getDependencyConflictId() );
-                }
-                return true;
-            }
             // somehow the transitive artifacts in the  tree are not always resolved?
             artifact = artifacts.get( artifact.getDependencyConflictId() );
 
@@ -162,9 +150,6 @@ public class CollectLibrariesNodeVisitor
         }
         if ( node == root )
         {
-            Set<String> badDuplicates = new HashSet<String>();
-            badDuplicates.addAll( duplicates );
-            badDuplicates.removeAll( includes );
             if ( nodes.size() > 0 )
             {
                 log.info( "Adding on module's Class-Path:" );
@@ -173,32 +158,6 @@ public class CollectLibrariesNodeVisitor
                     log.info( "    " + inc.getId() );
                 }
             }
-
-            Set<String> badConflicts = new HashSet<String>();
-            badConflicts.addAll( conflicts );
-            badConflicts.removeAll( conflicts );
-
-            if ( badDuplicates.size() > 0 || badConflicts.size() > 0 )
-            {
-                log.warn( "There are transitive dependencies that were not included " +
-                    "in the module's Class-Path because they were resolved as part of another NetBeans module." );
-                if ( badConflicts.size() > 0 )
-                {
-                    log.warn( "Some are used in different version." );
-                }
-                for ( String dup : badConflicts )
-                {
-                    log.warn( "  " + dup + " (with different version)" );
-                }
-                badDuplicates.removeAll( badConflicts );
-                for ( String dup : badDuplicates )
-                {
-                    log.warn( "  " + dup );
-                }
-
-            }
-
-
         }
         return true;
     }

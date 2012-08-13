@@ -53,8 +53,8 @@ import org.codehaus.mojo.nbm.model.NetBeansModule;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.analyzer.DefaultClassAnalyzer;
 import org.apache.maven.shared.dependency.analyzer.asm.ASMDependencyAnalyzer;
-import org.apache.maven.shared.dependency.tree.DependencyNode;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
 import org.codehaus.plexus.util.IOUtil;
@@ -240,7 +240,7 @@ public class NetBeansManifestUpdateMojo
      * The dependency tree builder to use.
      */
     @Component
-    private DependencyTreeBuilder dependencyTreeBuilder;
+    private DependencyGraphBuilder dependencyGraphBuilder;
 
 // end of component params custom code folding
 // </editor-fold> 
@@ -388,8 +388,7 @@ public class NetBeansManifestUpdateMojo
         }
         getLog().debug( "module =" + module );
         
-            DependencyNode treeroot = createDependencyTree( project, dependencyTreeBuilder, localRepository,
-                artifactFactory, artifactMetadataSource, artifactCollector, "compile" );
+            DependencyNode treeroot = createDependencyTree( project, dependencyGraphBuilder, "compile" );
             Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
             @SuppressWarnings( "unchecked" )
             List<Artifact> libArtifacts = getLibraryArtifacts( treeroot, module, project.getRuntimeArtifacts(),
@@ -668,7 +667,7 @@ public class NetBeansManifestUpdateMojo
             {
                 if ( !deps.isEmpty() )
                 {
-                    throw new MojoFailureException( "Uncategorized problems with NetBeans dependency verification (maybe MNBMODULE-102): " + deps );
+                    throw new MojoFailureException( "Uncategorized problems with NetBeans dependency verification (maybe MNBMODULE-102 or wrong maven dependency metadata). Class usages: " + deps );
                 }
                 else
                 {

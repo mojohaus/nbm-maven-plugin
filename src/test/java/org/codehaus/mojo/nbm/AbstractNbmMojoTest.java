@@ -19,6 +19,7 @@ package org.codehaus.mojo.nbm;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,8 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
-import org.apache.maven.shared.dependency.tree.DependencyNode;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
+import org.apache.maven.shared.dependency.graph.internal.DefaultDependencyNode;
 import org.codehaus.mojo.nbm.model.Dependency;
 import org.codehaus.mojo.nbm.model.NetBeansModule;
 
@@ -39,7 +41,7 @@ import org.codehaus.mojo.nbm.model.NetBeansModule;
  */
 public class AbstractNbmMojoTest extends TestCase {
     Log log = null;
-    DependencyNode treeRoot = null;
+    DefaultDependencyNode treeRoot = null;
     
     public AbstractNbmMojoTest(String testName) {
         super(testName);
@@ -49,7 +51,7 @@ public class AbstractNbmMojoTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         log = new SystemStreamLog();
-        treeRoot = createNode("root", "root", "1.0", "jar", "", true, new ArrayList<Artifact>(), new HashMap<Artifact,ExamineManifest>());
+        treeRoot = createNode(null, "root", "root", "1.0", "jar", "", true, new ArrayList<Artifact>(), new HashMap<Artifact,ExamineManifest>());
     }
 
     @Override
@@ -143,8 +145,8 @@ public class AbstractNbmMojoTest extends TestCase {
         System.out.println("getLibraryArtifacts1");
         Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
         List<Artifact> runtimes = new ArrayList<Artifact>();
-        DependencyNode module = createNode("gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
-        treeRoot.addChild( module );
+        DependencyNode module = createNode(treeRoot, "gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
+        treeRoot.setChildren( Collections.singletonList( module ));
         NetBeansModule mdl = new NetBeansModule();
         List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log, false);
         assertEquals(0, result.size());
@@ -157,8 +159,8 @@ public class AbstractNbmMojoTest extends TestCase {
         System.out.println("getLibraryArtifacts2");
         Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
         List<Artifact> runtimes = new ArrayList<Artifact>();
-        DependencyNode library = createNode("gr1", "ar1", "1.0", "jar", "compile", false, runtimes, examinerCache);
-        treeRoot.addChild( library );
+        DependencyNode library = createNode(treeRoot, "gr1", "ar1", "1.0", "jar", "compile", false, runtimes, examinerCache);
+        treeRoot.setChildren( Collections.singletonList( library ));
         NetBeansModule mdl = new NetBeansModule();
         List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log, false);
         assertEquals(1, result.size());
@@ -172,10 +174,11 @@ public class AbstractNbmMojoTest extends TestCase {
         System.out.println("getLibraryArtifacts3");
         Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
         List<Artifact> runtimes = new ArrayList<Artifact>();
-        DependencyNode library = createNode("gr1", "ar1", "1.0", "jar", "compile", false, runtimes, examinerCache);
-        treeRoot.addChild( library );
-        DependencyNode translibrary = createNode("gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
-        library.addChild(translibrary);
+        DependencyNode library = createNode(treeRoot, "gr1", "ar1", "1.0", "jar", "compile", false, runtimes, examinerCache);
+        treeRoot.setChildren( Collections.singletonList( library ));
+        DependencyNode translibrary = createNode(library, "gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
+        ((DefaultDependencyNode)library).setChildren( Collections.singletonList( translibrary ) );
+        
         NetBeansModule mdl = new NetBeansModule();
         List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log, false);
         assertEquals(2, result.size());
@@ -188,10 +191,10 @@ public class AbstractNbmMojoTest extends TestCase {
         System.out.println("getLibraryArtifacts4");
         Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
         List<Artifact> runtimes = new ArrayList<Artifact>();
-        DependencyNode module = createNode("gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
-        treeRoot.addChild( module );
-        DependencyNode translibrary = createNode("gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
-        module.addChild(translibrary);
+        DependencyNode module = createNode(treeRoot, "gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
+        treeRoot.setChildren( Collections.singletonList( module ));
+        DependencyNode translibrary = createNode(module, "gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
+        ((DefaultDependencyNode)module).setChildren( Collections.singletonList( translibrary ) );
         NetBeansModule mdl = new NetBeansModule();
         List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log, false);
         assertEquals(0, result.size());
@@ -205,17 +208,15 @@ public class AbstractNbmMojoTest extends TestCase {
         System.out.println("getLibraryArtifacts5");
         Map<Artifact, ExamineManifest> examinerCache = new HashMap<Artifact, ExamineManifest>();
         List<Artifact> runtimes = new ArrayList<Artifact>();
-        DependencyNode module = createNode("gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
-        treeRoot.addChild( module );
-        DependencyNode translibrary = createNode("gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
-        module.addChild(translibrary);
+        DependencyNode module = createNode(treeRoot, "gr1", "ar1", "1.0", "jar", "compile", true, runtimes, examinerCache);
+        DependencyNode translibrary = createNode(module, "gr2", "ar2", "1.0", "jar", "runtime", false, runtimes, examinerCache);
+        ((DefaultDependencyNode)module).setChildren( Collections.singletonList( translibrary ) );
 
-        DependencyNode library = createNode("gr3", "ar3", "1.0", "jar", "compile", false, runtimes, examinerCache);
-        treeRoot.addChild( library );
-        DependencyNode translibrary2 = createNode("gr4", "ar4", "1.0", "jar", "runtime", false, runtimes, examinerCache);
-        library.addChild(translibrary2);
-        DependencyNode translibrary3 = createNode(translibrary.getArtifact(), DependencyNode.OMITTED_FOR_DUPLICATE);
-        translibrary2.addChild(translibrary3);
+        DependencyNode library = createNode(treeRoot, "gr3", "ar3", "1.0", "jar", "compile", false, runtimes, examinerCache);
+        DependencyNode translibrary2 = createNode(library, "gr4", "ar4", "1.0", "jar", "runtime", false, runtimes, examinerCache);
+        ((DefaultDependencyNode)library).setChildren( Collections.singletonList( translibrary2 ) );
+        treeRoot.setChildren( Arrays.asList( new DependencyNode[] { module, library}));
+
 
         NetBeansModule mdl = new NetBeansModule();
         List<Artifact> result = AbstractNbmMojo.getLibraryArtifacts(treeRoot, mdl, runtimes, examinerCache, log, false);
@@ -224,19 +225,20 @@ public class AbstractNbmMojoTest extends TestCase {
         assertEquals(result.get(1).getId(), translibrary2.getArtifact().getId());
     }
 
-    private DependencyNode createNode(String gr, String art, String ver, String pack, String scope, boolean isModule, List<Artifact> runtimes, Map<Artifact, ExamineManifest> cache) {
+    private DefaultDependencyNode createNode(DependencyNode parent, String gr, String art, String ver, String pack, String scope, boolean isModule, List<Artifact> runtimes, Map<Artifact, ExamineManifest> cache) {
         Artifact a = createArtifact(gr, art, ver, pack, scope);
-        DependencyNode nd = new DependencyNode(a);
+        DefaultDependencyNode nd = new DefaultDependencyNode(parent, a, ver, scope, ver);
         ExamineManifest manifest = isModule ? createModule() : createNonModule();
         runtimes.add(a);
         cache.put(a, manifest);
+        nd.setChildren( Collections.<DependencyNode>emptyList() );
         return nd;
     }
 
-    private DependencyNode createNode(Artifact a, int state) {
-        DependencyNode nd = new DependencyNode(a, state, a);
-        return nd;
-    }
+//    private DependencyNode createNode(Artifact a, int state) {
+//        DependencyNode nd = new DefaultDependencyNode(a, state, a);
+//        return nd;
+//    }
 
     private Artifact createArtifact(String gr, String art, String ver, String pack, String scope) {
         VersionRange rng = VersionRange.createFromVersion(ver);

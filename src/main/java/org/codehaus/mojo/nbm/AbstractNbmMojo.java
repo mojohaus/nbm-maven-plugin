@@ -26,9 +26,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactCollector;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -38,9 +36,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.dependency.tree.DependencyNode;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
+import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
@@ -155,7 +153,7 @@ public abstract class AbstractNbmMojo
         return antProject;
     }
 
-    static final boolean matchesLibrary( Artifact artifact, List<String> libraries, ExamineManifest depExaminator,
+    static boolean matchesLibrary( Artifact artifact, List<String> libraries, ExamineManifest depExaminator,
         Log log, boolean useOsgiDependencies )
     {
         String artId = artifact.getArtifactId();
@@ -432,22 +430,16 @@ public abstract class AbstractNbmMojo
     }
 
     //copied from dependency:tree mojo
-    protected DependencyNode createDependencyTree( MavenProject project, DependencyTreeBuilder dependencyTreeBuilder,
-                                                   ArtifactRepository localRepository, ArtifactFactory artifactFactory,
-                                                   ArtifactMetadataSource artifactMetadataSource,
-                                                   ArtifactCollector artifactCollector, String scope )
+    protected DependencyNode createDependencyTree( MavenProject project, DependencyGraphBuilder dependencyGraphBuilder,
+                                                   String scope )
         throws MojoExecutionException
     {
         ArtifactFilter artifactFilter = createResolvingArtifactFilter( scope );
-
         try
         {
-            // TODO: note that filter does not get applied due to MNG-3236
-            return dependencyTreeBuilder.buildDependencyTree( project,
-                localRepository, artifactFactory,
-                artifactMetadataSource, artifactFilter, artifactCollector );
+            return dependencyGraphBuilder.buildDependencyGraph( project, artifactFilter );
         }
-        catch ( DependencyTreeBuilderException exception )
+        catch ( DependencyGraphBuilderException exception )
         {
             throw new MojoExecutionException( "Cannot build project dependency tree", exception );
         }
