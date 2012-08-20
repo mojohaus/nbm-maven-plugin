@@ -621,13 +621,13 @@ public abstract class CreateNetBeansFileStructure
         }
     }
 
-    private static void writeExternal( PrintWriter w, Artifact artifact )
+    static void writeExternal( PrintWriter w, Artifact artifact )
         throws IOException
     {
         w.write( "CRC:" );
         File file = artifact.getFile();
         w.write( Long.toString( CreateClusterAppMojo.crcForFile( file ).getValue() ) );
-        w.write( "SIZE:" );
+        w.write( "\nSIZE:" );
         w.write( Long.toString( file.length() ) );
         w.write( "\nURL:m2:/" );
         w.write( artifact.getGroupId() );
