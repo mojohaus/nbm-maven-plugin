@@ -41,7 +41,7 @@ For explanation why it's like this, see {{{http://netbeans.org/bugzilla/show_bug
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.8.1</version>
                 <extensions>true</extensions>
             </plugin>
             <plugin> <!-- required since nbm-plugin 3.0-->
@@ -257,7 +257,7 @@ and are to be exposed for reuse by other modules.
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.8.1</version>
                 <extensions>true</extensions>
                 <configuration>
                    <publicPackages>
