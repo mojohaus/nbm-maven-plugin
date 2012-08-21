@@ -176,6 +176,16 @@ public abstract class CreateNetBeansFileStructure
     @Parameter(defaultValue="${project.groupId}.${project.artifactId}")
     private String codeNameBase;
     
+    /**
+     * list of groupId:artifactId pairs describing libraries that go into the nbm file and will only include the .external reference in the nbm
+     * instead of the actual binary. See <a href="http://netbeans.org/bugzilla/show_bug.cgi?id=195041">NetBeans issue #195041</a> for details.
+     * Please note that the scheme will only work for artifacts present in central repository but no effort is made at build time to enforce that.
+     * Additionally at runtime when installing the module, the user has to be online and be capable of reaching central using maven. 
+     * You have been warned.
+     * @since 3.8
+     */ 
+    @Parameter
+    private List<String> externals;
 
 
     @Component
@@ -316,7 +326,7 @@ public abstract class CreateNetBeansFileStructure
                     try
                     {
                         FileUtils.getFileUtils().copyFile( source, target, null, true, false );
-                        if ( trackedInCentral( source ) ) // MNBMODULE-138
+                        if ( externals != null && externals.contains(artifact.getGroupId() + ":" + artifact.getArtifactId())) // MNBMODULE-138
                         {
                             getLog().info( "Using *.external replacement for " + name );
                             PrintWriter external = new PrintWriter( new File( targetDir, name + ".external" ), "UTF-8" );
@@ -597,28 +607,6 @@ public abstract class CreateNetBeansFileStructure
             }
         }
         return false;
-    }
-
-    private static boolean trackedInCentral( File source )
-        throws IOException
-    {
-        // Cf. EnhancedLocalRepositoryManager, TrackingFileManager
-        File trackingFile = new File( source.getParentFile(), "_maven.repositories" );
-        if ( !trackingFile.isFile() )
-        {
-            return false;
-        }
-        InputStream is = new FileInputStream( trackingFile );
-        try
-        {
-            Properties props = new Properties();
-            props.load( is );
-            return props.containsKey( source.getName() + ">central" );
-        }
-        finally
-        {
-            is.close();
-        }
     }
 
     static void writeExternal( PrintWriter w, Artifact artifact )
