@@ -3,12 +3,12 @@
     <parent>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>nbm-maven</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>nbm-maven-plugin</artifactId>
-    <version>3.9-SNAPSHOT</version>
+    <version>3.8</version>
     <packaging>maven-plugin</packaging>
 
     <name>NBM Maven Plugin</name>
@@ -31,9 +31,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-plugin</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-plugin</developerConnection>
-        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven/nbm-maven-plugin</url>
+        <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nbm-maven-1.1/nbm-maven-plugin</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-maven-1.1/nbm-maven-plugin</developerConnection>
+        <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-maven-1.1/nbm-maven-plugin</url>
     </scm>
     <developers>
         <developer>
@@ -525,7 +525,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nbm-maven-harness</artifactId>
-            <version>7.3-SNAPSHOT</version>
+            <version>7.2</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
