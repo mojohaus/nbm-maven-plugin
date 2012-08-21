@@ -239,7 +239,7 @@ public class NetBeansManifestUpdateMojo
     /**
      * The dependency tree builder to use.
      */
-    @Component
+    @Component( hint = "default" )
     private DependencyGraphBuilder dependencyGraphBuilder;
 
 // end of component params custom code folding
