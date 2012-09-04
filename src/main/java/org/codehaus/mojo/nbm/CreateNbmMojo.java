@@ -309,7 +309,10 @@ public class CreateNbmMojo
         {
             nbmTask.setDistribution( nbmFile.getName() );
         }
-        nbmTask.setTargetcluster( cluster );
+        if ( ! "extra".equals( cluster ) )
+        {
+            nbmTask.setTargetcluster( cluster );
+        }
         try
         {
             nbmTask.execute();
