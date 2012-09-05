@@ -231,6 +231,8 @@ public class CreateClusterAppMojo
                                             {
                                                 is.close();
                                             }
+                                            //MNBMODULE-192
+                                            set.appendIncludes( new String[] { name.substring( "netbeans/".length(), name.length() - ".external".length() ) } );
                                         }
                                         else
                                         {
