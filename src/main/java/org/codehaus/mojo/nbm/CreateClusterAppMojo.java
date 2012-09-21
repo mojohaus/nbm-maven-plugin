@@ -33,11 +33,15 @@ import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -364,12 +368,14 @@ public class CreateClusterAppMojo
                         FileUtils.copyFile( art.getFile(), moduleArt );
                         final File moduleConf = new File( confModules, cnbDashed + ".xml" );
                         FileUtils.copyStreamToFile( new InputStreamFacade() {
+                            @Override
                             public InputStream getInputStream() throws IOException
                             {
                                 return new StringInputStream( createBundleConfigFile( cnb ), "UTF-8" );
                             }
                         }, moduleConf );
                         FileUtils.copyStreamToFile( new InputStreamFacade() {
+                            @Override
                             public InputStream getInputStream() throws IOException
                             {
                                 return new StringInputStream( createBundleUpdateTracking( cnb, moduleArt, moduleConf, specVer ), "UTF-8" );
@@ -473,6 +479,7 @@ public class CreateClusterAppMojo
             File[] clusters = buildDir.listFiles( new FileFilter()
             {
 
+                @Override
                 public boolean accept( File pathname )
                 {
                     return new File( pathname, ".lastModified" ).exists();
@@ -536,6 +543,7 @@ public class CreateClusterAppMojo
 
         if ( binDirectory != null )
         {
+            //we have custom launchers.
             binDir = binDirectory;
             File[] fls = binDir.listFiles();
             if ( fls == null )
@@ -577,6 +585,7 @@ public class CreateClusterAppMojo
             File harnessDir = new File( buildDir, "harness" );
             if ( harnessDir.exists() )
             {
+                //we have org-netbeans-modules-apisupport-harness in target area, just use it's own launchers.
                 binDir = new File(
                     harnessDir.getAbsolutePath() + File.separator + "launchers" );
                 File exe = new File( binDir, "app.exe" );
@@ -596,10 +605,17 @@ public class CreateClusterAppMojo
             }
             else
             {
-                getLog().debug( "Using fallback executables bundled with the nbm-maven-plugin." );
-                writeFile( "harness/launchers/app.sh", destSh );
-                writeFile( "harness/launchers/app.exe", destExe );
-                writeFile( "harness/launchers/app64.exe", destExe64 );
+                File nbm = getHarnessNbm();
+                ZipFile zip = new ZipFile( nbm );
+                try {
+                    getLog().debug( "Using fallback executables from downloaded org-netbeans-modules-apisupport-harness nbm file." );
+                    writeFromZip(zip, "netbeans/launchers/app.sh",  destSh, true );
+                    writeFromZip(zip, "netbeans/launchers/app.exe",  destExe, true );
+                    writeFromZip(zip, "netbeans/launchers/app64.exe",  destExe64, false );
+                    writeFromZip(zip, "netbeans/launchers/app_w.exe",  destExeW, false );
+                } finally {
+                    zip.close();
+                }
             }
         }
 
@@ -741,6 +757,63 @@ public class CreateClusterAppMojo
         {
             throw new IOException( "Size of " + f + " does not match declared " + size );
         }
+    }
+
+    private File getHarnessNbm() throws MojoExecutionException
+    {
+        @SuppressWarnings( "unchecked" )
+        Set<Artifact> artifacts = project.getArtifacts();
+        VersionRange version = null;
+        for (Artifact a : artifacts) {
+            if ("org.netbeans.modules".equals(a.getGroupId()) && "org-netbeans-bootstrap".equals(a.getArtifactId())) {
+                version = a.getVersionRange();
+                break;
+            }
+        }
+        if (version == null) {
+            throw new MojoExecutionException( "We could not find org-netbeans-bootstrap among the modules in the application. Launchers could not be found.");
+        }
+        Artifact nbmArt = artifactFactory.createDependencyArtifact(
+            "org.netbeans.modules",
+            "org-netbeans-modules-apisupport-harness",
+            version,
+            "nbm-file",
+            null,
+            null );
+        try
+        {
+            artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), localRepository );
+        }
+
+        catch ( ArtifactResolutionException ex )
+        {
+            throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
+        }
+        catch ( ArtifactNotFoundException ex )
+        {
+            throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
+        }
+        return nbmArt.getFile();
+    }
+
+    private void writeFromZip( final ZipFile zip, String zipPath, File destFile, boolean mandatory ) throws MojoExecutionException, IOException
+    {
+        final ZipEntry path = zip.getEntry( zipPath );
+        if (path == null) {
+            if (mandatory) {
+                throw new MojoExecutionException( zipPath + " not found in " + zip.getName());
+            }
+            getLog().debug(zipPath + " is not present in " + zip.getName());
+            return;
+        }
+        FileUtils.copyStreamToFile( new InputStreamFacade() {
+            
+            @Override
+            public InputStream getInputStream() throws IOException
+            {
+                return zip.getInputStream( path );
+            }
+        }, destFile);
     }
 
     private static class ClusterTuple
