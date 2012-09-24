@@ -176,8 +176,8 @@ public class BuildInstallersMojo
 
         Map<String, String> props = new HashMap<String, String> ();
 
-        //TODO mkleint: this is wrong.. why reference the parent directory of current project? what guarantees that something is there.
-        props.put( "suite.location", basedir.getParentFile().getAbsolutePath().replace( "\\", "/" ) );
+        props.put( "suite.location", basedir.getAbsolutePath().replace( "\\", "/" ) );
+        props.put( "suite.props.app.name", brandingToken);
         props.put( "suite.dist.zip", zipFile.getAbsolutePath().replace( "\\", "/" ) );
         props.put( "suite.dist.directory", outputDirectory.getAbsolutePath().replace( "\\", "/" ) );
         props.put( "installer.build.dir", new File( outputDirectory, "installerbuild" ).getAbsolutePath().replace( "\\", "/" ) );
