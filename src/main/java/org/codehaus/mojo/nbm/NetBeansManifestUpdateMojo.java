@@ -780,15 +780,14 @@ public class NetBeansManifestUpdateMojo
             String cnb = stripVersionFromCodebaseName( projectCodeNameBase );
             if ( manifest.hasFriendPackages() && !manifest.getFriends().contains( cnb ) )
             {
+                String message = "Module has friend dependency on " + manifest.getModule() + " but is not listed as a friend.";
                 if ( verifyRuntime.equalsIgnoreCase( FAIL ) )
                 {
-                    throw new MojoFailureException(
-                        "Module dependency has friend dependency on " + manifest.getModule() + "but is not listed as friend." );
+                    throw new MojoFailureException( message );
                 }
                 else
                 {
-                    getLog().warn(
-                        "Module dependency has friend dependency on " + manifest.getModule() + "but is not listed as friend." );
+                    getLog().warn( message );
                 }
             }
             List<Pattern> compiled = createCompiledPatternList( manifest.getPackages() );
