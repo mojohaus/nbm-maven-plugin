@@ -61,7 +61,7 @@ public class ExamineManifest
     private List<String> packages = Collections.<String>emptyList();
 
 
-    ExamineManifest( Log logger )
+    public ExamineManifest( Log logger )
     {
         this.logger = logger;
     }
