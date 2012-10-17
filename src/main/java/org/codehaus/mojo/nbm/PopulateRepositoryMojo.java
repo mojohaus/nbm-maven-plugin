@@ -41,12 +41,13 @@ import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Fieldable;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.artifact.Artifact;
@@ -280,7 +281,7 @@ public class PopulateRepositoryMojo
         {
             try
             {
-                Directory nexusDir = FSDirectory.getDirectory( nexusIndexDirectory );
+                Directory nexusDir = FSDirectory.open( nexusIndexDirectory );
                 IndexReader nexusReader = IndexReader.open( nexusDir );
                 searcher = new IndexSearcher( nexusReader );
                 getLog().info( "Opened index with " + nexusReader.numDocs() + " documents" );
@@ -905,11 +906,14 @@ public class PopulateRepositoryMojo
             }
             String sha = encode( shaDig.digest() );
             TermQuery q = new TermQuery( new Term( "1", sha ) );
-            Hits hits = searcher.search( q );
-            if ( hits.length() == 1 )
+            TopScoreDocCollector collector = TopScoreDocCollector.create(5, true);
+            searcher.search(q, collector);
+            ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            if ( hits.length >= 1 )
             {
-                Document doc = hits.doc( 0 );
-                Field idField = doc.getField( "u" );
+                int docId = hits[0].doc;    
+                Document doc = searcher.doc(docId);                
+                Fieldable idField = doc.getFieldable( "u" );
                 if ( idField != null )
                 {
                     String id = idField.stringValue();
