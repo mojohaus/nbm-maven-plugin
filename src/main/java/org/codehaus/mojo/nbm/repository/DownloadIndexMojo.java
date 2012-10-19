@@ -22,8 +22,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.context.IndexCreator;
@@ -32,7 +30,6 @@ import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.index.updater.ResourceFetcher;
 import org.apache.maven.index.updater.WagonHelper;
-import org.apache.maven.index.updater.WagonHelper.WagonFetcher;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -51,16 +48,24 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
- *
+ * Goal for retrieving and expanding the lucene index of the given repository. That in turn is used by the <code>populate</code>
+ * goal.
  * @author mkleint
  */
 @Mojo(name="download", aggregator=true, requiresProject=false)
 public class DownloadIndexMojo extends AbstractMojo implements Contextualizable {
     
-    
+    /**
+     * url of the repository to download index from. Please note that if you already have
+     * an existing index at <code>nexusIndexDirectory</code>, you should always use the same url for that directory.
+     */
     @Parameter(required=true, property="repositoryUrl")
     private String repositoryUrl;
     
+    /**
+     * location on disk where the index should be created. either empty or with existing index from same repository. then only update check will
+     * be performed.
+     */
     @Parameter(required=true, property="nexusIndexDirectory")
     private File nexusIndexDirectory;
  
