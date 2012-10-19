@@ -12,15 +12,10 @@ NetBeans Module plugin
 this packaging will be automatically turned into a NetBeans module project. Additionally it allows to create clusters of modules, generate
 an autoupdate site content or build and assemble an application on top of NetBeans platform.
 
- The plugin is also capable of populating the local maven repository with module jars and NBM files from a given NetBeans installation. Useful for
-module development, modules with public APIs are separated from those without a public API.
-See the {{{./populate-repository-mojo.html}<<<nbm:populate-repository>>>}} goal and the {{{./repository.html}HOWTO document}} for details.
+ Note: The <<<nbm:populate-repository>>> goal has been moved to it's own plugin {{{../nb-repository-plugin/index.html}nb-repository-plugin}}.
 
  To get access to a repository with NetBeans.org module artifacts and metadata, add {{{http://bits.netbeans.org/maven2/}http://bits.netbeans.org/maven2/}} repository to your project POM
 or the repository manager you are using. The repository hosts binaries of NetBeans 6.5 and later.
-If you need NetBeans 6.5 binaries with an older version of nbm-maven-plugin or older versions of NetBeans with new 3.0 nbm-maven-plugin generated metadata,
-you are encouraged to generate the repository content yourself for use with your company. See {{{./repository.html}instructions}} for details.
-For explanation why it's like this, see {{{http://netbeans.org/bugzilla/show_bug.cgi?id=202041}bug #202041}}.
 
  Also see: {{{http://wiki.netbeans.org/NetBeansDeveloperFAQ#Mavenized_Builds}Maven NBM development FAQs}}
 
