@@ -14,7 +14,6 @@
       <item name="2.6 -> 3.0 upgrade" href="2630upgrade.html"/>
     </menu>-->
     <menu name="HOWTOs ">
-      <item name="Populate repository" href="repository.html"/>
       <item name="Customize installers" href="buildinstexample.html"/>
       <item name="Upgrade from older versions" href="upgrade.html"/>
     </menu>

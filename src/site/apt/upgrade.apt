@@ -10,11 +10,17 @@
 HOW TO: Migrate from older version of the plugin
 
 
+  {{{Upgrading_to_3.9} Upgrading to 3.9}}
+
   {{{Upgrading_to_3.8} Upgrading to 3.8}}
 
   {{{Upgrading_from_2.6_version_to_3.0} Upgrading from 2.6 to 3.0}}
 
   {{{Upgrading_from_2.4_version_to_2.5} Upgrading from 2.4 to 2.5}}
+
+{Upgrading to 3.9}
+
+In 3.9, the <code>populate-repository</code> goal is moved to separate plugin.
 
 {Upgrading to 3.8}
 
