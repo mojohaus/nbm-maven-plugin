@@ -55,6 +55,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.tools.ant.taskdefs.Chmod;
 import org.apache.tools.ant.types.FileSet;
+import org.codehaus.mojo.nbm.utils.ExamineManifest;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;

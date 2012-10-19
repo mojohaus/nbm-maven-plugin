@@ -57,6 +57,7 @@ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.tools.ant.taskdefs.Manifest;
 import org.apache.tools.ant.taskdefs.ManifestException;
+import org.codehaus.mojo.nbm.utils.ExamineManifest;
 import org.codehaus.plexus.util.IOUtil;
 
 /**

@@ -34,6 +34,7 @@ import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.dependency.graph.internal.DefaultDependencyNode;
 import org.codehaus.mojo.nbm.model.Dependency;
 import org.codehaus.mojo.nbm.model.NetBeansModule;
+import org.codehaus.mojo.nbm.utils.ExamineManifest;
 
 /**
  *

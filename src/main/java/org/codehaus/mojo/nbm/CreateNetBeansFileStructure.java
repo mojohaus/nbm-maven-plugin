@@ -59,6 +59,7 @@ import org.apache.tools.ant.util.FileUtils;
 import org.netbeans.nbbuild.CreateModuleXML;
 import org.netbeans.nbbuild.MakeListOfNBM;
 import org.codehaus.mojo.nbm.model.NetBeansModule;
+import org.codehaus.mojo.nbm.utils.ExamineManifest;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.netbeans.nbbuild.JHIndexer;

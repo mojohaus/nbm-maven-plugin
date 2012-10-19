@@ -27,6 +27,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.dependency.graph.traversal.DependencyNodeVisitor;
+import org.codehaus.mojo.nbm.utils.ExamineManifest;
 
 /**
  * A dependency node visitor that collects visited nodes that are known libraries or are
