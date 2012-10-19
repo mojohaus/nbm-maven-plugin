@@ -130,7 +130,7 @@ public class PopulateRepositoryMojo
     /**
      * Location of NetBeans installation
      */
-    @Parameter(property="netbeansInstallDirectory")
+    @Parameter(property="netbeansInstallDirectory", required=true)
     protected File netbeansInstallDirectory;
 
     /**
@@ -154,11 +154,11 @@ public class PopulateRepositoryMojo
      * Assumes a folder with &lt;code-name-base&gt;.nbm files containing nbm files for modules.
      * @since 3.0
      */
-    @Parameter(property="netbeansNbmDirectory")
+    @Parameter(property="netbeansNbmDirectory", required=true)
     protected File netbeansNbmDirectory;
 
     /**
-     * Optional parameter, when specified, will force all modules to have the designated version.
+     * When specified, will force all modules to have the designated version.
      * Good when depending on releases. Then you would for example specify RELEASE50 in this parameter and
      * all modules get this version in the repository. If not defined, the maven version is
      * derived from the OpenIDE-Module-Specification-Version manifest attribute.
