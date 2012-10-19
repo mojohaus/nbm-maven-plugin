@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+-->
+<project xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+  <body>
+    <menu name="Overview">
+      <item name="Usage" href="index.html"/>
+      <item name="Plugin Goals" href="plugin-info.html"/>
+      <!-- <item name="Javadoc" href="apidocs/index.html"/> -->
+      <!--item name="FAQ" href="faq.html"/-->
+    </menu>
+    <!--<menu name="Upgrade">   
+      <item name="2.4 -> 2.5 upgrade" href="2425upgrade.html"/>
+      <item name="2.6 -> 3.0 upgrade" href="2630upgrade.html"/>
+    </menu>-->
+    <menu name="HOWTOs ">
+      <item name="Populate repository" href="repository.html"/>
+    </menu>
+  </body>
+</project>
+
