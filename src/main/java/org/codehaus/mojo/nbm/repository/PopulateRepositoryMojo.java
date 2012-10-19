@@ -118,7 +118,7 @@ public class PopulateRepositoryMojo
     private String deployUrl;
 
     /**
-     * Optional parameter, by default the generated metadata is installed in local repository.
+     * By default the generated metadata is installed in local repository.
      * Setting this parameter to false will avoid installing the bits. Only meaningful together with
      * a defined "deployUrl" parameter.
      * @since 3.0
@@ -169,15 +169,13 @@ public class PopulateRepositoryMojo
     protected String forcedVersion;
 
     /**
-     * Optional parameter, when specified it shall point to a directory containing a
-     * Nexus Lucene index. This index will be used to find external libraries that
+     * When specified it points to a directory containing a Maven Indexer
+     * (Nexus) Lucene index. This index will be used to find external libraries that
      * are referenced by NetBeans modules and populate the POM metadata with correct
-     * dependencies. Any dependencies not found this way, will be generated a unique
+     * dependencies. Any dependencies not found this way, will be generated with a unique
      * id under the org.netbeans.external groupId.
      * <p/>
-     * The Nexus Lucene index zip file for central repository can be found here:
-     * http://repo1.maven.org/maven2/.index/nexus-maven-repository-index.zip
-     * Unzip it to a directory and use this parameter to point to it.
+     * Use the {@code download} goal to retrieve the index.
      * @since 3.0
      */
     @Parameter(property="nexusIndexDirectory")
