@@ -80,8 +80,8 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Input;
 import org.apache.tools.ant.taskdefs.PathConvert;
 import org.apache.tools.ant.types.FileSet;
-import org.codehaus.mojo.nbm.AbstractNbmMojo;
-import org.codehaus.mojo.nbm.ExamineManifest;
+import org.codehaus.mojo.nbm.utils.AbstractNetbeansMojo;
+import org.codehaus.mojo.nbm.utils.ExamineManifest;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -103,7 +103,7 @@ import org.codehaus.plexus.util.StringUtils;
  */
 @Mojo(name="populate", aggregator=true, requiresProject=false)
 public class PopulateRepositoryMojo
-    extends AbstractNbmMojo
+    extends AbstractNetbeansMojo
 {
     private static final String GROUP_API = "org.netbeans.api";
     private static final String GROUP_IMPL = "org.netbeans.modules";
@@ -261,7 +261,7 @@ public class PopulateRepositoryMojo
         throws MojoExecutionException
     {
         getLog().info( "Populate repository with NetBeans modules" );
-        Project antProject = registerNbmAntTasks();
+        Project antProject = antProject();
         ArtifactRepository deploymentRepository = null;
         if ( deployUrl != null )
         {
