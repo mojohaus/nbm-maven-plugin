@@ -276,6 +276,7 @@ public abstract class AbstractNbmMojo
                     if ( useOsgiDependencies && depExaminator.isOsgiBundle() )
                     {
                         ModuleWrapper wr = new ModuleWrapper();
+                        wr.osgi = true;
                         String id = artifact.getGroupId() + ":" + artifact.getArtifactId();
                         for ( Dependency depe : deps )
                         {
@@ -327,6 +328,8 @@ public abstract class AbstractNbmMojo
         Artifact artifact;
 
         boolean transitive = true;
+        
+        boolean osgi = false;
 
     }
 

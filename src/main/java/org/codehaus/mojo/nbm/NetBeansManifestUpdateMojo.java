@@ -640,8 +640,10 @@ public class NetBeansManifestUpdateMojo
                     classes[0].retainAll( deps );
                     if ( classes[0].size() > 0 )
                     {
+                        String module = wr.osgi ? "OSGi bundle" : "module";
                         getLog().error(
-                            "Project uses classes from transitive module " + wr.artifact.getId() + " which will not be accessible at runtime." );
+                            "Project uses classes from transitive " + module + " " + wr.artifact.getId() + " which will not be accessible at runtime." );
+                        getLog().info( "    To fix the problem, add this module as direct dependency. For OSGi bundles that are supposed to be wrapped in NetBeans modules, use the useOSGiDependencies=false parameter");
                         deps.removeAll( classes[0] );
                     }
                     classes[1].retainAll( deps );
