@@ -22,6 +22,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.context.IndexCreator;
@@ -79,9 +81,6 @@ public class DownloadIndexMojo extends AbstractMojo implements Contextualizable 
     {
         try        
         {
-            if (nexusIndexDirectory.exists() || nexusIndexDirectory.isFile()) {
-                throw new MojoExecutionException( "nexusIndexDirectory has to be non existing directory path.");
-            }
             List<IndexCreator> creators = new ArrayList<IndexCreator>();
             creators.addAll(container.lookupList(IndexCreator.class));
             String indexurl = repositoryUrl + (!repositoryUrl.endsWith( "/") ? "/" : "") + ".index";
@@ -93,8 +92,6 @@ public class DownloadIndexMojo extends AbstractMojo implements Contextualizable 
                                     repositoryUrl,// repositoryUrl
                                     indexurl,
                                     creators);
-
-
 
             String protocol = URI.create(repositoryUrl).getScheme();
             ProxyInfo wagonProxy = wagonManager.getProxy( protocol );
