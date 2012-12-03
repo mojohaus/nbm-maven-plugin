@@ -442,7 +442,7 @@ public class CreateClusterAppMojo
         Matcher m = patt.matcher( str );
         if ( !m.matches() )
         {
-            getLog().warn( "Cannot find cluster for " + jf.getName() + " Falling back to default value - '"
+            getLog().info( "Cannot find cluster for " + jf.getName() + " Falling back to default value - '"
                                + defaultCluster + "'." );
             return defaultCluster;
         }
