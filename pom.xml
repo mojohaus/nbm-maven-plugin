@@ -3,12 +3,12 @@
     <parent>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>nbm-maven</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>nb-shared</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>NBM Plugins Utilities</name>
@@ -31,9 +31,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nb-repository-plugin</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nb-repository-plugin</developerConnection>
-        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven/nb-repository-plugin</url>
+        <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nbm-maven-1.2/nb-repository-plugin</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nbm-maven-1.2/nb-repository-plugin</developerConnection>
+        <url>http://fisheye.codehaus.org/browse/mojo/tags/nbm-maven-1.2/nb-repository-plugin</url>
     </scm>
     <developers>
         <developer>
