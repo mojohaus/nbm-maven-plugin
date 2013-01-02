@@ -120,7 +120,7 @@ public class BrandingMojo
             for ( String brandingFilePath : scanner.getIncludedFiles() )
             {
                 File brandingFile = new File( brandingSources, brandingFilePath );
-                String destinationFilePath = destinationFileName( brandingFilePath );
+                String destinationFilePath = destinationFileName( brandingFilePath, brandingToken );
                 File brandingDestination = new File( clusterDir, destinationFilePath );
                 if ( !brandingDestination.getParentFile().exists() )
                 {
@@ -146,7 +146,7 @@ public class BrandingMojo
                 // jars should be placed in locales/ under the same directory the jar-directories are
                 File destinationJar =
                     new File( jarDirectory.getParentFile().getAbsolutePath() + File.separator + "locale"
-                        + File.separator + destinationFileName( jarDirectory.getName() ) );
+                        + File.separator + destinationFileName( jarDirectory.getName(), brandingToken ) );
 
                 // create nnn.jar archive of contents
                 JarArchiver archiver = new JarArchiver();
@@ -164,20 +164,18 @@ public class BrandingMojo
         }
     }
 
-    private String destinationFileName( String brandingFilePath )
+    //as done in Branding.java in nbbuild/antsrc in netbeans.org sourcebase.
+    static  String destinationFileName( String brandingFilePath, String branding )
     {
         // use first underscore in filename 
-        int lastSeparator = brandingFilePath.indexOf( File.separator );
-        int firstUnderscore = brandingFilePath.indexOf( "_", lastSeparator );
-
-        if ( firstUnderscore != -1 )
-        {
-            return brandingFilePath.substring( 0, firstUnderscore ) + "_" + brandingToken + "_"
-                + brandingFilePath.substring( firstUnderscore + 1 );
-        }
+        int lastSeparator = brandingFilePath.lastIndexOf( File.separator );
+        String infix = "_" + branding;
 
         // no underscores, use dot
         int lastDot = brandingFilePath.lastIndexOf( "." );
-        return brandingFilePath.substring( 0, lastDot ) + "_" + brandingToken + brandingFilePath.substring( lastDot );
+        if (lastDot == -1 || lastDot < lastSeparator) {
+            return brandingFilePath + infix;
+        }
+        return brandingFilePath.substring( 0, lastDot ) + infix + brandingFilePath.substring( lastDot );
     }
 }
