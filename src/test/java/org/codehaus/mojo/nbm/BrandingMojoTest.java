@@ -15,6 +15,7 @@
  */
 package org.codehaus.mojo.nbm;
 
+import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -38,8 +39,8 @@ public class BrandingMojoTest
         assertEquals( "cut_brandingToken.gif", BrandingMojo.destinationFileName( "cut.gif", "brandingToken" ) );
         assertEquals( "cut_brandingToken", BrandingMojo.destinationFileName( "cut", "brandingToken" ) );
         assertEquals( "cut_pressed_brandingToken.gif", BrandingMojo.destinationFileName( "cut_pressed.gif", "brandingToken" ) );
-        assertEquals( "path1/path2/cut_brandingToken", BrandingMojo.destinationFileName( "path1/path2/cut", "brandingToken" ) );
-        assertEquals( "path.1/path.2/cut_brandingToken", BrandingMojo.destinationFileName( "path.1/path.2/cut", "brandingToken" ) );
-        assertEquals( "path.1/cut_pressed_brandingToken.gif", BrandingMojo.destinationFileName( "path.1/cut_pressed.gif", "brandingToken" ) );
+        assertEquals( "path1" + File.separator + "path2" + File.separator + "cut_brandingToken", BrandingMojo.destinationFileName( "path1" + File.separator + "path2" + File.separator + "cut", "brandingToken" ) );
+        assertEquals( "path.1" + File.separator + "path.2" + File.separator + "cut_brandingToken", BrandingMojo.destinationFileName( "path.1" + File.separator + "path.2" + File.separator + "cut", "brandingToken" ) );
+        assertEquals( "path.1" + File.separator + "cut_pressed_brandingToken.gif", BrandingMojo.destinationFileName( "path.1" + File.separator + "cut_pressed.gif", "brandingToken" ) );
     }
 }
