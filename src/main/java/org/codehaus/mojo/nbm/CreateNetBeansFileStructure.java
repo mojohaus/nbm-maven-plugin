@@ -317,18 +317,22 @@ public abstract class CreateNetBeansFileStructure
             for ( Artifact artifact : artifacts )
             {
                 File source = artifact.getFile();
-                String name = source.getName();
-                if ( classpathValue.contains( "ext/" + artifact.getGroupId() + "/" + name ) )
+                
+                String path = NetBeansManifestUpdateMojo.artifactToClassPathEntry( artifact, codeNameBase );
+                
+                if ( classpathValue.contains( path ) )
                 {
-                    File targetDir = new File( moduleJarLocation, "ext/" + artifact.getGroupId() );
+                    File target = new File( moduleJarLocation, path );
+
+                    File targetDir = target.getParentFile();
                     targetDir.mkdirs();
-                    File target = new File( targetDir, name );
 
                     try
                     {
                         FileUtils.getFileUtils().copyFile( source, target, null, true, false );
                         if ( externals != null && externals.contains(artifact.getGroupId() + ":" + artifact.getArtifactId())) // MNBMODULE-138
                         {
+                            String name = target.getName();
                             getLog().info( "Using *.external replacement for " + name );
                             PrintWriter external = new PrintWriter( new File( targetDir, name + ".external" ), "UTF-8" );
                             try

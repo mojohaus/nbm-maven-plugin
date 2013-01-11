@@ -396,20 +396,25 @@ public class NetBeansManifestUpdateMojo
                 examinerCache, getLog(), useOSGiDependencies );
             List<ModuleWrapper> moduleArtifacts = getModuleDependencyArtifacts( treeroot, module, moduleDependencies, project, examinerCache,
                 libArtifacts, getLog(), useOSGiDependencies );
-            String classPath = "";
+            StringBuilder classPath = new StringBuilder();
             StringBuilder mavenClassPath = new StringBuilder();
             String dependencies = "";
             String depSeparator = " ";
 
             for ( Artifact a : libArtifacts )
             {
-                classPath = classPath + " ext/" + a.getGroupId() + "/" + a.getFile().getName();
+                if (classPath.length() > 0)
+                {
+                    classPath.append(' ');
+                }
+                classPath.append(artifactToClassPathEntry( a, codeNameBase ));
                 if ( mavenClassPath.length() > 0 )
                 {
                     mavenClassPath.append( ' ' );
                 }
                 mavenClassPath.append( a.getGroupId() ).append( ':' ).append( a.getArtifactId() ).append( ':' ).append( a.getBaseVersion() );
-                if (a.getClassifier() != null) {
+                if (a.getClassifier() != null) 
+                {
                     mavenClassPath.append(":").append(a.getClassifier());
             }
             }
@@ -482,12 +487,12 @@ public class NetBeansManifestUpdateMojo
             if ( nbmJavahelpSource.exists() )
             {
                 String moduleJarName = stripVersionFromCodebaseName( moduleName ).replace( ".", "-" );
-                classPath = classPath + " docs/" + moduleJarName + ".jar";
+                classPath.append( " docs/").append( moduleJarName ).append( ".jar" );
             }
 
             if ( classPath.length() > 0 )
             {
-                conditionallyAddAttribute( mainSection, "X-Class-Path", classPath.trim() );
+                conditionallyAddAttribute( mainSection, "X-Class-Path", classPath.toString().trim() );
             }
             if ( mavenClassPath.length() > 0)
             {
@@ -526,6 +531,12 @@ public class NetBeansManifestUpdateMojo
         {
             IOUtil.close( writer );
         }
+    }
+
+    //MNBMODULE-137
+    static String artifactToClassPathEntry( Artifact a, String codenamebase )
+    {
+        return "ext/" + codenamebase + "/" + a.getGroupId().replace( '.', '-') + "/" + a.getArtifactId() + ( a.getClassifier() != null ? "-" + a.getClassifier() : "" ) + "." + a.getArtifactHandler().getExtension();
     }
 
     /**
