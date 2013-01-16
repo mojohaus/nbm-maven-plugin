@@ -243,6 +243,7 @@ public class ExamineManifest
                 this.publicPackages = exp != null;
                 if ( populateDependencies )
                 {
+                    //well, this doesn't appear to cover the major way of declation dependencies in osgi - Import-Package
                     String deps = attrs.getValue( "Require-Bundle" );
                     if ( deps != null )
                     {
