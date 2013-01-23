@@ -23,7 +23,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -55,6 +57,8 @@ public class ExamineManifest
     private boolean publicPackages;
     private boolean populateDependencies = false;
     private List<String> dependencyTokens = Collections.<String>emptyList();
+    private Set<String> osgiImports = Collections.<String>emptySet();
+    private Set<String> osgiExports = Collections.<String>emptySet();
 
     private boolean friendPackages = false;
     private List<String> friends = Collections.<String>emptyList();
@@ -220,7 +224,7 @@ public class ExamineManifest
                             {
                                 tok = tok.substring( 0, slash );
                             }
-                            depList.add( tok.trim() );
+                            depList.add( tok.trim().intern() );
                         }
                     }
                     this.dependencyTokens = depList;
@@ -251,10 +255,33 @@ public class ExamineManifest
                         // http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
                         for ( String piece : deps.split( ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)" ) )
                         {
-                            depList.add( piece.trim().replaceFirst( ";.+", "" ) );
+                            depList.add( piece.trim().replaceFirst( ";.+", "" ).intern() );
                         }
                         this.dependencyTokens = depList;
                     }
+                    String imps = attrs.getValue( "Import-Package" );
+                    if ( imps != null )
+                    {
+                        Set<String> depList = new HashSet<String>();
+                        // http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
+                        for ( String piece : imps.split( ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)" ) )
+                        {
+                            depList.add( piece.trim().replaceFirst( ";.+", "" ).intern() );
+                        }
+                        this.osgiImports = depList;
+                    }
+                    String exps = attrs.getValue( "Export-Package" );
+                    if ( exps != null )
+                    {
+                        Set<String> depList = new HashSet<String>();
+                        // http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
+                        for ( String piece : exps.split( ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)" ) )
+                        {
+                            depList.add( piece.trim().replaceFirst( ";.+", "" ).intern() );
+                        }
+                        this.osgiExports = depList;
+                    }
+                    
                 }
             }
             else
@@ -415,4 +442,14 @@ public class ExamineManifest
         return osgiBundle;
     }
 
+    public Set<String> getOsgiImports()
+    {
+        return osgiImports;
+    }
+
+    public Set<String> getOsgiExports()
+    {
+        return osgiExports;
+    }
+    
 }
