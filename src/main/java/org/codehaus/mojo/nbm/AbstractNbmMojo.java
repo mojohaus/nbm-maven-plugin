@@ -394,6 +394,7 @@ public abstract class AbstractNbmMojo
                 return new ArtifactResult( null, null );
             }
             mnf.setJarFile( jar );
+            mnf.setPopulateDependencies( true );
             mnf.checkFile();
             if ( mnf.isNetBeansModule() )
             {

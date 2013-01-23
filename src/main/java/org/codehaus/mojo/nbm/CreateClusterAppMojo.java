@@ -16,12 +16,18 @@
  */
 package org.codehaus.mojo.nbm;
 
+import com.google.common.collect.Sets;
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
@@ -125,13 +131,6 @@ public class CreateClusterAppMojo
     @Parameter(defaultValue="extra")
     private String defaultCluster;
 
-    /**
-     * Process OSGi dependencies.
-     * These will all go into <code>defaultCluster</code>.
-     * @since 3.6
-     */
-    @Parameter(defaultValue="false")
-    private boolean useOSGiDependencies;
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
     
@@ -167,7 +166,9 @@ public class CreateClusterAppMojo
 
             Set<String> knownClusters = new HashSet<String>();
             Set<String> wrappedBundleCNBs = new HashSet<String>();
-            Map<Artifact, ExamineManifest> bundles = new HashMap<Artifact, ExamineManifest>();
+            Map<String, Set<String>> clusterDependencies = new HashMap<String, Set<String>>();
+            Map<String, Set<String>> clusterModules = new HashMap<String, Set<String>>();
+            List<BundleTuple> bundles = new ArrayList<BundleTuple>();
 
             @SuppressWarnings( "unchecked" )
             Set<Artifact> artifacts = project.getArtifacts();
@@ -186,8 +187,9 @@ public class CreateClusterAppMojo
                         JarFile jf = new JarFile( art.getFile() );
                         try
                         {
-                            String clusterName = findCluster( jf );
+                            String clusterName = findCluster( jf );                            
                             ClusterTuple cluster = processCluster( clusterName, knownClusters, nbmBuildDirFile, art );
+                            
                             if ( cluster.newer )
                             {
                                 getLog().debug( "Copying " + art.getId() + " to cluster " + clusterName );
@@ -283,12 +285,16 @@ public class CreateClusterAppMojo
                                             {
                                                 ExamineManifest ex = new ExamineManifest( getLog() );
                                                 ex.setJarFile( fl );
+                                                ex.setPopulateDependencies( true );
                                                 ex.checkFile();
                                                 if ( ex.isNetBeansModule() )
                                                 {
                                                     makeTask.setModule( part );
+                                                    addToMap(clusterDependencies, clusterName, ex.getDependencyTokens());
+                                                    addToMap(clusterModules, clusterName, Collections.singletonList( ex.getModule() ));
+                                                    
                                                 }
-                                                else if ( useOSGiDependencies && ex.isOsgiBundle() )
+                                                else if ( ex.isOsgiBundle() )
                                                 {
                                                     wrappedBundleCNBs.add( ex.getModule() );
                                                 }
@@ -331,28 +337,47 @@ public class CreateClusterAppMojo
                         getLog().error( art.getFile().getAbsolutePath(), ex );
                     }
                 }
-                if ( useOSGiDependencies && res.isOSGiBundle() )
+                if ( res.isOSGiBundle() )
                 {
-                    bundles.put( art, res.getExaminedManifest() );
+                    bundles.add( new BundleTuple( art, res.getExaminedManifest() ) );
                 }
             }
-            for ( Map.Entry<Artifact, ExamineManifest> ent : bundles.entrySet() )
+            //attempt to sort clusters based on the dependencies and cluster content.
+            
+            Map<String, Set<String>> cluster2depClusters = new HashMap<String, Set<String>>();
+            for ( Map.Entry<String, Set<String>> entry : clusterDependencies.entrySet() )
             {
-                Artifact art = ent.getKey();
-                ExamineManifest ex = ent.getValue();
-
-                String spec = ex.getModule();
-                if ( wrappedBundleCNBs.contains( spec ) )
-                {
-                    // we already have this one as a wrapped module.
-                    getLog().debug( "Not including bundle " + art.getDependencyConflictId()
-                                        + ". It is already included in a NetBeans module." );
-                    continue;
+                String cluster = entry.getKey();
+                Set<String> deps = entry.getValue();
+                for (Map.Entry<String, Set<String>> subEnt : clusterModules.entrySet()) {
+                    if (subEnt.getKey().equals( cluster) ) {
+                        continue;
+                    }
+                    Sets.SetView<String> is = Sets.intersection(subEnt.getValue(), deps );
+                    if (!is.isEmpty()) {
+                        addToMap( cluster2depClusters, cluster, Collections.singletonList( subEnt.getKey() ) );
+                    }
                 }
-                ClusterTuple cluster = processCluster( defaultCluster, knownClusters, nbmBuildDirFile, art );
+            }
+            clusterModules.clear();
+        
+            //now assign the cluster to bundles based on dependencies..
+            assignClustersToBundles( bundles, wrappedBundleCNBs, clusterDependencies, cluster2depClusters );
+            
+            
+            for (BundleTuple ent : bundles) {
+                Artifact art = ent.artifact;
+                ExamineManifest ex = ent.manifest;
+                
+                String clstr = ent.cluster;
+                if (clstr == null) {
+                    clstr = defaultCluster;
+                }
+                
+                ClusterTuple cluster = processCluster( clstr, knownClusters, nbmBuildDirFile, art );
                 if ( cluster.newer )
                 {
-                    getLog().debug( "Copying " + art.getId() + " to cluster " + defaultCluster );
+                    getLog().info( "Copying " + art.getId() + " to cluster " + clstr );
                     File modules = new File( cluster.location, "modules" );
                     modules.mkdirs();
                     File config = new File( cluster.location, "config" );
@@ -815,6 +840,187 @@ public class CreateClusterAppMojo
                 return zip.getInputStream( path );
             }
         }, destFile);
+    }
+
+    private void addToMap( Map<String, Set<String>> map, String clusterName, List<String> newValues )
+    {
+        Set<String> lst = map.get( clusterName );
+        if ( lst == null )
+        {
+            lst = new HashSet<String>();
+            map.put( clusterName, lst );
+        }
+        if ( newValues != null )
+        {
+            lst.addAll( newValues );
+        }
+    }
+    
+    private List<String> findByDependencies( Map<String, Set<String>> clusterDependencies, String spec)
+    {
+        List<String> toRet = new ArrayList<String>();
+        for ( Map.Entry<String, Set<String>> entry : clusterDependencies.entrySet() )
+        {
+            if ( entry.getValue().contains( spec ) )
+            {
+                toRet.add(entry.getKey());
+            }
+        }
+        return toRet;
+    }
+
+    //the basic idea is that bundle's cluster can be determined by who depends on it.
+    //simplest case is when a module depends on it. If there are more, we need to pick one that is "lower in the stack, that's what cluster2depClusters is for.
+    //the rest needs to be determined in more sofisticated manner.
+    //start from bundles with known cluster and see what other bundles they depend on. stamp all these with the same cluster. do it recursively.
+    //At the end process the remaining bundles in reverse order. Check if *they* depend on a bundle with known cluster and so on..
+    //A few unsolved cases:
+    // - we never update the cluster information once a match was found, but there is a possibility that later in the processing the cluster could be "lowered".
+    // - 2 or more modules from unrelated clusters we cannot easily decide, most likely should be in common denominator cluster but our cluster2depClusters map is not transitive, only lists direct dependencies
+    private void assignClustersToBundles( List<BundleTuple> bundles, Set<String> wrappedBundleCNBs, Map<String, Set<String>> clusterDependencies, Map<String, Set<String>> cluster2depClusters)
+    {
+        List<BundleTuple> toProcess = new ArrayList<BundleTuple>();
+        List<BundleTuple> known = new ArrayList<BundleTuple>();
+        for ( Iterator<BundleTuple> it = bundles.iterator(); it.hasNext(); )
+        {
+            BundleTuple ent = it.next();
+            Artifact art = ent.artifact;
+            ExamineManifest ex = ent.manifest;
+            String spec = ex.getModule();
+            if ( wrappedBundleCNBs.contains( spec ) )
+            {
+                // we already have this one as a wrapped module.
+                getLog().debug( "Not including bundle " + art.getDependencyConflictId()
+                                    + ". It is already included in a NetBeans module" );
+                it.remove();
+                continue;
+            }
+            List<String> depclusters = findByDependencies(clusterDependencies, spec);
+            if (depclusters.size() == 1) {
+                ent.cluster = depclusters.get( 0 );
+                known.add( ent );
+            } else if (depclusters.isEmpty()) {
+                toProcess.add(ent);
+            } else {
+                //more results.. from 2 dependent clusters pick the one that is lower in the stack.
+                getLog().info( " (" + depclusters.size() + ")-" + Arrays.toString( depclusters.toArray() )  + " " + art.getId());
+                for ( Iterator<String> it2 = depclusters.iterator(); it2.hasNext(); )
+                {
+                    String s = it2.next();
+                    Set<String> depsCs = cluster2depClusters.get( s );
+                    boolean removeS = false;
+                    for (String sDep : depclusters) {
+                        if (s.equals( sDep) ) {
+                            continue;
+                        }
+                        if (depsCs != null && depsCs.contains( sDep ) ) {
+                            removeS = true;
+                        }
+                    }
+                    if (removeS) {
+                        it2.remove();
+                    }
+                }
+                ent.cluster = depclusters.get( 0 ); //TODO still some free room there, what if they don't directly depend on each other but still are related
+                known.add (ent);
+            }
+        }
+        if (!toProcess.isEmpty())
+        {
+            walkKnownBundleDependenciesDown(known, toProcess);
+        }
+        if (!toProcess.isEmpty())
+        {
+            walkKnownBundleDependenciesUp(known, toProcess);
+        }
+    }
+
+    private void walkKnownBundleDependenciesDown( List<BundleTuple> known, List<BundleTuple> toProcess )
+    {
+        boolean atLeastOneWasFound = false;
+        for ( Iterator<BundleTuple> it = toProcess.iterator(); it.hasNext(); )
+        {
+            BundleTuple bundleTuple = it.next();
+            boolean found = false;
+            for ( BundleTuple knownBT : known)
+            {
+                Sets.SetView<String> is = Sets.intersection(bundleTuple.manifest.getOsgiExports() , knownBT.manifest.getOsgiImports() );
+                if (!is.isEmpty()) {
+                    found = true;
+                    bundleTuple.cluster = knownBT.cluster;
+                    break;
+                }
+                //dependencyTokens are requireBundle - matches the module property
+                is = Sets.intersection(Collections.singleton( bundleTuple.manifest.getModule()), new HashSet(knownBT.manifest.getDependencyTokens()) );
+                if (!is.isEmpty()) {
+                    found = true;
+                    bundleTuple.cluster = knownBT.cluster;
+                    break;
+                }
+                
+            }
+            if (found) {
+                atLeastOneWasFound = true;
+                it.remove();
+                known.add(bundleTuple);
+            }
+            
+        }
+        if (!toProcess.isEmpty() && atLeastOneWasFound) {
+            walkKnownBundleDependenciesDown( known, toProcess );
+        }
+    }
+
+    private void walkKnownBundleDependenciesUp( List<BundleTuple> known, List<BundleTuple> toProcess )
+    {
+        boolean atLeastOneWasFound = false;
+        for ( Iterator<BundleTuple> it = toProcess.iterator(); it.hasNext(); )
+        {
+            BundleTuple bundleTuple = it.next();
+            boolean found = false;
+            for ( BundleTuple knownBT : known)
+            {
+                Sets.SetView<String> is = Sets.intersection(bundleTuple.manifest.getOsgiImports() , knownBT.manifest.getOsgiExports() );
+                if (!is.isEmpty()) {
+                    found = true;
+                    bundleTuple.cluster = knownBT.cluster;
+                    break;
+                }
+                //dependencyTokens are requireBundle - matches the module property
+                is = Sets.intersection(Collections.singleton( knownBT.manifest.getModule()), new HashSet(bundleTuple.manifest.getDependencyTokens()) );
+                if (!is.isEmpty()) {
+                    found = true;
+                    bundleTuple.cluster = knownBT.cluster;
+                    break;
+                }
+                
+            }
+            if (found) {
+                atLeastOneWasFound = true;
+                it.remove();
+                known.add(bundleTuple);
+            }
+            
+        }
+        if (!toProcess.isEmpty() && atLeastOneWasFound) {
+            walkKnownBundleDependenciesDown( known, toProcess );
+        }
+        if (!toProcess.isEmpty() && atLeastOneWasFound) {
+            walkKnownBundleDependenciesUp( known, toProcess );
+        }
+    }
+    
+    private static class BundleTuple {
+        final Artifact artifact;
+        final ExamineManifest manifest;
+        String cluster;
+
+        BundleTuple( Artifact artifact, ExamineManifest manifest )
+        {
+            this.artifact = artifact;
+            this.manifest = manifest;
+        }
+        
     }
 
     private static class ClusterTuple
