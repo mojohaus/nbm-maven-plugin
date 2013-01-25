@@ -50,6 +50,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -343,26 +344,11 @@ public class CreateClusterAppMojo
                 }
             }
             //attempt to sort clusters based on the dependencies and cluster content.
-            
-            Map<String, Set<String>> cluster2depClusters = new HashMap<String, Set<String>>();
-            for ( Map.Entry<String, Set<String>> entry : clusterDependencies.entrySet() )
-            {
-                String cluster = entry.getKey();
-                Set<String> deps = entry.getValue();
-                for (Map.Entry<String, Set<String>> subEnt : clusterModules.entrySet()) {
-                    if (subEnt.getKey().equals( cluster) ) {
-                        continue;
-                    }
-                    Sets.SetView<String> is = Sets.intersection(subEnt.getValue(), deps );
-                    if (!is.isEmpty()) {
-                        addToMap( cluster2depClusters, cluster, Collections.singletonList( subEnt.getKey() ) );
-                    }
-                }
-            }
+            Map<String, Set<String>> cluster2depClusters = computeClusterOrdering( clusterDependencies, clusterModules );
             clusterModules.clear();
         
             //now assign the cluster to bundles based on dependencies..
-            assignClustersToBundles( bundles, wrappedBundleCNBs, clusterDependencies, cluster2depClusters );
+            assignClustersToBundles( bundles, wrappedBundleCNBs, clusterDependencies, cluster2depClusters, getLog() );
             
             
             for (BundleTuple ent : bundles) {
@@ -842,7 +828,7 @@ public class CreateClusterAppMojo
         }, destFile);
     }
 
-    private void addToMap( Map<String, Set<String>> map, String clusterName, List<String> newValues )
+    private static void addToMap( Map<String, Set<String>> map, String clusterName, List<String> newValues )
     {
         Set<String> lst = map.get( clusterName );
         if ( lst == null )
@@ -856,7 +842,7 @@ public class CreateClusterAppMojo
         }
     }
     
-    private List<String> findByDependencies( Map<String, Set<String>> clusterDependencies, String spec)
+    private static List<String> findByDependencies( Map<String, Set<String>> clusterDependencies, String spec)
     {
         List<String> toRet = new ArrayList<String>();
         for ( Map.Entry<String, Set<String>> entry : clusterDependencies.entrySet() )
@@ -877,7 +863,7 @@ public class CreateClusterAppMojo
     //A few unsolved cases:
     // - we never update the cluster information once a match was found, but there is a possibility that later in the processing the cluster could be "lowered".
     // - 2 or more modules from unrelated clusters we cannot easily decide, most likely should be in common denominator cluster but our cluster2depClusters map is not transitive, only lists direct dependencies
-    private void assignClustersToBundles( List<BundleTuple> bundles, Set<String> wrappedBundleCNBs, Map<String, Set<String>> clusterDependencies, Map<String, Set<String>> cluster2depClusters)
+    static void assignClustersToBundles( List<BundleTuple> bundles, Set<String> wrappedBundleCNBs, Map<String, Set<String>> clusterDependencies, Map<String, Set<String>> cluster2depClusters, Log log)
     {
         List<BundleTuple> toProcess = new ArrayList<BundleTuple>();
         List<BundleTuple> known = new ArrayList<BundleTuple>();
@@ -890,7 +876,7 @@ public class CreateClusterAppMojo
             if ( wrappedBundleCNBs.contains( spec ) )
             {
                 // we already have this one as a wrapped module.
-                getLog().debug( "Not including bundle " + art.getDependencyConflictId()
+                log.debug( "Not including bundle " + art.getDependencyConflictId()
                                     + ". It is already included in a NetBeans module" );
                 it.remove();
                 continue;
@@ -903,7 +889,6 @@ public class CreateClusterAppMojo
                 toProcess.add(ent);
             } else {
                 //more results.. from 2 dependent clusters pick the one that is lower in the stack.
-                getLog().info( " (" + depclusters.size() + ")-" + Arrays.toString( depclusters.toArray() )  + " " + art.getId());
                 for ( Iterator<String> it2 = depclusters.iterator(); it2.hasNext(); )
                 {
                     String s = it2.next();
@@ -935,7 +920,7 @@ public class CreateClusterAppMojo
         }
     }
 
-    private void walkKnownBundleDependenciesDown( List<BundleTuple> known, List<BundleTuple> toProcess )
+    private static void walkKnownBundleDependenciesDown( List<BundleTuple> known, List<BundleTuple> toProcess )
     {
         boolean atLeastOneWasFound = false;
         for ( Iterator<BundleTuple> it = toProcess.iterator(); it.hasNext(); )
@@ -971,7 +956,7 @@ public class CreateClusterAppMojo
         }
     }
 
-    private void walkKnownBundleDependenciesUp( List<BundleTuple> known, List<BundleTuple> toProcess )
+    private static void walkKnownBundleDependenciesUp( List<BundleTuple> known, List<BundleTuple> toProcess )
     {
         boolean atLeastOneWasFound = false;
         for ( Iterator<BundleTuple> it = toProcess.iterator(); it.hasNext(); )
@@ -1009,8 +994,29 @@ public class CreateClusterAppMojo
             walkKnownBundleDependenciesUp( known, toProcess );
         }
     }
+
+    //static and default for tests..
+    static Map<String, Set<String>> computeClusterOrdering( Map<String, Set<String>> clusterDependencies, Map<String, Set<String>> clusterModules )
+    {
+        Map<String, Set<String>> cluster2depClusters = new HashMap<String, Set<String>>();
+        for ( Map.Entry<String, Set<String>> entry : clusterDependencies.entrySet() )
+        {
+            String cluster = entry.getKey();
+            Set<String> deps = entry.getValue();
+            for (Map.Entry<String, Set<String>> subEnt : clusterModules.entrySet()) {
+                if (subEnt.getKey().equals( cluster) ) {
+                    continue;
+                }
+                Sets.SetView<String> is = Sets.intersection(subEnt.getValue(), deps );
+                if (!is.isEmpty()) {
+                    addToMap( cluster2depClusters, cluster, Collections.singletonList( subEnt.getKey() ) );
+                }
+            }
+        }
+        return cluster2depClusters;
+    }
     
-    private static class BundleTuple {
+    static class BundleTuple {
         final Artifact artifact;
         final ExamineManifest manifest;
         String cluster;
