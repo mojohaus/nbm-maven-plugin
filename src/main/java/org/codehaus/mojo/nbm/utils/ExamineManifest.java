@@ -318,7 +318,7 @@ public class ExamineManifest
     }
 
     /** 
-     * Manifest file to be examined. It is exclusing with jarFile.
+     * Manifest file to be examined. It is exclusive with jarFile.
      */
     public void setManifestFile( File manifestFileLoc )
     {
