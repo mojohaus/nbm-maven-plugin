@@ -681,7 +681,7 @@ public class NetBeansManifestUpdateMojo
             {
                 if ( !deps.isEmpty() )
                 {
-                    throw new MojoFailureException( "Uncategorized problems with NetBeans dependency verification (maybe MNBMODULE-102 or wrong maven dependency metadata). Class usages: " + deps );
+                    throw new MojoFailureException( "Uncategorized problems with NetBeans dependency verification (maybe MNBMODULE-102 or wrong maven dependency metadata). Supposedly external classes are used in the project's binaries but the classes are not found on classpath. Class usages: " + deps );
                 }
                 else
                 {
