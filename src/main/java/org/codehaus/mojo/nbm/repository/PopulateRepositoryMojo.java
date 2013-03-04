@@ -507,6 +507,9 @@ public class PopulateRepositoryMojo
                                             b.append( ' ' );
                                         }
                                         b.append( dep.getGroupId() ).append( ':' ).append( dep.getArtifactId() ).append( ':' ).append( dep.getVersion() );
+                                        if (dep.getClassifier() != null) {
+                                            b.append(":").append(dep.getClassifier());
+                                        }
                                     }
                                     mani.getMainAttributes().putValue( "Maven-Class-Path", b.toString() );
                                 }
