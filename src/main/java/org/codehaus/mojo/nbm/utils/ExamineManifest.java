@@ -64,6 +64,9 @@ public class ExamineManifest
     private List<String> friends = Collections.<String>emptyList();
     private List<String> packages = Collections.<String>emptyList();
 
+    private List<String> requires = Collections.<String>emptyList();
+
+    private List<String> provides = Collections.<String>emptyList();
 
     public ExamineManifest( Log logger )
     {
@@ -174,7 +177,7 @@ public class ExamineManifest
         if ( isNetBeansModule() )
         {
             this.locBundle = attrs.getValue( "OpenIDE-Module-Localizing-Bundle" );
-            this.localized = ( locBundle == null ? false : true );
+            this.localized = locBundle != null;
             this.specVersion = attrs.getValue( "OpenIDE-Module-Specification-Version" );
             this.implVersion = attrs.getValue( "OpenIDE-Module-Implementation-Version" );
             String cp = attrs.getValue( Attributes.Name.CLASS_PATH );
@@ -228,6 +231,21 @@ public class ExamineManifest
                         }
                     }
                     this.dependencyTokens = depList;
+                }
+                String req = attrs.getValue( "OpenIDE-Module-Requires" );
+                String prov = attrs.getValue( "OpenIDE-Module-Provides" );
+                String needs = attrs.getValue( "OpenIDE-Module-Needs" );
+                if (prov != null) {
+                    provides = Arrays.asList( StringUtils.stripAll( StringUtils.split( prov, "," ) ));
+                }
+                if (req != null || needs != null) {
+                    requires = new ArrayList<String>();
+                    if (req != null) {
+                        requires.addAll(Arrays.asList( StringUtils.stripAll( StringUtils.split( req, "," ) )));
+                    }
+                    if (needs != null) {
+                        requires.addAll(Arrays.asList( StringUtils.stripAll( StringUtils.split( needs, "," ) )));
+                    }
                 }
             }
 
@@ -451,5 +469,16 @@ public class ExamineManifest
     {
         return osgiExports;
     }
+    
+    public List<String> getNetBeansRequiresTokens()
+    {
+        return requires;
+    }
+
+    public List<String> getNetBeansProvidesTokens()
+    {
+        return provides;
+    }
+    
     
 }
