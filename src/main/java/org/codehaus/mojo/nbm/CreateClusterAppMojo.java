@@ -21,6 +21,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -131,6 +132,26 @@ public class CreateClusterAppMojo
      */
     @Parameter(defaultValue="extra")
     private String defaultCluster;
+    
+    /**
+     * attempts to verify the integrity of module artifacts making sure that all dependencies are included
+     * and that all required tokens are provided
+     * @since 3.10
+     */
+    @Parameter(defaultValue = "true", property = "netbeans.verify.integrity")
+    private boolean verifyIntegrity;
+    
+    private final Collection<String> defaultPlatformTokens = Arrays.asList( new String[] {
+                    "org.openide.modules.os.Windows",
+                    "org.openide.modules.os.Unix",
+                    "org.openide.modules.os.MacOSX",
+                    "org.openide.modules.os.OS2",
+                    "org.openide.modules.os.PlainUnix",    
+                    "org.openide.modules.os.Linux",
+                    "org.openide.modules.os.Solaris",
+                    "org.openide.modules.ModuleFormat1",
+                    "org.openide.modules.ModuleFormat2"
+    });
 
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
@@ -165,10 +186,19 @@ public class CreateClusterAppMojo
         {
             Project antProject = registerNbmAntTasks();
 
-            Set<String> knownClusters = new HashSet<String>();
-            Set<String> wrappedBundleCNBs = new HashSet<String>();
+            Set<String> knownClusters = new HashSet<String>(20);
+            Set<String> wrappedBundleCNBs = new HashSet<String>(100);
             Map<String, Set<String>> clusterDependencies = new HashMap<String, Set<String>>();
             Map<String, Set<String>> clusterModules = new HashMap<String, Set<String>>();
+            
+            //verify integrity
+            Set<String> modulesCNBs = new HashSet<String>(200);
+            Set<String> dependencyCNBs = new HashSet<String>(200);
+            Set<String> requireTokens = new HashSet<String>(50);
+            Set<String> provideTokens = new HashSet<String>(50);
+            Set<String> osgiImports = new HashSet<String>(50);
+            Set<String> osgiExports = new HashSet<String>(50);
+            
             List<BundleTuple> bundles = new ArrayList<BundleTuple>();
 
             @SuppressWarnings( "unchecked" )
@@ -299,6 +329,18 @@ public class CreateClusterAppMojo
                                                 {
                                                     wrappedBundleCNBs.add( ex.getModule() );
                                                 }
+                                                if (verifyIntegrity) {
+                                                    dependencyCNBs.addAll(ex.getDependencyTokens());
+                                                    modulesCNBs.add(ex.getModule());
+                                                    if (ex.isOsgiBundle()) {
+                                                        osgiImports.addAll( ex.getOsgiImports());
+                                                        osgiExports.addAll( ex.getOsgiExports());
+                                                    }
+                                                    if (ex.isNetBeansModule()) {
+                                                        requireTokens.addAll(ex.getNetBeansRequiresTokens());
+                                                        provideTokens.addAll(ex.getNetBeansProvidesTokens());
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -343,6 +385,37 @@ public class CreateClusterAppMojo
                     bundles.add( new BundleTuple( art, res.getExaminedManifest() ) );
                 }
             }
+            
+            if (verifyIntegrity) {
+                dependencyCNBs.removeAll( modulesCNBs );
+                osgiImports.removeAll( osgiExports );
+                requireTokens.removeAll( provideTokens );
+                System.out.println( Arrays.toString( requireTokens.toArray() ) );
+                System.out.println( Arrays.toString( provideTokens.toArray() ) );
+                requireTokens.removeAll( defaultPlatformTokens );
+                if (!dependencyCNBs.isEmpty() || !osgiImports.isEmpty() ||!requireTokens.isEmpty()) {
+                    if (!dependencyCNBs.isEmpty()) {
+                        getLog().error( "Some included modules/bundles depend on these codenamebases but they are not included. The application will fail starting up. The missing codenamebases are:" );
+                        for (String s : dependencyCNBs) {
+                            getLog().error("   " + s);
+                        }
+                    }
+                    if (!osgiImports.isEmpty()) {
+                        getLog().error("Some OSGi imports are not satisfied by included bundles' exports. The application will fail starting up. The missing imports are:");
+                        for (String s : osgiImports) {
+                            getLog().error("   " + s);
+                        }
+                    }
+                     if (!requireTokens.isEmpty()) {
+                        getLog().error("Some tokens required by included modules are not provided by included modules. The application will fail starting up. The missing tokens are:");
+                        for (String s : requireTokens) {
+                            getLog().error("   " + s);
+                        }
+                    }
+                    throw new MojoFailureException("See above for consistency validation check failures. Either fix those by adding the relevant dependencies to the application or disable the check by setting the verifyIntegrity parameter to false or by running with -Dnetbeans.verify.integrity=false cmd line parameter.");
+                }
+            }
+            
             //attempt to sort clusters based on the dependencies and cluster content.
             Map<String, Set<String>> cluster2depClusters = computeClusterOrdering( clusterDependencies, clusterModules );
             clusterModules.clear();
