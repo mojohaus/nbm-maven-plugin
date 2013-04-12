@@ -198,6 +198,8 @@ public class CreateWebstartAppMojo
                 "This goal only makes sense on project with nbm-application packaging." );
         }
         Project antProject = antProject();
+        
+        getLog().warn( "WARNING: Unsigned and self-signed WebStart applications are deprecated from JDK7u21 onwards. To ensure future correct functionality please use trusted certificate.");
 
         if ( keystore != null && keystorealias != null && keystorepassword != null )
         {
