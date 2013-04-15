@@ -67,6 +67,8 @@ public class ExamineManifest
     private List<String> requires = Collections.<String>emptyList();
 
     private List<String> provides = Collections.<String>emptyList();
+    //that's the default behaviour without the special manifest entry
+    private boolean bundleAutoload = true;
 
     public ExamineManifest( Log logger )
     {
@@ -262,6 +264,10 @@ public class ExamineManifest
                     bndName./* MNBMODULE-125 */replaceFirst( " *;.+", "" )./* MNBMODULE-96 */replace( '-', '_' );
                 this.specVersion = attrs.getValue( "Bundle-Version" );
                 String exp = attrs.getValue( "Export-Package" );
+                String autoload = attrs.getValue( "Nbm-Maven-Plugin-Autoload");
+                if (autoload != null) {
+                    bundleAutoload = Boolean.parseBoolean( autoload );
+                }
                 this.publicPackages = exp != null;
                 if ( populateDependencies )
                 {
@@ -478,6 +484,11 @@ public class ExamineManifest
     public List<String> getNetBeansProvidesTokens()
     {
         return provides;
+    }
+
+    public boolean isBundleAutoload()
+    {
+        return bundleAutoload;
     }
     
     
