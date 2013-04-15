@@ -118,7 +118,7 @@ public class CreateClusterMojo
                     if ( "bundle".equals( proj.getPackaging() ) )
                     {
                         Artifact art = proj.getArtifact();
-                        ExamineManifest mnf = new ExamineManifest( getLog() );
+                        final ExamineManifest mnf = new ExamineManifest( getLog() );
 
                         File jar = new File( proj.getBuild().getDirectory(), proj.getBuild().getFinalName() + ".jar" );
                         if ( !jar.exists() )
@@ -151,7 +151,7 @@ public class CreateClusterMojo
                             FileUtils.copyStreamToFile( new InputStreamFacade() {
                                 public InputStream getInputStream() throws IOException
                                 {
-                                    return new StringInputStream( CreateClusterAppMojo.createBundleConfigFile( cnb ), "UTF-8" );
+                                    return new StringInputStream( CreateClusterAppMojo.createBundleConfigFile( cnb, mnf.isBundleAutoload() ), "UTF-8" );
                                 }
                             }, moduleConf );
                             FileUtils.copyStreamToFile( new InputStreamFacade() {

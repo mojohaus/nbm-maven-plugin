@@ -426,7 +426,7 @@ public class CreateClusterAppMojo
             
             for (BundleTuple ent : bundles) {
                 Artifact art = ent.artifact;
-                ExamineManifest ex = ent.manifest;
+                final ExamineManifest ex = ent.manifest;
                 
                 String clstr = ent.cluster;
                 if (clstr == null) {
@@ -456,7 +456,7 @@ public class CreateClusterAppMojo
                             @Override
                             public InputStream getInputStream() throws IOException
                             {
-                                return new StringInputStream( createBundleConfigFile( cnb ), "UTF-8" );
+                                return new StringInputStream( createBundleConfigFile( cnb, ex.isBundleAutoload() ), "UTF-8" );
                             }
                         }, moduleConf );
                         FileUtils.copyStreamToFile( new InputStreamFacade() {
@@ -1114,16 +1114,15 @@ public class CreateClusterAppMojo
         }
     }
 
-    static String createBundleConfigFile( String cnb )
+    static String createBundleConfigFile( String cnb, boolean autoload)
     {
         return
 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 "<!DOCTYPE module PUBLIC \"-//NetBeans//DTD Module Status 1.0//EN\"\n" +
 "                        \"http://www.netbeans.org/dtds/module-status-1_0.dtd\">\n" +
 "<module name=\"" + cnb +"\">\n" +
-"    <param name=\"autoload\">true</param>\n" +
-"    <param name=\"eager\">false</param>\n" +
-//"    <param name=\"enabled\">true</param>\n" +
+"    <param name=\"autoload\">" + autoload + "</param>\n" +
+"    <param name=\"eager\">false</param>\n" + (autoload ? "" : "    <param name=\"enabled\">true</param>\n") +
 "    <param name=\"jar\">modules/" + cnb.replace( ".", "-") + ".jar</param>\n" +
 "    <param name=\"reloadable\">false</param>\n" +
 "</module>\n";
