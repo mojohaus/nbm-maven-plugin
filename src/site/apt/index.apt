@@ -136,7 +136,8 @@ There are a few prerequisites.
      as part of the module NBM but will include a modular dependency reference on the bundle only. Modules depending on these old wrapper modules
      shall depend directly on the bundle, eventually rendering the old library wrapper module obsolete.
 
-   * in the distribution, all bundles will be included in the default cluster (<<<extra>>> if not configured otherwise)
+   * in the distribution, all bundles will be included in the default cluster (<<<extra>>> if not configured otherwise), 
+    in <<3.10 and later>> the plugin will attempt to guess the cluster based on modules depending on it.
 
    * Before version <<3.10>> all bundles will be autoload, thus requiring at least one depending regular module to enable them. In <<3.10 and later>>, developers of the OSGi bundles
      can influence the autoload vs regular behaviour by adding <<Nbm-Maven-Plugin-Autoload>> attribute to the bundle's manifest with "true" or "false" values. 
