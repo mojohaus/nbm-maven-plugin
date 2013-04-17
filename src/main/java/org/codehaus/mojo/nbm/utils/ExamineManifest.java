@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -42,7 +43,7 @@ import org.codehaus.plexus.util.StringUtils;
 public class ExamineManifest
 {
 
-    private Log logger;
+    private final Log logger;
     private File jarFile;
     private File manifestFile;
     private boolean netBeansModule;
@@ -279,7 +280,7 @@ public class ExamineManifest
                         // http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
                         for ( String piece : deps.split( ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)" ) )
                         {
-                            depList.add( piece.trim().replaceFirst( ";.+", "" ).intern() );
+                            depList.add( piece.replaceFirst( ";.+", "" ).trim().intern() );
                         }
                         this.dependencyTokens = depList;
                     }
@@ -290,7 +291,7 @@ public class ExamineManifest
                         // http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
                         for ( String piece : imps.split( ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)" ) )
                         {
-                            depList.add( piece.trim().replaceFirst( ";.+", "" ).intern() );
+                            depList.add( piece.replaceFirst( ";.+", "" ).trim().intern() );
                         }
                         this.osgiImports = depList;
                     }
@@ -301,7 +302,7 @@ public class ExamineManifest
                         // http://stackoverflow.com/questions/1757065/java-splitting-a-comma-separated-string-but-ignoring-commas-in-quotes
                         for ( String piece : exps.split( ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)" ) )
                         {
-                            depList.add( piece.trim().replaceFirst( ";.+", "" ).intern() );
+                            depList.add( piece.replaceFirst( ";.+", "" ).trim().intern() );
                         }
                         this.osgiExports = depList;
                     }
@@ -490,6 +491,5 @@ public class ExamineManifest
     {
         return bundleAutoload;
     }
-    
-    
+
 }
