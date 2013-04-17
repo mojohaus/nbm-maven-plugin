@@ -38,7 +38,7 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-nbjunit</artifactId>
             <version>${D}{netbeans.version}</version>
-            <scope>test</scope>
+            <scope>test</scope> <!-- beyond platform cluster, this often needs to be dropped down to compile/runtime, some other modules in IDE clusters depend on it -->
         </dependency>
 #if (${netbeansVersion} == "RELEASE71")
         <!-- Cf.: https://netbeans.org/bugzilla/show_bug.cgi?id=207956 -->
