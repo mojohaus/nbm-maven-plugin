@@ -194,10 +194,14 @@ public class CreateClusterAppMojo
             //verify integrity
             Set<String> modulesCNBs = new HashSet<String>(200);
             Set<String> dependencyCNBs = new HashSet<String>(200);
+            Map<String, Set<String>> dependencyCNBBacktraces = new HashMap<String, Set<String>>(50);
             Set<String> requireTokens = new HashSet<String>(50);
+            Map<String, Set<String>> requireTokensBacktraces = new HashMap<String, Set<String>>(50);
             Set<String> provideTokens = new HashSet<String>(50);
             Set<String> osgiImports = new HashSet<String>(50);
+            Map<String, Set<String>> osgiImportsBacktraces = new HashMap<String, Set<String>>(50);
             Set<String> osgiExports = new HashSet<String>(50);
+            Set<String> osgiExportsSubs = new HashSet<String>(50); //a way to deal with nb module declaring xxx.** (subpackages) declaration that is consumed by osgi imports
             
             List<BundleTuple> bundles = new ArrayList<BundleTuple>();
 
@@ -332,13 +336,33 @@ public class CreateClusterAppMojo
                                                 if (verifyIntegrity) {
                                                     dependencyCNBs.addAll(ex.getDependencyTokens());
                                                     modulesCNBs.add(ex.getModule());
+                                                    for (String d : ex.getDependencyTokens()) {
+                                                        addToMap(dependencyCNBBacktraces, d, Collections.singletonList( ex.getModule() ));
+                                                    }
                                                     if (ex.isOsgiBundle()) {
                                                         osgiImports.addAll( ex.getOsgiImports());
+                                                        for (String d : ex.getOsgiImports()) {
+                                                            addToMap(osgiImportsBacktraces, d, Collections.singletonList( ex.getModule() ));
+                                                        }
                                                         osgiExports.addAll( ex.getOsgiExports());
                                                     }
                                                     if (ex.isNetBeansModule()) {
                                                         requireTokens.addAll(ex.getNetBeansRequiresTokens());
+                                                        for (String r : ex.getNetBeansRequiresTokens()) {
+                                                            addToMap( requireTokensBacktraces, r, Collections.singletonList( ex.getModule()));
+                                                        }
                                                         provideTokens.addAll(ex.getNetBeansProvidesTokens());
+                                                        for (String pack : ex.getPackages()) {
+                                                            if (pack.endsWith( ".**")) {
+                                                                //what to do with subpackages?
+                                                                pack = pack.substring( 0, pack.length() - ".**".length());
+                                                                osgiExportsSubs.add( pack );
+                                                            } else if (pack.endsWith( ".*")) {
+                                                                pack = pack.substring( 0, pack.length() - ".*".length());
+                                                                osgiExports.add(pack);                                                            
+                                                            }
+                                                        }
+                                                        
                                                     }
                                                 }
                                             }
@@ -382,34 +406,68 @@ public class CreateClusterAppMojo
                 }
                 if ( res.isOSGiBundle() )
                 {
-                    bundles.add( new BundleTuple( art, res.getExaminedManifest() ) );
+                    ExamineManifest ex = res.getExaminedManifest();
+                    bundles.add( new BundleTuple( art,  ex) );
+                    if (verifyIntegrity) {
+                        dependencyCNBs.addAll(ex.getDependencyTokens());
+                        for ( String d : ex.getDependencyTokens() )
+                        {
+                            addToMap( dependencyCNBBacktraces, d, Collections.singletonList( ex.getModule() ) );
+                        }
+                        modulesCNBs.add(ex.getModule());
+                        osgiImports.addAll( ex.getOsgiImports());
+                        for ( String d : ex.getOsgiImports() )
+                        {
+                            addToMap( osgiImportsBacktraces, d, Collections.singletonList( ex.getModule() ) );
+                        }
+                        
+                        osgiExports.addAll( ex.getOsgiExports());
+                    }
                 }
             }
             
             if (verifyIntegrity) {
                 dependencyCNBs.removeAll( modulesCNBs );
+                if (modulesCNBs.contains( "org.netbeans.modules.netbinox")) {
+                    dependencyCNBs.remove( "org.eclipse.osgi"); //this is special.
+                }
                 osgiImports.removeAll( osgiExports );
+                Iterator<String> it = osgiImports.iterator();
+                while (it.hasNext()) {
+                    String s = it.next();
+                    if (s.startsWith( "java.") || s.startsWith( "javax.") || s.startsWith( "sun.") || s.startsWith( "org.xml.sax") || s.startsWith( "org.w3c.dom") || s.startsWith( "org.ietf.jgss")) {
+                        it.remove();
+                        continue;
+                    }
+                    for (String sub : osgiExportsSubs) {
+                        if (s.startsWith( sub )) {
+                            it.remove();
+                            break;
+                        }
+                    }
+                }
                 requireTokens.removeAll( provideTokens );
-                System.out.println( Arrays.toString( requireTokens.toArray() ) );
-                System.out.println( Arrays.toString( provideTokens.toArray() ) );
                 requireTokens.removeAll( defaultPlatformTokens );
                 if (!dependencyCNBs.isEmpty() || !osgiImports.isEmpty() ||!requireTokens.isEmpty()) {
                     if (!dependencyCNBs.isEmpty()) {
                         getLog().error( "Some included modules/bundles depend on these codenamebases but they are not included. The application will fail starting up. The missing codenamebases are:" );
                         for (String s : dependencyCNBs) {
-                            getLog().error("   " + s);
+                            Set<String> back = dependencyCNBBacktraces.get( s );
+                            getLog().error("   " + s + (back != null ? "          ref: " + Arrays.toString( back.toArray()) : ""));
                         }
                     }
                     if (!osgiImports.isEmpty()) {
                         getLog().error("Some OSGi imports are not satisfied by included bundles' exports. The application will fail starting up. The missing imports are:");
                         for (String s : osgiImports) {
-                            getLog().error("   " + s);
+                            Set<String> back = osgiImportsBacktraces.get( s );
+                            getLog().error("   " + s + (back != null ? "          ref: " + Arrays.toString( back.toArray()) : ""));
                         }
                     }
                      if (!requireTokens.isEmpty()) {
                         getLog().error("Some tokens required by included modules are not provided by included modules. The application will fail starting up. The missing tokens are:");
                         for (String s : requireTokens) {
-                            getLog().error("   " + s);
+                            Set<String> back = requireTokensBacktraces.get( s );
+                            getLog().error("   " + s + (back != null ? "          ref: " + Arrays.toString( back.toArray()) : ""));
                         }
                     }
                     throw new MojoFailureException("See above for consistency validation check failures. Either fix those by adding the relevant dependencies to the application or disable the check by setting the verifyIntegrity parameter to false or by running with -Dnetbeans.verify.integrity=false cmd line parameter.");
