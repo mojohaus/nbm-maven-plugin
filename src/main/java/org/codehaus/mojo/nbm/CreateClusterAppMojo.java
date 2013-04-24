@@ -315,6 +315,13 @@ public class CreateClusterAppMojo
                                             {
                                                 IOUtil.close( outstream );
                                             }
+                                            
+                                            //TODO examine netbeans/config/Modules to see if the module is autoload/eager
+                                            // in verifyIntegrity these could be handled more gracefully than regular modules.
+                                            //eager is simpler, does not need to have module dependencies satisfied.
+                                            //autoload needs checking if any of the other modules declares a dependency on it. if not, also safe to ignore?
+                                            
+                                            
                                             // now figure which one of the jars is the module jar..
                                             if ( part.matches("(modules|core|lib)/[^/]+[.]jar") )
                                             {
