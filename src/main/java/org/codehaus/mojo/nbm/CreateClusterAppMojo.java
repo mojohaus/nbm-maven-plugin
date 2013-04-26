@@ -433,6 +433,11 @@ public class CreateClusterAppMojo
             }
             
             if (verifyIntegrity) {
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug( "All found codenamebases:" + Arrays.toString( modulesCNBs.toArray()) );
+                    getLog().debug( "All found OSGI exports:" + Arrays.toString( osgiExports.toArray()) );
+                    getLog().debug( "All found provided tokens:" + Arrays.toString( provideTokens.toArray()) );
+                }
                 dependencyCNBs.removeAll( modulesCNBs );
                 if (modulesCNBs.contains( "org.netbeans.modules.netbinox")) {
                     dependencyCNBs.remove( "org.eclipse.osgi"); //this is special.
@@ -477,7 +482,11 @@ public class CreateClusterAppMojo
                         }
                     }
                     throw new MojoFailureException("See above for consistency validation check failures. Either fix those by adding the relevant dependencies to the application or disable the check by setting the verifyIntegrity parameter to false or by running with -Dnetbeans.verify.integrity=false cmd line parameter.");
+                } else {
+                    getLog().info( "Integrity verification passed.");
                 }
+            } else {
+                getLog().info( "Integrity verification skipped.");
             }
             
             //attempt to sort clusters based on the dependencies and cluster content.
