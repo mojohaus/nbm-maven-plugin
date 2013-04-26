@@ -48,7 +48,6 @@ import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -913,23 +912,22 @@ public class CreateClusterAppMojo
     {
         @SuppressWarnings( "unchecked" )
         Set<Artifact> artifacts = project.getArtifacts();
-        VersionRange version = null;
+        String version = null;
         for (Artifact a : artifacts) {
             if ("org.netbeans.modules".equals(a.getGroupId()) && "org-netbeans-bootstrap".equals(a.getArtifactId())) {
-                version = a.getVersionRange();
+                version = a.getBaseVersion(); //base version in non-snapshot should equals version, in snapshots to X-SNAPSHOT, not timestamp
                 break;
             }
         }
         if (version == null) {
             throw new MojoExecutionException( "We could not find org-netbeans-bootstrap among the modules in the application. Launchers could not be found.");
         }
-        Artifact nbmArt = artifactFactory.createDependencyArtifact(
+        Artifact nbmArt = artifactFactory.createArtifact(
             "org.netbeans.modules",
             "org-netbeans-modules-apisupport-harness",
             version,
-            "nbm-file",
-            null,
-            null );
+            "compile",
+            "nbm-file");
         try
         {
             artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), localRepository );
