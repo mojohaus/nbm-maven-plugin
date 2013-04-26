@@ -385,11 +385,21 @@ public abstract class AbstractNbmMojo
             File jar = art.getFile();
             if ( !jar.isFile() )
             {
-                getLog().warn( "MNBMODULE-131: need to at least run package phase on " + jar );
-                return new ArtifactResult( null, null );
+                //MNBMODULE-210 with recent CoS changes in netbeans (7.4) jar will be file as we link open projects in the build
+                // via WorkspaceReader. That's fine here, as all we need is to know if project is osgi or nbm module.
+                // the nbm file has to be in local repository though.
+                String path = localRepository.pathOf( art );
+                File jar2 = new File(localRepository.getBasedir(), path.replace( "/", File.separator));
+                File manifest = new File(jar, "META-INF/MANIFEST.MF" );
+                
+                if (! jar2.isFile() || !manifest.isFile() ) {
+                    getLog().warn( "MNBMODULE-131: need to at least run install phase on " + jar2 );
+                    return new ArtifactResult( null, null );
+                }
+                mnf.setManifestFile( manifest );
+            } else {
+                mnf.setJarFile( jar );
             }
-            mnf.setJarFile( jar );
-            mnf.setPopulateDependencies( true );
             mnf.checkFile();
             if ( mnf.isNetBeansModule() )
             {
