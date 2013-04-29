@@ -4,7 +4,7 @@
     <parent>
         <artifactId>nbm-maven</artifactId>
         <groupId>org.codehaus.mojo</groupId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.2</version>
     </parent>
     <artifactId>nbm-maven-harness</artifactId>
     <version>7.3-SNAPSHOT</version>
