@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>nb-shared</artifactId>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>NBM Plugins Utilities</name>
@@ -31,9 +31,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mojo/tags/nb-shared-1.1</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/nb-shared-1.1</developerConnection>
-        <url>http://fisheye.codehaus.org/browse/mojo/tags/nb-shared-1.1</url>
+        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-shared</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-shared</developerConnection>
+        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven/nbm-shared</url>
     </scm>
     <developers>
         <developer>
