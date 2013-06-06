@@ -658,7 +658,14 @@ public class CreateClusterAppMojo
         if ( confFile == null )
         {
             File harnessDir = new File( buildDir, "harness" );
-            if ( !harnessDir.exists() )
+            // app.conf contains default options and other settings
+            confFile = new File(
+                    harnessDir.getAbsolutePath() + File.separator + "etc" + File.separator + "app.conf" );
+            if ( confFile.exists() )
+            {
+                str = FileUtils.fileRead( confFile, "UTF-8" );
+            }
+            else 
             {
                 getLog().debug( "Using fallback app.conf shipping with the nbm-maven-plugin." );
                 InputStream instream = null;
@@ -671,13 +678,6 @@ public class CreateClusterAppMojo
                 {
                     IOUtil.close( instream );
                 }
-            }
-            else
-            {
-                // app.conf contains default options and other settings
-                confFile = new File(
-                    harnessDir.getAbsolutePath() + File.separator + "etc" + File.separator + "app.conf" );
-                str = FileUtils.fileRead( confFile, "UTF-8" );
             }
         }
         else
@@ -741,11 +741,11 @@ public class CreateClusterAppMojo
         else
         {
             File harnessDir = new File( buildDir, "harness" );
-            if ( harnessDir.exists() )
-            {
-                //we have org-netbeans-modules-apisupport-harness in target area, just use it's own launchers.
-                binDir = new File(
+            //we have org-netbeans-modules-apisupport-harness in target area, just use it's own launchers.
+            binDir = new File(
                     harnessDir.getAbsolutePath() + File.separator + "launchers" );
+            if ( binDir.exists() )
+            {
                 File exe = new File( binDir, "app.exe" );
                 FileUtils.copyFile( exe, destExe );
                 File exe64 = new File( binDir, "app64.exe" );
