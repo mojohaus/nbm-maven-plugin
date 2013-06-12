@@ -224,8 +224,6 @@ public class CreateClusterAppMojo
                             String clusterName = findCluster( jf );                            
                             ClusterTuple cluster = processCluster( clusterName, knownClusters, nbmBuildDirFile, art );
                             
-                            if ( cluster.newer )
-                            {
                                 getLog().debug( "Copying " + art.getId() + " to cluster " + clusterName );
                                 Enumeration<JarEntry> enu = jf.entries();
 
@@ -242,9 +240,11 @@ public class CreateClusterAppMojo
                                     JarEntry ent = enu.nextElement();
                                     String name = ent.getName();
                                     //MNBMODULE-176
-                                    if ( name.equals("Info/executables.list")) {
-                                        InputStream is = jf.getInputStream( ent );
-                                        executables = StringUtils.split( IOUtil.toString( is, "UTF-8" ), "\n");
+                                    if (name.equals("Info/executables.list")) {
+                                        if (cluster.newer) {
+                                            InputStream is = jf.getInputStream( ent );
+                                            executables = StringUtils.split( IOUtil.toString( is, "UTF-8" ), "\n");
+                                        }
                                     }
                                     else if ( name.startsWith( "netbeans/" ) )
                                     { // ignore everything else.
@@ -255,65 +255,69 @@ public class CreateClusterAppMojo
                                             path = path.replace( ".jar.pack.gz", ".jar" );
                                         }
                                         File fl = new File( nbmBuildDirFile, path.replace( "/", File.separator ) );
-                                        if ( ent.isDirectory() )
+                                        String part = name.substring( "netbeans/".length() );
+                                        if ( ispack200 )
                                         {
-                                            fl.mkdirs();
+                                            part = part.replace( ".jar.pack.gz", ".jar" );
                                         }
-                                        else if ( path.endsWith( ".external" ) ) // MNBMODULE-138
+                                        if (cluster.newer) 
                                         {
-                                            InputStream is = jf.getInputStream( ent );
-                                            try
+                                            if ( ent.isDirectory() )
                                             {
-                                                externalDownload( new File( fl.getParentFile(),
-                                                                            fl.getName().replaceFirst( "[.]external$",
-                                                                                                       "" ) ), is );
+                                                fl.mkdirs();
                                             }
-                                            finally
+                                            else if ( path.endsWith( ".external" ) ) // MNBMODULE-138
                                             {
-                                                is.close();
+                                                InputStream is = jf.getInputStream( ent );
+                                                try
+                                                {
+                                                    externalDownload( new File( fl.getParentFile(),
+                                                                                fl.getName().replaceFirst( "[.]external$",
+                                                                                                           "" ) ), is );
+                                                }
+                                                finally
+                                                {
+                                                    is.close();
+                                                }
+                                                //MNBMODULE-192
+                                                set.appendIncludes( new String[] { name.substring( "netbeans/".length(), name.length() - ".external".length() ) } );
                                             }
-                                            //MNBMODULE-192
-                                            set.appendIncludes( new String[] { name.substring( "netbeans/".length(), name.length() - ".external".length() ) } );
-                                        }
-                                        else
-                                        {
-                                            String part = name.substring( "netbeans/".length() );
-                                            if ( ispack200 )
+                                            else
                                             {
-                                                part = part.replace( ".jar.pack.gz", ".jar" );
-                                            }
-                                            set.appendIncludes( new String[] { part } );
+                                                set.appendIncludes( new String[] { part } );
 
-                                            fl.getParentFile().mkdirs();
-                                            fl.createNewFile();
-                                            BufferedOutputStream outstream = null;
-                                            try
-                                            {
-                                                outstream = new BufferedOutputStream( new FileOutputStream( fl ) );
-                                                InputStream instream = jf.getInputStream( ent );
-                                                if ( ispack200 )
+                                                fl.getParentFile().mkdirs();
+                                                fl.createNewFile();
+                                                BufferedOutputStream outstream = null;
+                                                try
                                                 {
-                                                    Pack200.Unpacker unp = Pack200.newUnpacker();
-                                                    JarOutputStream jos = new JarOutputStream( outstream );
-                                                    GZIPInputStream gzip = new GZIPInputStream( instream );
-                                                    try
+                                                    outstream = new BufferedOutputStream( new FileOutputStream( fl ) );
+                                                    InputStream instream = jf.getInputStream( ent );
+                                                    if ( ispack200 )
                                                     {
-                                                        unp.unpack( gzip, jos );
+                                                        Pack200.Unpacker unp = Pack200.newUnpacker();
+                                                        JarOutputStream jos = new JarOutputStream( outstream );
+                                                        GZIPInputStream gzip = new GZIPInputStream( instream );
+                                                        try
+                                                        {
+                                                            unp.unpack( gzip, jos );
+                                                        }
+                                                        finally
+                                                        {
+                                                            jos.close();
+                                                        }
                                                     }
-                                                    finally
+                                                    else
                                                     {
-                                                        jos.close();
+                                                        IOUtil.copy( instream, outstream );
                                                     }
                                                 }
-                                                else
+                                                finally
                                                 {
-                                                    IOUtil.copy( instream, outstream );
+                                                    IOUtil.close( outstream );
                                                 }
                                             }
-                                            finally
-                                            {
-                                                IOUtil.close( outstream );
-                                            }
+                                        }
                                             
                                             //TODO examine netbeans/config/Modules to see if the module is autoload/eager
                                             // in verifyIntegrity these could be handled more gracefully than regular modules.
@@ -374,8 +378,9 @@ public class CreateClusterAppMojo
                                             }
                                         }
                                     }
-                                }
 
+                            if ( cluster.newer )
+                            {
                                 try
                                 {
                                     makeTask.execute();
@@ -385,20 +390,22 @@ public class CreateClusterAppMojo
                                     getLog().error( "Cannot Generate update_tracking XML file from " + art.getFile() );
                                     throw new MojoExecutionException( e.getMessage(), e );
                                 }
-                                
-                                if ( executables != null ) 
+
+                                if ( executables != null )
                                 {
                                     //MNBMODULE-176
                                     for ( String exec : executables )
                                     {
-                                        exec = exec.replace( "/", File.separator);
-                                        File execFile = new File(cluster.location, exec);
-                                        if (execFile.exists()) {
-                                            execFile.setExecutable( true, false);
+                                        exec = exec.replace( "/", File.separator );
+                                        File execFile = new File( cluster.location, exec );
+                                        if ( execFile.exists() )
+                                        {
+                                            execFile.setExecutable( true, false );
                                         }
                                     }
                                 }
                             }
+                            
                         }
                         finally
                         {
@@ -429,7 +436,7 @@ public class CreateClusterAppMojo
                         
                         osgiExports.addAll( ex.getOsgiExports());
                     }
-                }
+                } 
             }
             
             if (verifyIntegrity) {
