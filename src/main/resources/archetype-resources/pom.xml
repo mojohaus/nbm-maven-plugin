@@ -65,6 +65,6 @@
         <netbeans.version>${netbeansVersion}</netbeans.version>
 ## XXX better to pass toLowerCase(java.util.Locale.ENGLISH), to fix Turkish problem, but Velocity rejects that syntax
 ## XXX some other patterns are also rejected by NbBundle; it wants /[a-z][a-z0-9]*(_[a-z][a-z0-9]*)*/
-        <brandingToken>${artifactId.toLowerCase().replaceAll("[^a-z0-9_]+", "_")}</brandingToken>
+        <brandingToken>${artifactId.toLowerCase().replaceAll("[^a-z0-9]+", "")}</brandingToken>
     </properties>
 </project>
