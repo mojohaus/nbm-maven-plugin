@@ -59,8 +59,7 @@ public class RunPlatformAppMojo
     @Parameter(required=true, defaultValue="${project.build.directory}/userdir", property="netbeans.userdir")
     protected File netbeansUserdir;
     /**
-     * additional command line arguments. Eg. 
-     * -J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=8888
+     * additional command line arguments passed to the application.
      * can be used to debug the IDE.
      */
     @Parameter(property="netbeans.run.params")
