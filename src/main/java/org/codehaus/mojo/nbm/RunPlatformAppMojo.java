@@ -65,6 +65,17 @@ public class RunPlatformAppMojo
      */
     @Parameter(property="netbeans.run.params")
     protected String additionalArguments;
+    
+    /**
+     * Attach a debugger to the application JVM. If set to "true", the process will suspend and wait for a debugger to attach
+     * on port 5005. If set to some other string, that string will be appended to the <code>additionalArguments</code>, allowing you to configure
+     * arbitrary debuggability options (without overwriting the other options specified through the <code>additionalArguments</code>
+     * parameter).
+     * @since 3.11
+     */
+    @Parameter(property="netbeans.run.params.debug")
+    protected String debugAdditionalArguments;
+    
     /**
      * The Maven Project.
      *
@@ -148,6 +159,7 @@ public class RunPlatformAppMojo
 
             cmdLine.addArguments( args.toArray( new String[0] ) );
             cmdLine.addArguments( CommandLineUtils.translateCommandline( additionalArguments ) );
+            cmdLine.addArguments( CommandLineUtils.translateCommandline( getDebugAdditionalArguments() ) );
             getLog().info( "Executing: " + cmdLine.toString() );
             StreamConsumer out = new StreamConsumer()
             {
@@ -163,5 +175,14 @@ public class RunPlatformAppMojo
         {
             throw new MojoExecutionException( "Failed executing NetBeans", e );
         }
+    }
+
+    private String getDebugAdditionalArguments()
+    {
+       if ( "true".equals( debugAdditionalArguments ) )
+        {
+            return "-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005";
+        }
+        return debugAdditionalArguments;
     }
 }
