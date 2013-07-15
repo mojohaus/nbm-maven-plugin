@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -219,19 +218,21 @@ public class ExamineManifest
                         String tok = tokens.nextToken();
                         //we are just interested in specification and loose dependencies.
                         int spec = tok.indexOf( '>' );
-                        if ( spec > 0 || ( tok.indexOf( '=' ) == -1 && spec == -1 ) )
+                        int impl = tok.indexOf( '=');
+                        if ( spec > 0 )
                         {
-                            if ( spec > 0 )
-                            {
-                                tok = tok.substring( 0, spec );
-                            }
-                            int slash = tok.indexOf( '/' );
-                            if ( slash > 0 )
-                            {
-                                tok = tok.substring( 0, slash );
-                            }
-                            depList.add( tok.trim().intern() );
+                            tok = tok.substring( 0, spec );
                         }
+                        else if ( impl > 0 )
+                        {
+                            tok = tok.substring( 0, impl );
+                        }
+                        int slash = tok.indexOf( '/' );
+                        if ( slash > 0 )
+                        {
+                            tok = tok.substring( 0, slash );
+                        }
+                        depList.add( tok.trim().intern() );
                     }
                     this.dependencyTokens = depList;
                 }
