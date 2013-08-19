@@ -723,13 +723,13 @@ public class CreateClusterAppMojo
                 {
                     dest = destExeW;
                 }
-                else if ( name.endsWith( ".exe" ) )
-                {
-                    dest = destExe;
-                }
                 else if ( name.endsWith( "64.exe" ) )
                 {
                     dest = destExe64;
+                }
+                else if ( name.endsWith( ".exe" ) )
+                {
+                    dest = destExe;
                 }
                 else if ( !name.contains( "." ) || name.endsWith( ".sh" ) )
                 {
