@@ -150,7 +150,8 @@ public abstract class CreateNetBeansFileStructure
     protected String encoding;
     
     /**
-     * Deployment type of the module, allowed values are <code>normal</code>,<code>eager</code>,<code>autoload</code>. 
+     * Deployment type of the module, allowed values are <code>normal</code>,<code>eager</code>,<code>autoload</code>,
+     * <code>disabled</code>.
      * <p>
      * <code>autoload</code> - Such a module is
      * automatically enabled when some other module requires it and
@@ -161,7 +162,9 @@ public abstract class CreateNetBeansFileStructure
      *                     <p><code>normal</code> - This is the default
      * value. This kind of module is enabled/disabled manually by
      * the user. It installs enabled.</p>
-     * 
+     *                     <p><code>disabled</code> - This kind of module is enabled/disabled manually by
+     * the user. It installs disabled. Since 3.11</p>
+     *
      * For details, see <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans Module system docs</a>
      * @since 3.8
      */ 
@@ -218,11 +221,12 @@ public abstract class CreateNetBeansFileStructure
             type = module.getModuleType();
             getLog().warn( "moduleType in module descriptor is deprecated, use the plugin's parameter moduleType");
         }
-        if (!"normal".equals(type) && !"autoload".equals(type) && !"eager".equals(type)) {
-            getLog().error( "Only 'normal,autoload,eager' are allowed values in the moduleType parameter");
+        if (!"normal".equals(type) && !"autoload".equals(type) && !"eager".equals(type) && !"disabled".equals(type)) {
+            getLog().error( "Only 'normal,autoload,eager,disabled' are allowed values in the moduleType parameter");
         }
         boolean autoload = "autoload".equals( type );
         boolean eager = "eager".equals( type );
+        boolean disabled = "disabled".equals( type );
         // 1. initialization
         String moduleName = codeNameBase;
         if (module.getCodeNameBase() != null) {
@@ -418,6 +422,10 @@ public abstract class CreateNetBeansFileStructure
         else if ( eager )
         {
             moduleXmlTask.addEager( fs );
+        }
+        else if ( disabled )
+        {
+            moduleXmlTask.addDisabled( fs );
         }
         else
         {
