@@ -235,6 +235,8 @@ public class CreateClusterAppMojo
                                 set.setDir( cluster.location );
                                 makeTask.setOutputfiledir( cluster.location );
                                 String[] executables = null;
+                                File classpathRoot = null;
+                                String classPath = null;
                                 while ( enu.hasMoreElements() )
                                 {
                                     JarEntry ent = enu.nextElement();
@@ -337,24 +339,16 @@ public class CreateClusterAppMojo
                                                     makeTask.setModule( part );
                                                     addToMap(clusterDependencies, clusterName, ex.getDependencyTokens());
                                                     addToMap(clusterModules, clusterName, Collections.singletonList( ex.getModule() ));
-                                                    
-                                                }
-                                                else if ( ex.isOsgiBundle() )
-                                                {
-                                                    wrappedBundleCNBs.add( ex.getModule() );
+                                                    if (ex.getClasspath().length() > 0) { //MNBMODULE-220
+                                                        classPath = ex.getClasspath();
+                                                        classpathRoot = fl.getParentFile();
+                                                    }
                                                 }
                                                 if (verifyIntegrity) {
                                                     dependencyCNBs.addAll(ex.getDependencyTokens());
                                                     modulesCNBs.add(ex.getModule());
                                                     for (String d : ex.getDependencyTokens()) {
                                                         addToMap(dependencyCNBBacktraces, d, Collections.singletonList( ex.getModule() ));
-                                                    }
-                                                    if (ex.isOsgiBundle()) {
-                                                        osgiImports.addAll( ex.getOsgiImports());
-                                                        for (String d : ex.getOsgiImports()) {
-                                                            addToMap(osgiImportsBacktraces, d, Collections.singletonList( ex.getModule() ));
-                                                        }
-                                                        osgiExports.addAll( ex.getOsgiExports());
                                                     }
                                                     if (ex.isNetBeansModule()) {
                                                         requireTokens.addAll(ex.getNetBeansRequiresTokens());
@@ -378,7 +372,19 @@ public class CreateClusterAppMojo
                                             }
                                         }
                                     }
-
+                                    if (classPath != null) { //MNBMODULE-220 collect wrappedbundleCNBs, later useful in assignClustersToBundles(), these get removed from list of bundles.
+                                        String[] paths = StringUtils.split( classPath, " ");
+                                        for (String path : paths) {
+                                            File classpathFile = new File(classpathRoot, path.trim());
+                                            ExamineManifest ex = new ExamineManifest( getLog() );
+                                            ex.setJarFile( classpathFile );
+                                            //ex.setPopulateDependencies( true );
+                                            ex.checkFile();
+                                            if (ex.isOsgiBundle()) {
+                                                wrappedBundleCNBs.add( ex.getModule() );
+                                            }
+                                        }
+                                    }
                             if ( cluster.newer )
                             {
                                 try
