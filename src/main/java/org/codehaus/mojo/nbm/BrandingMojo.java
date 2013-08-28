@@ -61,6 +61,13 @@ public class BrandingMojo
      */
     @Parameter(required=true, defaultValue="${project.build.directory}/nbm")
     protected File nbmBuildDir;
+    
+    /**
+    * output directory.
+    */
+    @Parameter(defaultValue="${project.build.directory}", required=true)
+    protected File outputDirectory;
+    
     /**
      * Location of the branded resources.
      */
@@ -113,48 +120,57 @@ public class BrandingMojo
             scanner.setBasedir( brandingSources );
             scanner.scan();
 
-            File clusterDir = new File( nbmBuildDir, "netbeans" + File.separator + cluster );
+            final String clusterPathPart = "netbeans" + File.separator + cluster;
+            File outputDir = new File(outputDirectory, "branding_and_locales");
+            outputDir.mkdirs();
+            File clusterDir = new File( nbmBuildDir, clusterPathPart );
             clusterDir.mkdirs();
 
             // copy all files and see to it that they get the correct names
             for ( String brandingFilePath : scanner.getIncludedFiles() )
             {
                 File brandingFile = new File( brandingSources, brandingFilePath );
-                String destinationFilePath = destinationFileName( brandingFilePath, brandingToken );
-                File brandingDestination = new File( clusterDir, destinationFilePath );
+                String[] locale = getLocale( brandingFile.getName());
+                String token = locale[1] == null ? brandingToken : brandingToken + "_" + locale[1];
+                File root = new File(outputDir, token);
+                root.mkdirs();
+                String destinationName = locale[0] + "_" + token + locale[2];
+                File brandingDestination = new File( root, brandingFilePath.replace( brandingFile.getName(), destinationName) );
                 if ( !brandingDestination.getParentFile().exists() )
                 {
                     brandingDestination.getParentFile().mkdirs();
                 }
                 FileUtils.copyFile( brandingFile, brandingDestination );
             }
-
-            // create jar-files from each toplevel .jar directory
-            scanner.setIncludes( new String[]
+            for (File rootDir : outputDir.listFiles()) {
+                if (!rootDir.isDirectory()) {
+                    continue;
+                }
+                String effectiveBranding = rootDir.getName();
+                // create jar-files from each toplevel .jar directory
+                scanner.setIncludes( new String[]
                     {
                         "**/*.jar"
                     } );
-            scanner.setBasedir( clusterDir );
-            scanner.scan();
+                scanner.setBasedir( rootDir );
+                scanner.scan();
+                for ( String jarDirectoryPath : scanner.getIncludedDirectories() )
+                {
+                    // move nnn.jar directory to nnn.jar.tmp
+                    File jarDirectory = new File( rootDir, jarDirectoryPath );
+                    File destinationLocation = new File(clusterDir, jarDirectoryPath).getParentFile();
+                    destinationLocation.mkdirs();
+                    // jars should be placed in locales/ under the same directory the jar-directories are
+                    File destinationJar =
+                        new File( destinationLocation + File.separator + "locale"
+                            + File.separator + destinationFileName( jarDirectory.getName(), effectiveBranding ) );
 
-            for ( String jarDirectoryPath : scanner.getIncludedDirectories() )
-            {
-
-                // move nnn.jar directory to nnn.jar.tmp
-                File jarDirectory = new File( clusterDir, jarDirectoryPath );
-
-                // jars should be placed in locales/ under the same directory the jar-directories are
-                File destinationJar =
-                    new File( jarDirectory.getParentFile().getAbsolutePath() + File.separator + "locale"
-                        + File.separator + destinationFileName( jarDirectory.getName(), brandingToken ) );
-
-                // create nnn.jar archive of contents
-                JarArchiver archiver = new JarArchiver();
-                archiver.setDestFile( destinationJar );
-                archiver.addDirectory( jarDirectory );
-                archiver.createArchive();
-
-                FileUtils.deleteDirectory( jarDirectory );
+                    // create nnn.jar archive of contents
+                    JarArchiver archiver = new JarArchiver();
+                    archiver.setDestFile( destinationJar );
+                    archiver.addDirectory( jarDirectory );
+                    archiver.createArchive();
+                }
             }
 
         }
@@ -164,7 +180,6 @@ public class BrandingMojo
         }
     }
 
-    //as done in Branding.java in nbbuild/antsrc in netbeans.org sourcebase.
     static  String destinationFileName( String brandingFilePath, String branding )
     {
         // use first underscore in filename 
@@ -177,5 +192,35 @@ public class BrandingMojo
             return brandingFilePath + infix;
         }
         return brandingFilePath.substring( 0, lastDot ) + infix + brandingFilePath.substring( lastDot );
+    }
+    
+    //[0] prefix
+    //[1] locale
+    //[2] suffix
+    static String[] getLocale(String name) {
+        String suffix = "";
+        int dot = name.indexOf( ".");
+        if (dot > -1) { //remove file extension
+            suffix = name.substring( dot );
+            name = name.substring( 0, dot);
+        }
+        String locale = null;
+        int count = 1;
+        //iterate from back of the string, max 3 times and see if the pattern patches local pattern
+        while (count <= 3) {
+            int underscore = name.lastIndexOf( '_');
+            if (underscore > -1) {
+                String loc1 = name.substring( underscore  + 1);
+                if (loc1.length() != 2) {
+                    break;
+                } 
+                locale = loc1 + (locale == null ? "" : "_" + locale);
+                name = name.substring( 0, underscore);
+            } else {
+                break;
+            }
+            count = count + 1;
+        }
+        return new String[] {name, locale, suffix};
     }
 }
