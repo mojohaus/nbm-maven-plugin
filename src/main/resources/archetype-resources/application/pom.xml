@@ -16,8 +16,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <netbeans.run.params.ide/>
-        <netbeans.run.params>${D}{netbeans.run.params.ide}</netbeans.run.params>
         <all.clusters>${D}{project.build.directory}/${D}{brandingToken}</all.clusters>
     </properties>
 
