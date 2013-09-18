@@ -18,7 +18,7 @@
         </goals>
         <properties>
             <jpda.listen>true</jpda.listen>
-            <netbeans.run.params>-J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=${D}{jpda.address}</netbeans.run.params>
+            <netbeans.run.params.debug>-J-Xdebug -J-Xnoagent -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=${D}{jpda.address}</netbeans.run.params.debug>
         </properties>
     </action>
 </actions>
