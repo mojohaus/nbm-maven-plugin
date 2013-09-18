@@ -68,7 +68,7 @@ public class RunPlatformAppMojo
     /**
      * Attach a debugger to the application JVM. If set to "true", the process will suspend and wait for a debugger to attach
      * on port 5005. If set to some other string, that string will be appended to the <code>additionalArguments</code>, allowing you to configure
-     * arbitrary debuggability options (without overwriting the other options specified through the <code>additionalArguments</code>
+     * arbitrary debug-ability options (without overwriting the other options specified through the <code>additionalArguments</code>
      * parameter).
      * @since 3.11
      */
