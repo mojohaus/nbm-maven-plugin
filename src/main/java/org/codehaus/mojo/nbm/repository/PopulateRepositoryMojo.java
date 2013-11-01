@@ -105,11 +105,20 @@ import org.codehaus.plexus.util.StringUtils;
 public class PopulateRepositoryMojo
     extends AbstractNetbeansMojo
 {
-    private static final String GROUP_API = "org.netbeans.api";
-    private static final String GROUP_IMPL = "org.netbeans.modules";
-    private static final String GROUP_EXTERNAL = "org.netbeans.external";
-    private static final String GROUP_CLUSTER = "org.netbeans.cluster";
+    private static final String GROUP_API = ".api";
+    private static final String GROUP_IMPL = ".modules";
+    private static final String GROUP_EXTERNAL = ".external";
+    private static final String GROUP_CLUSTER = ".cluster";
 
+    
+    /**
+     * a prefix for groupId of generated content, 
+     * eg. for org.netbeans value will generate org.netbeans.cluster groupId for clusters and org.netbeans.modules for module artifacts.
+     * @since 1.2
+     */
+    @Parameter(property="groupIdPrefix", defaultValue = "org.netbeans")
+    private String groupIdPrefix;
+    
     /**
      * an url where to deploy the NetBeans artifacts. Optional, if not specified, the artifacts will be only installed
      * in local repository, if you need to give credentials to access remote repo, the id of the server is hardwired to "netbeans".
@@ -362,7 +371,7 @@ public class PopulateRepositoryMojo
                     artifact = "org-netbeans-core-startup";
                 }
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
-                String group = examinator.isOsgiBundle() ? GROUP_EXTERNAL : examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL;
+                String group = groupIdPrefix + (examinator.isOsgiBundle() ? GROUP_EXTERNAL : examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL);
                 Artifact art = createArtifact( artifact, version, group );
                 if ( examinator.isOsgiBundle() )
                 {
@@ -780,15 +789,15 @@ public class PopulateRepositoryMojo
                             repositoryFactory.createArtifactRepository( dependencyRepositoryId, dependencyRepositoryUrl, artifactRepositoryLayout, policy, policy) );
                     try
                     {
-                        artifactResolver.resolve( artifactFactory.createBuildArtifact( GROUP_API, artifactId, forcedVersion, "pom" ), repos, localRepository );
-                        dep.setGroupId( GROUP_API );
+                        artifactResolver.resolve( artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_API, artifactId, forcedVersion, "pom" ), repos, localRepository );
+                        dep.setGroupId( groupIdPrefix + GROUP_API );
                     }
                     catch ( AbstractArtifactResolutionException x )
                     {
                         try
                         {
-                            artifactResolver.resolve( artifactFactory.createBuildArtifact( GROUP_IMPL, artifactId, forcedVersion, "pom" ), repos, localRepository );
-                            dep.setGroupId( GROUP_IMPL );
+                            artifactResolver.resolve( artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_IMPL, artifactId, forcedVersion, "pom" ), repos, localRepository );
+                            dep.setGroupId( groupIdPrefix + GROUP_IMPL );
                             if ( wrapper.getModuleManifest().hasPublicPackages() )
                             {
                                 dep.setScope( "runtime" );
@@ -838,11 +847,11 @@ public class PopulateRepositoryMojo
                         }
                         ex.setVersion( wrapper.getVersion() );
                         ex.setArtifact( artId );
-                        ex.setGroupid( GROUP_EXTERNAL );
+                        ex.setGroupid( groupIdPrefix + GROUP_EXTERNAL );
                         externalsList.add( ex );
                         dep = new Dependency();
                         dep.setArtifactId( artId );
-                        dep.setGroupId( GROUP_EXTERNAL );
+                        dep.setGroupId( groupIdPrefix + GROUP_EXTERNAL );
                         dep.setVersion( wrapper.getVersion() );
                         dep.setType( "jar" );
                         deps.add( dep );
@@ -1055,7 +1064,7 @@ public class PopulateRepositoryMojo
 
     private Artifact createClusterArtifact( String artifact, String version )
     {
-        return artifactFactory.createBuildArtifact( GROUP_CLUSTER, artifact, version, "pom" );
+        return artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_CLUSTER, artifact, version, "pom" );
     }
 
     private static Pattern PATTERN_CLUSTER = Pattern.compile( "([a-zA-Z]+)[0-9\\.]*" );
