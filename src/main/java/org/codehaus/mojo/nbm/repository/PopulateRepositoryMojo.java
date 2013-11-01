@@ -90,7 +90,7 @@ import org.codehaus.plexus.util.StringUtils;
  * repository with them. Optionally you can also deploy to a remote repository.
  * <p/>
  * If you are looking for an existing remote repository for NetBeans artifacts, check out
- * <a href="http://bits.netbeans.org/maven2/">http://bits.netbeans.org/maven2/</a>,
+ * <a href="http://bits.netbeans.org/nexus/content/groups/netbeans/">http://bits.netbeans.org/nexus/content/groups/netbeans/</a>,
  * it contains API artifacts for multiple releases.
  * <a href="http://bits.netbeans.org/netbeans/trunk/maven-snapshot/">http://bits.netbeans.org/netbeans/trunk/maven-snapshot/</a>
  * may also be used for <code>SNAPSHOT</code> artifacts if you wish to test development builds.
@@ -711,7 +711,7 @@ public class PopulateRepositoryMojo
     {
         assert type != null;
 
-        ArtifactHandler handler = null;
+        ArtifactHandler handler;
 
         handler = artifactHandlerManager.getArtifactHandler( type );
 
