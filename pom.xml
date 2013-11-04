@@ -215,7 +215,7 @@
         </plugins>
     </build>
     <properties>
-        <netbeans.repo>netbeans::default::http://bits.netbeans.org/maven2/</netbeans.repo>
-        <netbeans.version>RELEASE73</netbeans.version>
+        <netbeans.repo>netbeans::default::http://bits.netbeans.org/nexus/content/groups/netbeans/</netbeans.repo>
+        <netbeans.version>RELEASE74</netbeans.version>
     </properties>
 </project>
