@@ -185,7 +185,6 @@ public class CreateClusterAppMojo
         {
             Project antProject = registerNbmAntTasks();
 
-            Set<String> knownClusters = new HashSet<String>(20);
             Set<String> wrappedBundleCNBs = new HashSet<String>(100);
             Map<String, Set<String>> clusterDependencies = new HashMap<String, Set<String>>();
             Map<String, Set<String>> clusterModules = new HashMap<String, Set<String>>();
@@ -222,7 +221,7 @@ public class CreateClusterAppMojo
                         try
                         {
                             String clusterName = findCluster( jf );                            
-                            ClusterTuple cluster = processCluster( clusterName, knownClusters, nbmBuildDirFile, art );
+                            ClusterTuple cluster = processCluster( clusterName, nbmBuildDirFile, art );
                             
                                 getLog().debug( "Copying " + art.getId() + " to cluster " + clusterName );
                                 Enumeration<JarEntry> enu = jf.entries();
@@ -519,7 +518,7 @@ public class CreateClusterAppMojo
                     clstr = defaultCluster;
                 }
                 
-                ClusterTuple cluster = processCluster( clstr, knownClusters, nbmBuildDirFile, art );
+                ClusterTuple cluster = processCluster( clstr, nbmBuildDirFile, art );
                 if ( cluster.newer )
                 {
                     getLog().info( "Copying " + art.getId() + " to cluster " + clstr );
@@ -824,13 +823,8 @@ public class CreateClusterAppMojo
         }
     }
 
-    private ClusterTuple processCluster( String cluster, Set<String> knownClusters, File nbmBuildDirFile, Artifact art )
+    private ClusterTuple processCluster( String cluster, File nbmBuildDirFile, Artifact art )
     {
-        if ( !knownClusters.contains( cluster ) )
-        {
-            getLog().info( "Processing cluster '" + cluster + "'" );
-            knownClusters.add( cluster );
-        }
         File clusterFile = new File( nbmBuildDirFile, cluster );
         boolean newer = false;
         if ( !clusterFile.exists() )
