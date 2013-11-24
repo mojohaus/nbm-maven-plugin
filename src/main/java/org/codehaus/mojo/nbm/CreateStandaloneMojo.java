@@ -32,7 +32,7 @@ import org.codehaus.plexus.archiver.zip.ZipArchiver;
  * @author <a href="mailto:johan.andren@databyran.se">Johan Andrén</a>
  * @author Milos Kleint
  */
-@Mojo(name="standalone-zip", requiresProject=true)
+@Mojo(name="standalone-zip", requiresProject=true, threadSafe = true)
 public class CreateStandaloneMojo
         extends AbstractMojo
 {

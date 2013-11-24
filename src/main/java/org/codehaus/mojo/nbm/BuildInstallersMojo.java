@@ -46,6 +46,7 @@ import org.apache.tools.ant.util.StringUtils;
 @Mojo(name="build-installers", 
         requiresProject=true, 
         requiresDependencyResolution=ResolutionScope.RUNTIME,
+        threadSafe = true,
         defaultPhase=LifecyclePhase.PACKAGE )
 public class BuildInstallersMojo
         extends AbstractNbmMojo

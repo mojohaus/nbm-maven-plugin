@@ -78,6 +78,7 @@ import org.netbeans.nbbuild.MakeListOfNBM;
 @Mojo(name="cluster-app", 
         defaultPhase= LifecyclePhase.PACKAGE, 
         requiresProject=true, 
+        threadSafe = true,
         requiresDependencyResolution= ResolutionScope.RUNTIME )
 public class CreateClusterAppMojo
     extends AbstractNbmMojo

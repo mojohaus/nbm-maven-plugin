@@ -51,6 +51,7 @@ import org.codehaus.plexus.util.FileUtils;
  */
 @Mojo(name="branding",
         requiresProject=true,
+        threadSafe = true,
         defaultPhase= LifecyclePhase.PACKAGE)
 public class BrandingMojo
         extends AbstractNbmMojo

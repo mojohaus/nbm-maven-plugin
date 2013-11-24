@@ -82,6 +82,7 @@ import org.codehaus.plexus.util.IOUtil;
 @Mojo(name="manifest", 
         defaultPhase= LifecyclePhase.PROCESS_CLASSES, 
         requiresProject=true, 
+        threadSafe = true,
         requiresDependencyResolution= ResolutionScope.RUNTIME )
 public class NetBeansManifestUpdateMojo
     extends AbstractNbmMojo

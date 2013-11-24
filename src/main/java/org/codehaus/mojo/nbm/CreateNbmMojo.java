@@ -54,6 +54,7 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
  */
 @Mojo(name="nbm", 
         requiresProject=true, 
+        threadSafe = true,
         requiresDependencyResolution= ResolutionScope.RUNTIME, 
         defaultPhase= LifecyclePhase.PACKAGE )
 public class CreateNbmMojo
