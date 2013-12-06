@@ -375,7 +375,22 @@ public class CreateClusterAppMojo
                                     if (classPath != null) { //MNBMODULE-220 collect wrappedbundleCNBs, later useful in assignClustersToBundles(), these get removed from list of bundles.
                                         String[] paths = StringUtils.split( classPath, " ");
                                         for (String path : paths) {
-                                            File classpathFile = new File(classpathRoot, path.trim());
+                                            path = path.trim();
+                                            File classpathFile = new File(classpathRoot, path);
+                                            if (path.equals("${java.home}/lib/ext/jfxrt.jar")) { //MNBMODULE-228
+                                                String jhm = System.getProperty("java.home");
+                                                classpathFile = new File(new File(new File(new File(jhm), "lib"), "ext"), "jfxrt.jar");
+                                                if (!classpathFile.exists()) {
+                                                    File jdk7 = new File(new File(new File(jhm), "lib"), "jfxrt.jar");
+                                                    if (jdk7.exists()) {
+                                                        classpathFile = jdk7;
+                                                    }
+                                                }
+                                            }
+                                            if (!classpathFile.isFile()) {
+                                                getLog().warn( "Could not resolve Class-Path item in " + art.getId() + ", path is:" + path +  ", skipping");
+                                                continue; //try to guard against future failures
+                                            } 
                                             ExamineManifest ex = new ExamineManifest( getLog() );
                                             ex.setJarFile( classpathFile );
                                             //ex.setPopulateDependencies( true );
