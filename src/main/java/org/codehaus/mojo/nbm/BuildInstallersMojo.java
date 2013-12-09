@@ -151,6 +151,11 @@ public class BuildInstallersMojo
             throw new MojoExecutionException(
                     "This goal only makes sense on project with 'nbm-application' packaging." );
         }
+        
+        if (!installerOsLinux && !installerOsMacosx && !installerOsSolaris && !installerOsWindows) {
+            getLog().warn( "None of the Operating System Installers selected, skipping 'build-installers' goal.");
+            return;
+        }
 
         String zipName = finalName + ".zip";
         File zipFile = new File( outputDirectory, zipName );
