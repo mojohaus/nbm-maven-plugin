@@ -64,6 +64,7 @@ public class BuildInstallersMojo
     protected String brandingToken;
     /**
     * Installation directory name at the destination system
+    * Deprecated, to be removed, was never actually used.
     */
     @Parameter(property="netbeans.branding.token")
     protected String installDirName;
@@ -190,7 +191,7 @@ public class BuildInstallersMojo
         
         props.put( "installers.file.prefix", installersFilePrefix );
 
-        props.put( "install.dir.name", installDirName );
+//        props.put( "install.dir.name", installDirName );
 
         //mkleint: this is a flawed pattern! cannot make any assumption on multimodule layout
         String appName = project.getParent().getArtifactId().replace( ".", "" ).replace( "-", "" ).replace( "_", "" ).replaceAll( "[0-9]+", "" );
