@@ -150,7 +150,8 @@ public class CreateClusterAppMojo
                     "org.openide.modules.os.Linux",
                     "org.openide.modules.os.Solaris",
                     "org.openide.modules.ModuleFormat1",
-                    "org.openide.modules.ModuleFormat2"
+                    "org.openide.modules.ModuleFormat2",
+                    "org.openide.modules.jre.JavaFX" //MNBMODULE-234
     });
 
 
