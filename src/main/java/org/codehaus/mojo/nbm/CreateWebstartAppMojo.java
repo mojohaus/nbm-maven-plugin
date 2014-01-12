@@ -407,6 +407,11 @@ public class CreateWebstartAppMojo
                 signTask.setKeystore( keystore );
                 signTask.setStorepass( keystorepassword );
                 signTask.setAlias( keystorealias );
+                if ( keystoretype != null )
+                {
+                    signTask.setStoretype( keystoretype );
+                }
+                
                 FileSet set = new FileSet();
                 set.setDir( brandingDir );
                 set.setIncludes( "*.jar" );
