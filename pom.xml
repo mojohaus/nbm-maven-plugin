@@ -216,6 +216,6 @@
     </build>
     <properties>
         <netbeans.repo>netbeans::default::http://bits.netbeans.org/nexus/content/groups/netbeans/</netbeans.repo>
-        <netbeans.version>RELEASE74</netbeans.version>
+        <netbeans.version>RELEASE80-BETA</netbeans.version>
     </properties>
 </project>
