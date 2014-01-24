@@ -6,13 +6,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>netbeans-platform-app-archetype</artifactId>
-  <version>1.19</version>
+  <version>1.20-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
   <name>NetBeans Platform Application Archetype</name>
   <description>Archetype for sample application based on NetBeans Platform. Creates parent POM with branding and empty NBM project.</description>
   <scm>
-    <connection>scm:svn:http://svn.codehaus.org/mojo/tags/netbeans-platform-app-archetype-1.19</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/netbeans-platform-app-archetype-1.19</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/mojo/tags/netbeans-platform-app-archetype-1.19</url>
+    <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/mojo-archetypes/netbeans-platform-app-archetype</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/mojo-archetypes/netbeans-platform-app-archetype</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/mojo-archetypes/netbeans-platform-app-archetype</url>
   </scm>
 </project>
