@@ -19,7 +19,7 @@
         <repository>
             <id>netbeans</id>
             <name>NetBeans</name>
-            <url>http://bits.netbeans.org/maven2/</url>
+            <url>http://bits.netbeans.org/nexus/content/groups/netbeans/</url>
         </repository>
     </repositories>
 
@@ -40,7 +40,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>nbm-maven-plugin</artifactId>
-                    <version>3.12</version>
+                    <version>3.13</version>
                     <configuration>
                         <cluster>${artifactId.toLowerCase().replaceAll("[^a-z0-9_]+", "_")}</cluster>
                     </configuration>
