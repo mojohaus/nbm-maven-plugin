@@ -346,6 +346,9 @@ public class NetBeansManifestUpdateMojo
             StringBuilder sb = new StringBuilder();
             for ( String pub : publicPackages )
             {
+                if (pub == null) { //#MNBMODULE-237
+                    continue;
+                }
                 if ( pub.endsWith( ".**" ) )
                 {
                     // well, just sort of wrong value but accept
@@ -362,8 +365,13 @@ public class NetBeansManifestUpdateMojo
                 }
                 sb.append( ", " );
             }
-            sb.setLength( sb.length() - 2 ); //cut the last 2 ", " characters
-            packagesValue = sb.toString();
+            if (sb.length() > 1) { //if only item is null, we have empty builder
+                sb.setLength( sb.length() - 2 ); //cut the last 2 ", " characters
+                packagesValue = sb.toString();
+            } else {
+                // no packages available
+                packagesValue = "-";
+            }
         }
         else
         {
