@@ -166,6 +166,11 @@ public abstract class CreateNetBeansFileStructure
      * the user. It installs disabled. Since 3.11</p>
      *
      * For details, see <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans Module system docs</a>
+     *
+     * Since 3.14, for autoload and eager modules, we automatically set AutoUpdate-Show-In-Client manifest entry to false, if not defined already otherwise in the manifest.
+     * See issue <a href="http://jira.codehaus.org/browse/MNBMODULE-194">MNBMODULE-194</a>
+     *
+     * 
      * @since 3.8
      */ 
     @Parameter(defaultValue="normal")

@@ -210,6 +210,32 @@ public class NetBeansManifestUpdateMojo
      */
     @Parameter
     private Dependency[] moduleDependencies;
+    
+/**
+     * Deployment type of the module, allowed values are <code>normal</code>,<code>eager</code>,<code>autoload</code>,
+     * <code>disabled</code>.
+     * <p>
+     * <code>autoload</code> - Such a module is
+     * automatically enabled when some other module requires it and
+     * automatically disabled otherwise.</p>
+     *                     <p><code>eager</code> - This module type gets
+     * automatically enabled when all it's dependencies are
+     * satisfied. Disabled otherwise.</p>
+     *                     <p><code>normal</code> - This is the default
+     * value. This kind of module is enabled/disabled manually by
+     * the user. It installs enabled.</p>
+     *                     <p><code>disabled</code> - This kind of module is enabled/disabled manually by
+     * the user. It installs disabled. Since 3.11</p>
+     *
+     * For details, see <a href="http://bits.netbeans.org/dev/javadoc/org-openide-modules/org/openide/modules/doc-files/api.html#enablement">Netbeans Module system docs</a>
+     * 
+     * Since 3.14, for autoload and eager modules, we automatically set AutoUpdate-Show-In-Client manifest entry to false, if not defined already otherwise in the manifest.
+     * See issue <a href="http://jira.codehaus.org/browse/MNBMODULE-194">MNBMODULE-194</a>
+     * 
+     * @since 3.8 (3.14 in manifest goal)
+     */ 
+    @Parameter(defaultValue="normal")
+    protected String moduleType;    
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
@@ -268,6 +294,18 @@ public class NetBeansManifestUpdateMojo
         {
             module = createDefaultDescriptor( project, false );
         }
+        
+        String mtype = moduleType;
+        if ("normal".equals(mtype) && module.getModuleType() != null) {
+            mtype = module.getModuleType();
+            getLog().warn( "moduleType in module descriptor is deprecated, use the plugin's parameter moduleType");
+        }
+        if (!"normal".equals(mtype) && !"autoload".equals(mtype) && !"eager".equals(mtype) && !"disabled".equals(mtype)) {
+            getLog().error( "Only 'normal,autoload,eager,disabled' are allowed values in the moduleType parameter");
+        }
+        boolean autoload = "autoload".equals( mtype );
+        boolean eager = "eager".equals( mtype );
+        
 
         String moduleName = codeNameBase;
         if (module.getCodeNameBase() != null) {
@@ -336,6 +374,9 @@ public class NetBeansManifestUpdateMojo
             "OpenIDE-Module-Specification-Version", specVersion );
         conditionallyAddAttribute( mainSection,
             "OpenIDE-Module-Implementation-Version", implVersion );
+        if (autoload || eager) { //MNBMODULE-194
+            conditionallyAddAttribute( mainSection, "AutoUpdate-Show-In-Client", "false");
+        }
         final String timestamp = createTimestamp( date );
         conditionallyAddAttribute( mainSection, "OpenIDE-Module-Build-Version",
             timestamp );
