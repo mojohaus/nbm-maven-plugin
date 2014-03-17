@@ -221,6 +221,7 @@ public abstract class CreateNetBeansFileStructure
         {
             module = createDefaultDescriptor( project, false );
         }
+        //same moduleType related code in NetBeansManifestUpdateMojo.java
         String type = moduleType;
         if ("normal".equals(type) && module.getModuleType() != null) {
             type = module.getModuleType();

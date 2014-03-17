@@ -296,6 +296,7 @@ public class NetBeansManifestUpdateMojo
         }
         
         String mtype = moduleType;
+        //same moduleType related code in CreateNetBeansFileStructure.java
         if ("normal".equals(mtype) && module.getModuleType() != null) {
             mtype = module.getModuleType();
             getLog().warn( "moduleType in module descriptor is deprecated, use the plugin's parameter moduleType");
