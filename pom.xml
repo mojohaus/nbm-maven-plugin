@@ -381,23 +381,6 @@
 
     <profiles>
         <profile>
-            <id>tools.jar</id>
-            <activation>
-                <file>
-                    <exists>${java.home}/../lib/tools.jar</exists>
-                </file>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun</groupId>
-                    <artifactId>tools</artifactId>
-                    <version>1.5.0</version>
-                    <scope>system</scope>
-                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>site</id>
             <build>
                 <plugins>
@@ -448,6 +431,15 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-project</artifactId>
             <version>2.2.0</version>
+            <exclusions>
+                <exclusion>
+                    <!-- MNBMODULE-240 when building with m2 and clean repository, m2 will download different set of deps than m3, causing a failure of loading the project.
+                         if you are always building with m2 only, there's no way to get the project in netbeans IDE to load
+                    -->
+                    <artifactId>plexus-interpolation</artifactId>
+                    <groupId>org.codehaus.plexus</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
@@ -489,6 +481,15 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact-manager</artifactId>
             <version>2.2.0</version>
+            <exclusions>
+                <exclusion>
+                    <!-- MNBMODULE-240 when building with m2 and clean repository, m2 will download different set of deps than m3, causing a failure of loading the project.
+                         if you are always building with m2 only, there's no way to get the project in netbeans IDE to load
+                    -->
+                    <artifactId>backport-util-concurrent</artifactId>
+                    <groupId>backport-util-concurrent</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
@@ -499,23 +500,71 @@
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-filtering</artifactId>
             <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <!-- MNBMODULE-240 when building with m2 and clean repository, m2 will download different set of deps than m3, causing a failure of loading the project.
+                         if you are always building with m2 only, there's no way to get the project in netbeans IDE to load
+                    -->
+                    <artifactId>plexus-interpolation</artifactId>
+                    <groupId>org.codehaus.plexus</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
             <version>2.2.0</version>
+            <exclusions>
+                <!-- MNBMODULE-240 when building with m2 and clean repository, m2 will download different set of deps than m3, causing a failure of loading the project.
+                     if you are always building with m2 only, there's no way to get the project in netbeans IDE to load
+                -->
+                <exclusion>
+                    <artifactId>doxia-sink-api</artifactId>
+                    <groupId>org.apache.maven.doxia</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>doxia-logging-api</artifactId>
+                    <groupId>org.apache.maven.doxia</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>maven-reporting-api</artifactId>
+                    <groupId>org.apache.maven.reporting</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>plexus-interactivity-api</artifactId>
+                    <groupId>org.codehaus.plexus</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-jdk14</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-nop</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-cli</artifactId>
+                    <groupId>commons-cli</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>plexus-sec-dispatcher</artifactId>
+                    <groupId>org.sonatype.plexus</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugin-testing</groupId>
             <artifactId>maven-plugin-testing-harness</artifactId>
             <version>1.2</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.help</groupId>
-            <artifactId>javahelp</artifactId>
-            <version>2.0.05</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -537,6 +586,13 @@
             <artifactId>guava</artifactId>
             <version>12.0</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <!-- MNBMODULE-240 needs to be readded for tests to work -->
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>3.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <properties>

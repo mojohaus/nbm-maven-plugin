@@ -15,9 +15,9 @@
  */
 package org.codehaus.mojo.nbm;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,8 +27,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.mojo.nbm.CreateClusterAppMojo.BundleTuple;
 import org.codehaus.mojo.nbm.utils.ExamineManifest;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  *
