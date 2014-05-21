@@ -500,15 +500,6 @@
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-filtering</artifactId>
             <version>1.0</version>
-            <exclusions>
-                <exclusion>
-                    <!-- MNBMODULE-240 when building with m2 and clean repository, m2 will download different set of deps than m3, causing a failure of loading the project.
-                         if you are always building with m2 only, there's no way to get the project in netbeans IDE to load
-                    -->
-                    <artifactId>plexus-interpolation</artifactId>
-                    <groupId>org.codehaus.plexus</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
