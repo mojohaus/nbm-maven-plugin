@@ -112,6 +112,16 @@ public class CreateUpdateSiteMojo
      */
     @Parameter(required=true, readonly=true, defaultValue="${reactorProjects}")
     private List reactorProjects;
+    
+    /**
+     * List of Ant style patterns on artifact GA (groupID:artifactID) that should be included in the update site.
+     * Eg. org.netbeans.* matches all artifacts with any groupID starting with 'org.netbeans.',
+     * org.*:api will match any artifact with artifactId of 'api' and groupId starting with 'org.'
+     * @since 3.14
+     */
+    @Parameter
+    private List<String> updateSiteIncludes;
+    
 
     // <editor-fold defaultstate="collapsed" desc="Component parameters">
 
@@ -175,6 +185,9 @@ public class CreateUpdateSiteMojo
             Set<Artifact> artifacts = project.getArtifacts();
             for ( Artifact art : artifacts )
             {
+                if (!matchesIncludes(art)) {
+                    continue;
+                }
                 ArtifactResult res =
                     turnJarToNbmFile( art, artifactFactory, artifactResolver, project, localRepository );
                 if ( res.hasConvertedArtifact() )
@@ -377,5 +390,22 @@ public class CreateUpdateSiteMojo
         throws ContextException
     {
         this.container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+    }
+
+    private boolean matchesIncludes( Artifact art )
+    {
+        if (updateSiteIncludes != null) {
+            String s = art.getGroupId() + ":" + art.getArtifactId();
+            for (String p : updateSiteIncludes) {
+                //TODO optimize and only do once per execution.
+                p = p.replace(".", "\\.").replace( "*", ".*");
+                Pattern patt = Pattern.compile( p );
+                if (patt.matcher( s).matches()) {
+                    return true;
+                }
+            }
+            return false;    
+        }
+        return true;
     }
 }
