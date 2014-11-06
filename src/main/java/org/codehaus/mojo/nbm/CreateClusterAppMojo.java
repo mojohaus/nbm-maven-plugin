@@ -1042,7 +1042,9 @@ public class CreateClusterAppMojo
             Artifact art = ent.artifact;
             ExamineManifest ex = ent.manifest;
             String spec = ex.getModule();
-            if ( wrappedBundleCNBs.contains( spec ) )
+            //null check for tests
+            //have a way to force inclusion of osgi items. Direct dependency is never wrapped by modules.
+            if ( art != null && art.getDependencyTrail().size() > 2 && wrappedBundleCNBs.contains( spec ) )
             {
                 // we already have this one as a wrapped module.
                 log.debug( "Not including bundle " + art.getDependencyConflictId()
