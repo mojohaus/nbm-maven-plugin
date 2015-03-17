@@ -370,6 +370,10 @@ public class PopulateRepositoryMojo
                 {
                     artifact = "org-netbeans-core-startup";
                 }
+                if ( "core-base".equals( artifact ) )
+                {
+                    artifact = "org-netbeans-core-startup-base";
+                }                
                 String version = forcedVersion == null ? examinator.getSpecVersion() : forcedVersion;
                 String group = groupIdPrefix + (examinator.isOsgiBundle() ? GROUP_EXTERNAL : examinator.hasPublicPackages() ? GROUP_API : GROUP_IMPL);
                 Artifact art = createArtifact( artifact, version, group );
