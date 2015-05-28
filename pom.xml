@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>nbm-maven</artifactId>
         <groupId>org.codehaus.mojo</groupId>
-        <version>1.2</version>
+        <artifactId>mojo-parent</artifactId>
+        <version>33</version>
     </parent>
     <artifactId>nbm-maven-harness</artifactId>
     <version>8.0-SNAPSHOT</version>
@@ -16,9 +16,10 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</developerConnection>
-        <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/nbm-maven/nbm-maven-harness</url>
+        <connection>scm:git:https://github.com/mojohaus/nbm-maven-harness.git</connection>
+        <developerConnection>scm:git:https://github.com/mojohaus/nbm-maven-harness.git</developerConnection>
+        <url>https://github.com/mojohaus/nbm-maven-harness/tree/${project.scm.tag}</url>
+        <tag>master</tag>
     </scm>
     <build>
         <plugins>
@@ -216,6 +217,6 @@
     </build>
     <properties>
         <netbeans.repo>netbeans::default::http://bits.netbeans.org/nexus/content/groups/netbeans/</netbeans.repo>
-        <netbeans.version>RELEASE80-BETA</netbeans.version>
+        <netbeans.version>RELEASE80</netbeans.version>
     </properties>
 </project>
