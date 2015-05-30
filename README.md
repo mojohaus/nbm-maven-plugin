@@ -67,14 +67,15 @@ The plugin walks the dependency tree to detect and identify module dependencies 
 
 A maven dependency is turned into a NetBeans runtime dependency when:
 
-for NetBeans module dependencies (dependency jars that have the NetBeans specific entries in META-INF/MANIFEST.MF)
-It's a direct dependency (non-transitive) and is a NetBeans module itself. Preferred way of declaring module dependencies.
-It's defined in existing (though optional) module.xml file in dependencies section. Try to avoid this, but still useful if one wants to put an explicit dependency value on the module, or use implementation dependency.
-When the dependency is of type nbm. Deprecated in 3.0.x, only helpful in older versions. Such dependencies don't include their transitive deps on compilation classpath. That should allow one to simulate the rumtime dependencies at compilation time in maven, however there's one major drawback. Not only are the nbm's module dependencies hidden, but the libraries associated with the given nbm module are also hidden. So you can end up with less stuff on classpath as opposed to more stuff with jar typed dependencies.
-for module libraries (jars that are packed together with the module and appear on it's classpath directly, not by a dependency relationship.)
-It's a direct dependency and is not of provided scope.
-It's a transitive dependency, pulled in by a direct dependency (only non-module one - see first bullet) This is new in 3.0+
-It's defined in existing (though optional) module.xml file in libraries section. Consider this deprecated in 3.0+.
+* For NetBeans module dependencies (dependency jars that have the NetBeans specific entries in META-INF/MANIFEST.MF)
+  * It's a direct dependency (non-transitive) and is a NetBeans module itself. Preferred way of declaring module dependencies.
+  * It's defined in existing (though optional and deprecated) module.xml file in dependencies section. Try to avoid this, but still useful if one wants to put an explicit dependency value on the module, or use implementation dependency.
+  * When the dependency is of type nbm. Deprecated in 3.0.x, only helpful in older versions. Such dependencies don't include their transitive deps on compilation classpath. That should allow one to simulate the rumtime dependencies at compilation time in maven, however there's one major drawback. Not only are the nbm's module dependencies hidden, but the libraries associated with the given nbm module are also hidden. So you can end up with less stuff on classpath as opposed to more stuff with jar typed dependencies.
+* For module libraries (jars that are packed together with the module and appear on it's classpath directly, not by a dependency relationship.)
+  * It's a direct dependency and is not of provided scope.
+  * It's a transitive dependency, pulled in by a direct dependency (only non-module one - see first bullet) This is new in 3.0+
+  * It's defined in existing (though optional) module.xml file in libraries section. Consider this deprecated in 3.0+.
+
 The complete nbm descriptor format documentation, and example descriptors are also available. Please note that since 3.8 version, the descriptor is deprecated and replaced by plugin configuration parameters.
 
 Additionally we perform dependency analysis in order to warn the user when runtime dependencies are wrong. So project's own classes and it's classpath libraries' classes are checked against the module dependencies (with appropriate filtering for public packages/private packages). If the classes depend on declared module dependency's private classes or on transitive module dependency's classes, the build fails. That should prevent ClassNotFoundException's later at runtime, when the NetBeans module system constructs the classpath for the module based on our metadata generated.
