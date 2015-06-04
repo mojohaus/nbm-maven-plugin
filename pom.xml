@@ -436,7 +436,7 @@
         <dependency>
             <groupId>org.apache.maven.wagon</groupId>
             <artifactId>wagon-http</artifactId>
-            <version>${wagon.plugin.version}</version>
+            <version>${wagon.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -447,7 +447,7 @@
         <dependency>
             <groupId>org.apache.maven.wagon</groupId>
             <artifactId>wagon-provider-api</artifactId>
-            <version>${wagon.plugin.version}</version>
+            <version>${wagon.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -459,6 +459,6 @@
     </dependencies>
     <properties>
         <mojo.java.target>1.6</mojo.java.target>
-        <wagon.plugin.version>2.9</wagon.plugin.version>
+        <wagon.version>2.9</wagon.version>
     </properties>
 </project>
