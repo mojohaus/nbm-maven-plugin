@@ -20,11 +20,11 @@ HOW TO: Migrate from older version of the plugin
 
 {Upgrading to 3.9}
 
-In 3.9, the <code>populate-repository</code> goal is moved to separate plugin.
+ In 3.9, the <<<populate-repository>>> goal is moved to separate plugin.
 
 {Upgrading to 3.8}
 
- In 3.8 the <code>descriptor</code> parameter is deprecated and is replaced by equivalent plugin parameters. 
+ In 3.8 the <<<descriptor>>> parameter is deprecated and is replaced by equivalent plugin parameters. 
 The values from descriptor are still applied, warnings are printed. In future releases the parameter will be removed.
 
 {Upgrading from 2.6 version to 3.0}
@@ -85,7 +85,7 @@ public vs. private packages constraint etc)
 The result was a deprecated state that made all classes publicly accessible from other modules
 and printed a warning to the application's log file. In <<3.0>>, we introduced a new optional parameter <<<publicPackages>>>
 that lists all public packages in the module. If not defined, no package is exported as public. See
-{{{http://jira.codehaus.org/browse/MNBMODULE-32}issue MNBMODULE-32}} for details. If you have previously
+{{{https://github.com/mojohaus/nbm-maven-plugin/issues/3}issue}} for details. If you have previously
 placed the <<OpenIDE-Module-Public-Packages>> entry in the manifest file manually, it will not be overriden by the new parameter.
 
 =======================================================================
