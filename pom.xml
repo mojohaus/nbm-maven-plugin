@@ -17,8 +17,8 @@
     <inceptionYear>2005</inceptionYear>
     <url>https://github.com/mojohaus/nbm-maven-plugin</url>
     <issueManagement>
-        <system>jira</system>
-        <url>http://jira.codehaus.org/browse/MNBMODULE</url>
+        <system>GitHub</system>
+        <url>https://github.com/mojohaus/nbm-maven-plugin/issues</url>
     </issueManagement>
     <prerequisites>
         <maven>2.2.0</maven>
@@ -198,16 +198,17 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-changes-plugin</artifactId>
-                            <version>2.7.1</version>
+                            <version>2.11</version>
                             <reports>
-                                <report>jira-report</report>
+                                <report>github-report</report>
                             </reports>
                             <configuration>
-
-                                <onlyCurrentVersion>true</onlyCurrentVersion>
+                                <!-- configure github milestone ? -->
+                                <onlyMilestoneIssues>false</onlyMilestoneIssues>
+                                <onlyCurrentVersion>false</onlyCurrentVersion>
 
                             </configuration>
-       
+                                   
                         </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
@@ -315,7 +316,7 @@
                         <plugin>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>cobertura-maven-plugin</artifactId>
-                            <version>2.5.1</version>
+                            <version>2.6</version>
                             <configuration>
                                 <instrumentation>
                                     <excludes>
