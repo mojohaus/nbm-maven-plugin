@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd-cpd>
+<duplication lines="35" tokens="118">
+<file line="87" path="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/CollectLibrariesNodeVisitor.java"/>
+<file line="81" path="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/CollectModuleLibrariesNodeVisitor.java"/>
+<codefragment>
+<![CDATA[
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean visit( DependencyNode node )
+    {
+        if ( throwable != null )
+        {
+            return false;
+        }
+        if ( root == node )
+        {
+            return true;
+        }
+        try
+        {
+            Artifact artifact = node.getArtifact();
+            if ( !artifacts.containsKey( artifact.getDependencyConflictId() ) )
+            {
+                //ignore non-runtime stuff..
+                return false;
+            }
+            // somehow the transitive artifacts in the  tree are not always resolved?
+            artifact = artifacts.get( artifact.getDependencyConflictId() );
+
+            ExamineManifest depExaminator = examinerCache.get( artifact );
+            if ( depExaminator == null )
+            {
+                depExaminator = new ExamineManifest( log );
+                depExaminator.setArtifactFile( artifact.getFile() );
+                depExaminator.checkFile();
+                examinerCache.put( artifact, depExaminator );
+            }
+            if ( AbstractNbmMojo.matchesLibrary( artifact, explicitLibs, depExaminator, log, useOsgiDependencies ) )
+]]>
+</codefragment>
+</duplication>
+</pmd-cpd>

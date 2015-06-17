@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd version="4.3" timestamp="2015-06-17T12:03:20.940">
+<file name="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/CollectLibrariesNodeVisitor.java">
+<violation beginline="58" endline="58" begincolumn="25" endcolumn="34" rule="UnusedPrivateField" ruleset="Unused Code Rules" package="org.codehaus.mojo.nbm" class="CollectLibrariesNodeVisitor" variable="duplicates" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateField" priority="3">
+Avoid unused private fields such as 'duplicates'.
+</violation>
+<violation beginline="60" endline="60" begincolumn="25" endcolumn="33" rule="UnusedPrivateField" ruleset="Unused Code Rules" package="org.codehaus.mojo.nbm" class="CollectLibrariesNodeVisitor" variable="conflicts" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateField" priority="3">
+Avoid unused private fields such as 'conflicts'.
+</violation>
+<violation beginline="154" endline="161" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.codehaus.mojo.nbm" class="CollectLibrariesNodeVisitor" method="endVisit" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/CreateClusterAppMojo.java">
+<violation beginline="765" endline="767" begincolumn="17" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.codehaus.mojo.nbm" class="CreateClusterAppMojo" method="createBinEtcDir" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="820" endline="820" begincolumn="18" endcolumn="54" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.codehaus.mojo.nbm" class="CreateClusterAppMojo" method="writeFile" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'writeFile(String,File)'.
+</violation>
+</file>
+<file name="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/CreateNetBeansFileStructure.java">
+<violation beginline="29" endline="29" begincolumn="1" endcolumn="28" rule="UnusedImports" ruleset="Import Statement Rules" package="org.codehaus.mojo.nbm" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'java.util.Properties'
+</violation>
+</file>
+<file name="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/CreateStandaloneMojo.java">
+<violation beginline="87" endline="87" begincolumn="81" endcolumn="84" rule="AvoidUsingOctalValues" ruleset="Basic Rules" package="org.codehaus.mojo.nbm" class="CreateStandaloneMojo" method="execute" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#AvoidUsingOctalValues" priority="3">
+Do not start a literal by 0 unless it's an octal value
+</violation>
+</file>
+<file name="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/CreateUpdateSiteMojo.java">
+<violation beginline="225" endline="227" begincolumn="17" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.codehaus.mojo.nbm" class="CreateUpdateSiteMojo" method="execute" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/CreateWebstartAppMojo.java">
+<violation beginline="212" endline="214" begincolumn="13" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.codehaus.mojo.nbm" class="CreateWebstartAppMojo" method="execute" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/NetBeansManifestUpdateMojo.java">
+<violation beginline="150" endline="150" begincolumn="33" endcolumn="36" rule="UnusedPrivateField" ruleset="Unused Code Rules" package="org.codehaus.mojo.nbm" class="NetBeansManifestUpdateMojo" variable="WARN" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateField" priority="3">
+Avoid unused private fields such as 'WARN'.
+</violation>
+<violation beginline="247" endline="247" begincolumn="32" endcolumn="46" rule="UnusedPrivateField" ruleset="Unused Code Rules" package="org.codehaus.mojo.nbm" class="NetBeansManifestUpdateMojo" variable="localRepository" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateField" priority="3">
+Avoid unused private fields such as 'localRepository'.
+</violation>
+<violation beginline="253" endline="253" begincolumn="29" endcolumn="43" rule="UnusedPrivateField" ruleset="Unused Code Rules" package="org.codehaus.mojo.nbm" class="NetBeansManifestUpdateMojo" variable="artifactFactory" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateField" priority="3">
+Avoid unused private fields such as 'artifactFactory'.
+</violation>
+<violation beginline="259" endline="259" begincolumn="36" endcolumn="57" rule="UnusedPrivateField" ruleset="Unused Code Rules" package="org.codehaus.mojo.nbm" class="NetBeansManifestUpdateMojo" variable="artifactMetadataSource" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateField" priority="3">
+Avoid unused private fields such as 'artifactMetadataSource'.
+</violation>
+<violation beginline="265" endline="265" begincolumn="31" endcolumn="47" rule="UnusedPrivateField" ruleset="Unused Code Rules" package="org.codehaus.mojo.nbm" class="NetBeansManifestUpdateMojo" variable="artifactCollector" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateField" priority="3">
+Avoid unused private fields such as 'artifactCollector'.
+</violation>
+<violation beginline="334" endline="336" begincolumn="9" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.codehaus.mojo.nbm" class="NetBeansManifestUpdateMojo" method="execute" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="827" endline="830" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.codehaus.mojo.nbm" class="NetBeansManifestUpdateMojo" method="visibleModuleClasses" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/RunNetBeansMojo.java">
+<violation beginline="189" endline="196" begincolumn="21" endcolumn="21" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.codehaus.mojo.nbm" class="RunNetBeansMojo" method="execute" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/mkleint/src/nbm-maven-plugin/src/main/java/org/codehaus/mojo/nbm/RunPlatformAppMojo.java">
+<violation beginline="122" endline="129" begincolumn="21" endcolumn="21" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.codehaus.mojo.nbm" class="RunPlatformAppMojo" method="execute" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+</pmd>

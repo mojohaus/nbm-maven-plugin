@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<rss version="0.91">
+  <channel>
+    <title>NBM Maven Plugin - Checkstyle report</title>
+    <link>http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin/</link>
+    <description>NBM Maven Plugin - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2005 - 2015 Codehaus</copyright>
+    <item>
+      <title>File: 16,
+             Errors: 1421,
+             Warnings: 36,
+             Infos: 10
+      </title>
+            <link>http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.AdaptNbVersion.java">org/codehaus/mojo/nbm/AdaptNbVersion.java</a>
+                </td>
+                <td>
+                  2
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.CollectModuleLibrariesNodeVisitor.java">org/codehaus/mojo/nbm/CollectModuleLibrariesNodeVisitor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  7
+                </td>
+                <td>
+                  3
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.CreateWebstartAppMojo.java">org/codehaus/mojo/nbm/CreateWebstartAppMojo.java</a>
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  104
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.NetBeansManifestUpdateMojo.java">org/codehaus/mojo/nbm/NetBeansManifestUpdateMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  5
+                </td>
+                <td>
+                  151
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.CreateClusterMojo.java">org/codehaus/mojo/nbm/CreateClusterMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  30
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.RunPlatformAppMojo.java">org/codehaus/mojo/nbm/RunPlatformAppMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  47
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.CreateClusterAppMojo.java">org/codehaus/mojo/nbm/CreateClusterAppMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+                <td>
+                  484
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.CreateNbmMojo.java">org/codehaus/mojo/nbm/CreateNbmMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+                <td>
+                  124
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.CreateStandaloneMojo.java">org/codehaus/mojo/nbm/CreateStandaloneMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  32
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.CollectLibrariesNodeVisitor.java">org/codehaus/mojo/nbm/CollectLibrariesNodeVisitor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  7
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.BrandingMojo.java">org/codehaus/mojo/nbm/BrandingMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  87
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.AbstractNbmMojo.java">org/codehaus/mojo/nbm/AbstractNbmMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  6
+                </td>
+                <td>
+                  41
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.CreateUpdateSiteMojo.java">org/codehaus/mojo/nbm/CreateUpdateSiteMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+                <td>
+                  68
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.CreateNetBeansFileStructure.java">org/codehaus/mojo/nbm/CreateNetBeansFileStructure.java</a>
+                </td>
+                <td>
+                  7
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  112
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.RunNetBeansMojo.java">org/codehaus/mojo/nbm/RunNetBeansMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  41
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin//checkstyle.html#org.codehaus.mojo.nbm.BuildInstallersMojo.java">org/codehaus/mojo/nbm/BuildInstallersMojo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  94
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

@@ -1,0 +1,4 @@
+
+org.codehaus.mojo.nbm
+org.codehaus.mojo.nbm.model
+org.codehaus.mojo.nbm.model.io.xpp3
