@@ -36,7 +36,7 @@ or the repository manager you are using. The repository hosts binaries of NetBea
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${project.version}</version>
                 <extensions>true</extensions>
             </plugin>
             <plugin> <!-- required since nbm-plugin 3.0-->
@@ -255,7 +255,7 @@ and are to be exposed for reuse by other modules.
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${project.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                    <publicPackages>
