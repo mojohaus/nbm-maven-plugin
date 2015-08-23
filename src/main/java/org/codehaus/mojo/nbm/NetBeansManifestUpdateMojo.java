@@ -681,7 +681,7 @@ public class NetBeansManifestUpdateMojo
             {
                 ExamineManifest man = examinerCache.get( wr.artifact );
                 List<Artifact> arts = modules.get( wr.artifact.getDependencyConflictId() );
-                Set<String>[] classes = visibleModuleClasses( arts, man, wr.dependency, projectCodeNameBase );
+                Set<String>[] classes = visibleModuleClasses( arts, man, wr.dependency, projectCodeNameBase, false );
                 deps.removeAll( classes[0] );
                 moduleAllClasses.put( wr.artifact, classes[1] );
             }
@@ -698,7 +698,7 @@ public class NetBeansManifestUpdateMojo
                 {
                     ExamineManifest man = examinerCache.get( wr.artifact );
                     List<Artifact> arts = transmodules.get( wr.artifact.getDependencyConflictId() );
-                    Set<String>[] classes = visibleModuleClasses( arts, man, wr.dependency, projectCodeNameBase );
+                    Set<String>[] classes = visibleModuleClasses( arts, man, wr.dependency, projectCodeNameBase, true );
                     classes[0].retainAll( deps );
                     if ( classes[0].size() > 0 )
                     {
@@ -815,7 +815,8 @@ public class NetBeansManifestUpdateMojo
     }
 
     private Set<String>[] visibleModuleClasses( List<Artifact> moduleLibraries,
-        ExamineManifest manifest, Dependency dep, String projectCodeNameBase )
+        ExamineManifest manifest, Dependency dep, String projectCodeNameBase,
+        boolean transitive)
         throws IOException, MojoFailureException
     {
         Set<String> moduleClasses = new HashSet<String>();
@@ -843,7 +844,7 @@ public class NetBeansManifestUpdateMojo
         if ( "spec".equals( type ) )
         {
             String cnb = stripVersionFromCodebaseName( projectCodeNameBase );
-            if ( manifest.hasFriendPackages() && !manifest.getFriends().contains( cnb ) )
+            if ( !transitive && manifest.hasFriendPackages() && !manifest.getFriends().contains( cnb ) )
             {
                 String message = "Module has friend dependency on " + manifest.getModule() + " but is not listed as a friend.";
                 if ( verifyRuntime.equalsIgnoreCase( FAIL ) )
