@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
@@ -37,7 +38,7 @@ public class CreateNetBeansFileStructureTest
         ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.class.getName() );
         ArtifactResolver artifactResolver = (ArtifactResolver) lookup( ArtifactResolver.class.getName() );
         Artifact a = artifactFactory.createBuildArtifact( "asm", "asm", "3.0", "jar" );
-        artifactResolver.resolve( a, Collections.emptyList(), new DefaultArtifactRepository( "local", new File(localRepository).toURI().toString(), new DefaultRepositoryLayout() ) );
+        artifactResolver.resolve( a, Collections.<ArtifactRepository>emptyList(), new DefaultArtifactRepository( "local", new File(localRepository).toURI().toString(), new DefaultRepositoryLayout() ) );
         StringWriter w = new StringWriter();
         CreateNetBeansFileStructure.writeExternal( new PrintWriter( w ), a );
         assertEquals( "CRC:229904029\nSIZE:42710\nURL:m2:/asm:asm:3.0:jar\nURL:http://repo.maven.apache.org/maven2/asm/asm/3.0/asm-3.0.jar\n", w.toString() );

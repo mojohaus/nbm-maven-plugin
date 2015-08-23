@@ -486,6 +486,12 @@ public class CreateWebstartAppMojo
                         {
                             return false;
                         }
+
+                        @Override
+                        public boolean isSymbolicLink()
+                        {
+                            return false;
+                        }
                     }, jnlp.getName(), archiver.getDefaultFileMode() );
                 }
             }
@@ -538,6 +544,12 @@ public class CreateWebstartAppMojo
                         return true;
                     }
                     public @Override boolean isDirectory()
+                    {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean isSymbolicLink()
                     {
                         return false;
                     }
