@@ -7,7 +7,7 @@
         <version>36</version>
     </parent>
     <artifactId>nbm-maven-harness</artifactId>
-    <version>8.0-SNAPSHOT</version>
+    <version>8.0</version>
     <name>NBM Harness for Maven</name>
     <licenses>
         <license>
@@ -19,7 +19,7 @@
         <connection>scm:git:https://github.com/mojohaus/nbm-maven-harness.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/mojohaus/nbm-maven-harness</developerConnection>
         <url>https://github.com/mojohaus/nbm-maven-harness/tree/${project.scm.tag}</url>
-        <tag>master</tag>
+        <tag>nbm-maven-harness-8.0</tag>
     </scm>
     <build>
         <plugins>
