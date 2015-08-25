@@ -1,5 +1,7 @@
 # NetBeans Module Maven plugin
 
+CI build at (https://codeship.com/projects/827d5e10-2da6-0133-ca32-7e50f7676400/status?branch=master)
+
 This Apache Maven plugin is able to create NetBeans module(plugin) artifacts. It registers a new packaging type `nbm`. Any project with this packaging will be automatically turned into a NetBeans module project. Additionally it allows to create clusters of modules, generate an autoupdate site content or build and assemble an application on top of NetBeans platform.
 
 Note: The `nbm:populate-repository` goal has been moved to it's own plugin at [nb-repository-plugin](https://github.com/mojohaus/nb-repository-plugin/).
