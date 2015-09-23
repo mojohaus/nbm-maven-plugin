@@ -65,7 +65,7 @@ import org.codehaus.plexus.util.IOUtil;
  *
  * In order to have the generated manifest picked up by the maven-jar-plugin,
  * one shall add the following configuration snippet to maven-jar-plugin.
- * <p/>
+ * 
  * <pre>
     &lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
@@ -275,8 +275,8 @@ public class NetBeansManifestUpdateMojo
 
     /**
      * execute plugin
-     * @throws org.apache.maven.plugin.MojoExecutionException
-     * @throws org.apache.maven.plugin.MojoFailureException
+     * @throws MojoExecutionException if an unexpected problem occurs
+     * @throws MojoFailureException if an expected problem occurs
      */
     public void execute()
         throws MojoExecutionException, MojoFailureException

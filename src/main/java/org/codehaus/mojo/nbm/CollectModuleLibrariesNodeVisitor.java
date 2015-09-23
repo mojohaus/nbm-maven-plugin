@@ -62,6 +62,11 @@ public class CollectModuleLibrariesNodeVisitor
 
     /**
      * Creates a dependency node visitor that collects visited nodes for further processing.
+     * @param runtimeArtifacts list of runtime artifacts
+     * @param examinerCache cache of netbeans manifest for artifacts
+     * @param log mojo logger
+     * @param root dependency to start collect with
+     * @param useOSGiDependencies whether to allow osgi dependencies or not
      */
     public CollectModuleLibrariesNodeVisitor(
         List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
@@ -182,7 +187,7 @@ public class CollectModuleLibrariesNodeVisitor
     /**
      * modules declared in the project's pom
      * @return a map of module artifact lists, key is the dependencyConflictId
-     * @throws org.apache.maven.plugin.MojoExecutionException
+     * @throws MojoExecutionException if an unexpected problem occurs
      */
     public Map<String, List<Artifact>> getDeclaredArtifacts()
         throws MojoExecutionException
@@ -197,7 +202,7 @@ public class CollectModuleLibrariesNodeVisitor
     /**
      * modules that were picked up transitively
      * @return a map of module artifact lists, key is the dependencyConflictId
-     * @throws org.apache.maven.plugin.MojoExecutionException
+     * @throws MojoExecutionException if an unexpected problem occurs
      */
     public Map<String, List<Artifact>> getTransitiveArtifacts()
         throws MojoExecutionException

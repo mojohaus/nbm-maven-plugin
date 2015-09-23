@@ -50,7 +50,7 @@ import org.netbeans.nbbuild.MakeNBM.Signature;
 
 /**
  * Create the NetBeans module artifact (nbm file), part of "nbm" lifecycle/packaging.
- * <p/>
+ * 
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  */

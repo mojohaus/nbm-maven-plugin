@@ -81,8 +81,8 @@ public class RunNetBeansMojo
 
     /**
      * 
-     * @throws org.apache.maven.plugin.MojoExecutionException 
-     * @throws org.apache.maven.plugin.MojoFailureException 
+     * @throws MojoExecutionException if an unexpected problem occurs
+     * @throws MojoFailureException if an expected problem occurs
      */
     public void execute()
         throws MojoExecutionException, MojoFailureException

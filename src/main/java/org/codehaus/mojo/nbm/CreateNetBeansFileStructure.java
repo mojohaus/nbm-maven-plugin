@@ -66,7 +66,7 @@ import org.netbeans.nbbuild.JHIndexer;
 
 /**
  * Create the NetBeans module directory structure, a prerequisite for nbm creation and cluster creation.
- * <p/>
+ * 
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  *
