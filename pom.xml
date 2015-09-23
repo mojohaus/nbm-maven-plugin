@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>mojo-parent</artifactId>
-        <version>37</version>
+        <version>38</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -110,7 +110,7 @@
             <plugin>
                 <groupId>org.codehaus.modello</groupId>
                 <artifactId>modello-maven-plugin</artifactId>
-                <version>1.5</version>
+                <version>1.8.3</version>
                 <executions>
                     <execution>
                         <id>build</id>
@@ -169,13 +169,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.4</version>
                 <configuration> 
                     <reportPlugins>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-project-info-reports-plugin</artifactId>
-                            <version>2.4</version>
+                            <version>2.8.1</version>
                             <reports>
                                 <report>dependencies</report>
                                 <report>dependency-management</report>
@@ -213,7 +213,7 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-checkstyle-plugin</artifactId>
-                            <version>2.9.1</version>
+                            <version>2.16</version>
                             <reports>
                                 <report>checkstyle</report>
                             </reports>
@@ -221,42 +221,43 @@
                                 <configLocation>config/maven_checks.xml</configLocation>
                                 <headerLocation>config/maven-header.txt</headerLocation>
                             </configuration>
+                            
                         </plugin>
                         
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-javadoc-plugin</artifactId>
-                            <version>2.8.1</version>
+                            <version>2.10.3</version>
                             <configuration>
                                 <quiet>true</quiet>
                                 <links>
                                     <!--<link>http://download-llnw.oracle.com/javaee/1.4/api/</link>-->
-                                    <link>http://commons.apache.org/collections/apidocs-COLLECTIONS_3_0/</link>
+                                    <!-- unreachable site <link>http://commons.apache.org/collections/apidocs-COLLECTIONS_3_0/</link>-->
                                     <link>http://commons.apache.org/dbcp/apidocs/</link>
                                     <link>http://commons.apache.org/fileupload/apidocs/</link>
                                     <link>http://commons.apache.org/logging/apidocs/</link>
                                     <link>http://commons.apache.org/pool/apidocs/</link>
                                     <link>http://junit.sourceforge.net/javadoc/</link>
                                     <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
-                                    <link>http://jakarta.apache.org/regexp/apidocs/</link>
+                                    <!-- unreachable site <link>http://jakarta.apache.org/regexp/apidocs/</link> -->
                                     <link>http://velocity.apache.org/engine/releases/velocity-1.5/apidocs/</link>
                                     <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-artifact/apidocs/</link>
                                     <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-model/apidocs/</link>
                                     <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-plugin-api/apidocs/</link>
-                                    <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-project/apidocs/</link>
-                                    <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-reporting/maven-reporting-api/apidocs/</link>
+                                    <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-project/apidocs/</link>-->
+                                    <!-- unreachable site <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-reporting/maven-reporting-api/apidocs/</link>-->
                                     <link>http://maven.apache.org/ref/${mojo.javadoc.mavenVersion}/maven-settings/apidocs/</link>
                                 </links>
                                 <tagletArtifacts>
                                     <tagletArtifact>
                                         <groupId>org.apache.maven.plugin-tools</groupId>
                                         <artifactId>maven-plugin-tools-javadoc</artifactId>
-                                        <version>2.8</version>
+                                        <version>3.4</version>
                                     </tagletArtifact>
                                     <tagletArtifact>
                                         <groupId>org.codehaus.plexus</groupId>
                                         <artifactId>plexus-component-javadoc</artifactId>
-                                        <version>1.5.5</version>
+                                        <version>1.6</version>
                                     </tagletArtifact>
                                 </tagletArtifacts>
                             </configuration>
@@ -273,12 +274,12 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-jxr-plugin</artifactId>
-                            <version>2.3</version>
+                            <version>2.5</version>
                         </plugin>
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-plugin-plugin</artifactId>
-                            <version>3.1</version>
+                            <version>3.4</version>
                             <configuration>
                                 <requirements>
                                     <!--
@@ -292,7 +293,7 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-pmd-plugin</artifactId>
-                            <version>2.7.1</version>
+                            <version>3.5</version>
                             <configuration>
                                 <targetJdk>1.5</targetJdk>
                             </configuration>
@@ -300,7 +301,7 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-linkcheck-plugin</artifactId>
-                            <version>1.1</version>
+                            <version>1.2</version>
                             <configuration>
                                 <excludedLinks>
                                     <excludedLink>../../images/codehaus-small.png</excludedLink>
@@ -315,7 +316,7 @@
                         <plugin>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>cobertura-maven-plugin</artifactId>
-                            <version>2.6</version>
+                            <version>2.7</version>
                             <configuration>
                                 <instrumentation>
                                     <excludes>
@@ -335,6 +336,18 @@
                         
                     </reportPlugins>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.shared</groupId>
+                        <artifactId>maven-shared-resources</artifactId>
+                        <version>2</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-invoker-plugin</artifactId>
+                        <version>1.10</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
@@ -386,7 +399,7 @@
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.0</version>
+            <version>3.0.22</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -458,7 +471,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>12.0</version>
+            <version>18.0</version>
             <type>jar</type>
         </dependency>
     </dependencies>
