@@ -37,11 +37,12 @@ public class CreateNetBeansFileStructureTest
         String localRepository = System.getProperty( "localRepository" );
         ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.class.getName() );
         ArtifactResolver artifactResolver = (ArtifactResolver) lookup( ArtifactResolver.class.getName() );
-        Artifact a = artifactFactory.createBuildArtifact( "asm", "asm", "3.0", "jar" );
+        Artifact a = artifactFactory.createBuildArtifact( "junit", "junit", "4.12", "jar" );
+//        DefaultArtifactRepository central = new DefaultArtifactRepository( "central", "http://repo.maven.apache.org/maven2", new DefaultRepositoryLayout() );
         artifactResolver.resolve( a, Collections.<ArtifactRepository>emptyList(), new DefaultArtifactRepository( "local", new File(localRepository).toURI().toString(), new DefaultRepositoryLayout() ) );
         StringWriter w = new StringWriter();
         CreateNetBeansFileStructure.writeExternal( new PrintWriter( w ), a );
-        assertEquals( "CRC:229904029\nSIZE:42710\nURL:m2:/asm:asm:3.0:jar\nURL:http://repo.maven.apache.org/maven2/asm/asm/3.0/asm-3.0.jar\n", w.toString() );
+        assertEquals( "CRC:1355517765\nSIZE:314932\nURL:m2:/junit:junit:4.12:jar\nURL:http://repo.maven.apache.org/maven2/junit/junit/4.12/junit-4.12.jar\n", w.toString() );
     }
 
 }
