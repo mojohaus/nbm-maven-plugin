@@ -30,6 +30,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -621,7 +622,7 @@ public class CreateWebstartAppMojo
             }
             else
             {
-                instream = getClass().getClassLoader().getResourceAsStream( resourcePath );
+                instream = getClass().getClassLoader().getResourceAsStream( resourcePath );                
             }
             FileOutputStream outstream = new FileOutputStream( destinationFile );
 
@@ -662,10 +663,22 @@ public class CreateWebstartAppMojo
             }
 
             JarFile theJar = new JarFile( jar );
-            String codenamebase = theJar.getManifest().getMainAttributes().getValue( "OpenIDE-Module" );
+            Attributes attr = theJar.getManifest().getMainAttributes();
+            String codenamebase = attr.getValue( "OpenIDE-Module" );
+            if ( codenamebase == null )
+            {
+                codenamebase = attr.getValue("Bundle-SymbolicName");
+            }
             if ( codenamebase == null )
             {
                 throw new IOException( "Not a NetBeans Module: " + jar );
+            }
+            
+            // see http://hg.netbeans.org/main-silver/rev/87823abb86d9
+            if (codenamebase.equals("org.objectweb.asm.all")
+                    && jar.getParentFile().getName().equals("core")
+                    && jar.getParentFile().getParentFile().getName().startsWith("platform")) {
+                continue;
             }
             {
                 int slash = codenamebase.indexOf( '/' );
