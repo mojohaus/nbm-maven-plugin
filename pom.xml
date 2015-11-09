@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>nbm-maven-plugin</artifactId>
-    <version>4.1-SNAPSHOT</version>
+    <version>4.1</version>
     <packaging>maven-plugin</packaging>
 
     <name>NBM Maven Plugin</name>
@@ -485,7 +485,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nbm-maven-harness</artifactId>
-            <version>8.0</version>
+            <version>8.1</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
