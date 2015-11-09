@@ -7,7 +7,7 @@
         <version>37</version>
     </parent>
     <artifactId>nbm-maven-harness</artifactId>
-    <version>8.1-SNAPSHOT</version>
+    <version>8.1</version>
     <name>NBM Harness for Maven</name>
     <licenses>
         <license>
@@ -217,6 +217,6 @@
     </build>
     <properties>
         <netbeans.repo>netbeans::default::http://bits.netbeans.org/nexus/content/groups/netbeans/</netbeans.repo>
-        <netbeans.version>RELEASE80</netbeans.version>
+        <netbeans.version>RELEASE81</netbeans.version>
     </properties>
 </project>
