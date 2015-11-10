@@ -622,7 +622,7 @@ public class CreateWebstartAppMojo
             }
             else
             {
-                instream = getClass().getClassLoader().getResourceAsStream( resourcePath );                
+                instream = getClass().getClassLoader().getResourceAsStream( resourcePath );
             }
             FileOutputStream outstream = new FileOutputStream( destinationFile );
 
