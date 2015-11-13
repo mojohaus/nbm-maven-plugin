@@ -141,6 +141,7 @@ public class AbstractNbmMojoTest extends TestCase {
 
     /**
      * Module is not a library
+     * @throws java.lang.Exception if AbstractNbmMojo.getLibraryArtifacts fail
      */
     public void testGetLibraryArtifacts1() throws Exception {
         System.out.println("getLibraryArtifacts1");
@@ -155,6 +156,7 @@ public class AbstractNbmMojoTest extends TestCase {
 
     /**
      * direct dependency is a library
+     * @throws java.lang.Exception if AbstractNbmMojo.getLibraryArtifacts fail
      */
     public void testGetLibraryArtifact2() throws Exception {
         System.out.println("getLibraryArtifacts2");
@@ -170,6 +172,7 @@ public class AbstractNbmMojoTest extends TestCase {
     
     /**
      * transitive dependency gets included as well.
+     * @throws java.lang.Exception if AbstractNbmMojo.getLibraryArtifacts fail
      */
     public void testGetLibraryArtifact3() throws Exception {
         System.out.println("getLibraryArtifacts3");
@@ -187,6 +190,7 @@ public class AbstractNbmMojoTest extends TestCase {
 
     /**
      * transitive dependency of a module doesn't get included as library
+     * @throws java.lang.Exception if AbstractNbmMojo.getLibraryArtifacts fail
      */
     public void testGetLibraryArtifact4() throws Exception {
         System.out.println("getLibraryArtifacts4");
@@ -203,7 +207,8 @@ public class AbstractNbmMojoTest extends TestCase {
 
     /**
      * transitive dependency of a library is a duplicate of a transitive dependency of a module
-     * ->doesn't get included.
+     * -&gt;doesn't get included.
+     * @throws java.lang.Exception if AbstractNbmMojo.getLibraryArtifacts fail
      */
     public void testGetLibraryArtifact5() throws Exception {
         System.out.println("getLibraryArtifacts5");

@@ -185,8 +185,8 @@ public class CreateWebstartAppMojo
 
     /**
      * 
-     * @throws org.apache.maven.plugin.MojoExecutionException 
-     * @throws org.apache.maven.plugin.MojoFailureException 
+     * @throws MojoExecutionException if an unexpected problem occurs
+     * @throws MojoFailureException if an expected problem occurs
      */
     @Override
     public void execute()

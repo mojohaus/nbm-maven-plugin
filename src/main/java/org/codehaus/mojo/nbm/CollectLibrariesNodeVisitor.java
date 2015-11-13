@@ -65,6 +65,12 @@ public class CollectLibrariesNodeVisitor
 
     /**
      * Creates a dependency node visitor that collects visited nodes for further processing.
+     * @param explicitLibraries list of explicit libraries
+     * @param runtimeArtifacts list of runtime artifacts
+     * @param examinerCache cache of netbeans manifest for artifacts
+     * @param log mojo logger
+     * @param root dependency to start collect with
+     * @param useOsgiDependencies whether to allow osgi dependencies or not
      */
     public CollectLibrariesNodeVisitor( List<String> explicitLibraries,
         List<Artifact> runtimeArtifacts, Map<Artifact, ExamineManifest> examinerCache,
@@ -167,6 +173,7 @@ public class CollectLibrariesNodeVisitor
      * Gets the list of collected dependency nodes.
      * 
      * @return the list of collected dependency nodes
+     * @throws MojoExecutionException if a throwable is set
      */
     public List<Artifact> getArtifacts()
         throws MojoExecutionException
