@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.codehaus.mojo.archetypes</groupId>
   <artifactId>nbm-archetype</artifactId>
-  <version>1.15-SNAPSHOT</version>
+  <version>1.15</version>
   <packaging>maven-archetype</packaging>
   <name>NetBeans Module Archetype</name>
   <description>Archetype for development of NetBeans modules in Maven.</description>
@@ -15,7 +15,7 @@
     <connection>scm:git:https://github.com/mojohaus/nbm-archetype.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mojohaus/nbm-archetype.git</developerConnection>
     <url>https://github.com/mojohaus/nbm-archetype/tree/${project.scm.tag}</url>
-    <tag>master</tag>
+    <tag>nbm-archetype-1.15</tag>
   </scm>
  <build>
     <pluginManagement>
