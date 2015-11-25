@@ -809,8 +809,22 @@ public class PopulateRepositoryMojo
                         }
                         catch ( AbstractArtifactResolutionException x2 )
                         {
-                            getLog().warn( x2.getOriginalMessage() );
-                            throw new MojoExecutionException( "No module found for dependency '" + elem + "'", x );
+                            try
+                            {
+                                artifactResolver.resolve( artifactFactory.createBuildArtifact( groupIdPrefix + GROUP_EXTERNAL, artifactId, forcedVersion, "pom" ), repos, localRepository );
+                                dep.setGroupId( groupIdPrefix + GROUP_EXTERNAL );
+                                if ( wrapper.getModuleManifest().hasPublicPackages() )
+                                {
+                                    dep.setScope( "runtime" );
+                                }
+                            }
+                            catch ( AbstractArtifactResolutionException x3 )
+                            {
+                                getLog().warn( x3.getOriginalMessage() );
+                                throw new MojoExecutionException( "No module found for dependency '" + elem + "'", x );
+                            }
+
+                           
                         }
 
                     }
