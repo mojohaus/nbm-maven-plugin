@@ -394,7 +394,7 @@
                                 <goal>install</goal>
                             </goals>
                             <filterProperties>
-                                <netbeans.version>RELEASE81-BETA</netbeans.version>
+                                <netbeans.version>RELEASE81</netbeans.version>
                             </filterProperties>
                         </configuration>
                         <executions>
