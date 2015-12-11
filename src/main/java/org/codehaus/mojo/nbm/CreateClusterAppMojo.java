@@ -173,6 +173,7 @@ public class CreateClusterAppMojo
 // end of component params custom code folding
 // </editor-fold>
 
+    @Override
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -187,23 +188,23 @@ public class CreateClusterAppMojo
         {
             Project antProject = registerNbmAntTasks();
 
-            Set<String> wrappedBundleCNBs = new HashSet<String>(100);
-            Map<String, Set<String>> clusterDependencies = new HashMap<String, Set<String>>();
-            Map<String, Set<String>> clusterModules = new HashMap<String, Set<String>>();
+            Set<String> wrappedBundleCNBs = new HashSet<>(100);
+            Map<String, Set<String>> clusterDependencies = new HashMap<>();
+            Map<String, Set<String>> clusterModules = new HashMap<>();
             
             //verify integrity
-            Set<String> modulesCNBs = new HashSet<String>(200);
-            Set<String> dependencyCNBs = new HashSet<String>(200);
-            Map<String, Set<String>> dependencyCNBBacktraces = new HashMap<String, Set<String>>(50);
-            Set<String> requireTokens = new HashSet<String>(50);
-            Map<String, Set<String>> requireTokensBacktraces = new HashMap<String, Set<String>>(50);
-            Set<String> provideTokens = new HashSet<String>(50);
-            Set<String> osgiImports = new HashSet<String>(50);
-            Map<String, Set<String>> osgiImportsBacktraces = new HashMap<String, Set<String>>(50);
-            Set<String> osgiExports = new HashSet<String>(50);
-            Set<String> osgiExportsSubs = new HashSet<String>(50); //a way to deal with nb module declaring xxx.** (subpackages) declaration that is consumed by osgi imports
+            Set<String> modulesCNBs = new HashSet<>(200);
+            Set<String> dependencyCNBs = new HashSet<>(200);
+            Map<String, Set<String>> dependencyCNBBacktraces = new HashMap<>(50);
+            Set<String> requireTokens = new HashSet<>(50);
+            Map<String, Set<String>> requireTokensBacktraces = new HashMap<>(50);
+            Set<String> provideTokens = new HashSet<>(50);
+            Set<String> osgiImports = new HashSet<>(50);
+            Map<String, Set<String>> osgiImportsBacktraces = new HashMap<>(50);
+            Set<String> osgiExports = new HashSet<>(50);
+            Set<String> osgiExportsSubs = new HashSet<>(50); //a way to deal with nb module declaring xxx.** (subpackages) declaration that is consumed by osgi imports
             
-            List<BundleTuple> bundles = new ArrayList<BundleTuple>();
+            List<BundleTuple> bundles = new ArrayList<>();
 
             @SuppressWarnings( "unchecked" )
             Set<Artifact> artifacts = project.getArtifacts();
@@ -587,11 +588,11 @@ public class CreateClusterAppMojo
         }
         //in 6.1 the rebuilt modules will be cached if the timestamp is not touched.
         File[] files = nbmBuildDirFile.listFiles();
-        for ( int i = 0; i < files.length; i++ )
+        for ( File file : files )
         {
-            if ( files[i].isDirectory() )
+            if ( file.isDirectory() )
             {
-                File stamp = new File( files[i], ".lastModified" );
+                File stamp = new File( file, ".lastModified" );
                 if ( !stamp.exists() )
                 {
                     try
@@ -662,7 +663,7 @@ public class CreateClusterAppMojo
         else
         {
             clusterConf.createNewFile();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             File[] clusters = buildDir.listFiles( new FileFilter()
             {
 
@@ -793,15 +794,12 @@ public class CreateClusterAppMojo
             else
             {
                 File nbm = getHarnessNbm();
-                ZipFile zip = new ZipFile( nbm );
-                try {
+                try (ZipFile zip = new ZipFile( nbm )) {
                     getLog().debug( "Using fallback executables from downloaded org-netbeans-modules-apisupport-harness nbm file." );
                     writeFromZip(zip, "netbeans/launchers/app.sh",  destSh, true );
                     writeFromZip(zip, "netbeans/launchers/app.exe",  destExe, true );
                     writeFromZip(zip, "netbeans/launchers/app64.exe",  destExe64, false );
                     writeFromZip(zip, "netbeans/launchers/app_w.exe",  destExeW, false );
-                } finally {
-                    zip.close();
                 }
             }
         }
@@ -966,11 +964,7 @@ public class CreateClusterAppMojo
             artifactResolver.resolve( nbmArt, project.getRemoteArtifactRepositories(), localRepository );
         }
 
-        catch ( ArtifactResolutionException ex )
-        {
-            throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
-        }
-        catch ( ArtifactNotFoundException ex )
+        catch ( ArtifactResolutionException | ArtifactNotFoundException ex )
         {
             throw new MojoExecutionException( "Failed to retrieve the nbm file from repository", ex );
         }
@@ -1002,7 +996,7 @@ public class CreateClusterAppMojo
         Set<String> lst = map.get( clusterName );
         if ( lst == null )
         {
-            lst = new HashSet<String>();
+            lst = new HashSet<>();
             map.put( clusterName, lst );
         }
         if ( newValues != null )
@@ -1013,7 +1007,7 @@ public class CreateClusterAppMojo
     
     private static List<String> findByDependencies( Map<String, Set<String>> clusterDependencies, String spec)
     {
-        List<String> toRet = new ArrayList<String>();
+        List<String> toRet = new ArrayList<>();
         for ( Map.Entry<String, Set<String>> entry : clusterDependencies.entrySet() )
         {
             if ( entry.getValue().contains( spec ) )
@@ -1034,8 +1028,8 @@ public class CreateClusterAppMojo
     // - 2 or more modules from unrelated clusters we cannot easily decide, most likely should be in common denominator cluster but our cluster2depClusters map is not transitive, only lists direct dependencies
     static void assignClustersToBundles( List<BundleTuple> bundles, Set<String> wrappedBundleCNBs, Map<String, Set<String>> clusterDependencies, Map<String, Set<String>> cluster2depClusters, Log log)
     {
-        List<BundleTuple> toProcess = new ArrayList<BundleTuple>();
-        List<BundleTuple> known = new ArrayList<BundleTuple>();
+        List<BundleTuple> toProcess = new ArrayList<>();
+        List<BundleTuple> known = new ArrayList<>();
         for ( Iterator<BundleTuple> it = bundles.iterator(); it.hasNext(); )
         {
             BundleTuple ent = it.next();
@@ -1169,7 +1163,7 @@ public class CreateClusterAppMojo
     //static and default for tests..
     static Map<String, Set<String>> computeClusterOrdering( Map<String, Set<String>> clusterDependencies, Map<String, Set<String>> clusterModules )
     {
-        Map<String, Set<String>> cluster2depClusters = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> cluster2depClusters = new HashMap<>();
         for ( Map.Entry<String, Set<String>> entry : clusterDependencies.entrySet() )
         {
             String cluster = entry.getKey();
@@ -1245,8 +1239,7 @@ public class CreateClusterAppMojo
         throws FileNotFoundException, IOException
     {
         CRC32 crc = new CRC32();
-        InputStream inFileStream = new FileInputStream( inFile );
-        try {
+        try (InputStream inFileStream = new FileInputStream( inFile )) {
             byte[] array = new byte[(int) inFile.length()];
             int len = inFileStream.read( array );
             if ( len != array.length )
@@ -1255,11 +1248,6 @@ public class CreateClusterAppMojo
             }
             crc.update( array );
         }
-        finally
-        {
-            inFileStream.close();
-        }
-
         return crc;
     }
 
