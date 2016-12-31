@@ -195,7 +195,7 @@ public class CreateUpdateSiteMojo
                     art = res.getConvertedArtifact();
                 }
 
-                if ( art.getType().equals( "nbm-file" ) )
+                if ( art.getType().equals( "nbm-file" ) || res.isOSGiBundle() )
                 {
                     Copy copyTask = (Copy) antProject.createTask( "copy" );
                     copyTask.setOverwrite( true );
@@ -220,10 +220,6 @@ public class CreateUpdateSiteMojo
                         throw new MojoExecutionException( "Cannot merge nbm files into autoupdate site", ex );
                     }
 
-                }
-                if ( res.isOSGiBundle() )
-                {
-                    // TODO check for bundles
                 }
             }
             getLog().info( "Created NetBeans module cluster(s) at " + nbmBuildDirFile.getAbsoluteFile() );
@@ -310,6 +306,7 @@ public class CreateUpdateSiteMojo
         FileSet fs = new FileSet();
         fs.setDir( nbmBuildDirFile );
         fs.createInclude().setName( "**/*.nbm" );
+        fs.createInclude().setName( "**/*.jar" );
         descTask.addFileset( fs );
         try
         {
