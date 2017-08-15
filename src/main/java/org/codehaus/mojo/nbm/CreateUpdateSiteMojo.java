@@ -244,8 +244,9 @@ public class CreateUpdateSiteMojo
                     if ( !isRepository )
                     {
                         FileSet fs = new FileSet();
-                        fs.setDir( moduleDir );
-                        fs.createInclude().setName( "target/*.nbm" );
+                        File projOutputDirectory = new File( proj.getBuild().getDirectory() );
+                        fs.setDir( projOutputDirectory );
+                        fs.createInclude().setName( "*.nbm" );
                         copyTask.addFileset( fs );
                         copyTask.setOverwrite( true );
                         copyTask.setFlatten( true );
@@ -253,7 +254,7 @@ public class CreateUpdateSiteMojo
                     }
                     else
                     {
-                        File target = new File( moduleDir, "target" );
+                        File target = new File( proj.getBuild().getDirectory() );
                         boolean has = false;
                         File[] fls = target.listFiles();
                         if ( fls != null )
