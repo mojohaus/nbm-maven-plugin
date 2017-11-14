@@ -42,4 +42,7 @@
             </plugins>
         </pluginManagement>
     </build>
+    <properties>
+        <jar.plugin.version>3.0.2</jar.plugin.version>
+    </properties>
 </project>
