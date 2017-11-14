@@ -67,14 +67,18 @@ import org.codehaus.plexus.util.IOUtil;
  * one shall add the following configuration snippet to maven-jar-plugin.
  * 
  * <pre>
-    &lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-jar-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.2&lt;/version&gt;
-        &lt;configuration&gt;
-            &lt;useDefaultManifestFile&gt;true&lt;/useDefaultManifestFile&gt;
-        &lt;/configuration&gt;
-    &lt;/plugin&gt;
+ *  {@code
+   <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-jar-plugin</artifactId>
+       <version>3.0.2</version>
+       <configuration>
+           <archive>
+               <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+           </archive>
+       </configuration>
+   </plugin>
+ * }
  * </pre>
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
