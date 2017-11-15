@@ -293,11 +293,11 @@
             <artifactId>maven-plugin-api</artifactId>
             <version>3.0.4</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
             <version>3.0</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
