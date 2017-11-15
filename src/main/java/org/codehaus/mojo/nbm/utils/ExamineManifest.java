@@ -337,6 +337,7 @@ public class ExamineManifest
 
     /**
      * The jar file to examine. It is exclusive with manifestFile.
+     * @param jarFileLoc jar file
      */
     public void setJarFile( File jarFileLoc )
     {
@@ -345,6 +346,7 @@ public class ExamineManifest
 
     /** 
      * Manifest file to be examined. It is exclusive with jarFile.
+     * @param manifestFileLoc manifedt file
      */
     public void setManifestFile( File manifestFileLoc )
     {
@@ -408,6 +410,7 @@ public class ExamineManifest
     /**
      * Code name base of the module only.
      * Does not include any release version.
+     * @return module code name base
      */
     public String getModule()
     {
@@ -416,6 +419,7 @@ public class ExamineManifest
 
     /**
      * Full name of module: code name base, then optionally slash and major release version.
+     * @return module full name 
      */
     public String getModuleWithRelease()
     {
@@ -425,6 +429,7 @@ public class ExamineManifest
     /**
      * returns true if there are defined public packages and there is no friend
      * declaration.
+     * @return true if has public package
      */
     public boolean hasPublicPackages()
     {
@@ -443,6 +448,7 @@ public class ExamineManifest
 
     /**
      * returns true if both public packages and friend list are declared.
+     * @return true if has friend package
      */
     public boolean hasFriendPackages()
     {
@@ -457,6 +463,7 @@ public class ExamineManifest
     /**
      * list of package statements from OpenIDE-Module-Public-Packages.
      * All items end with .*
+     * @return list of package
      */
     public List<String> getPackages()
     {
