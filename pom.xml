@@ -20,9 +20,6 @@
         <system>GitHub</system>
         <url>https://github.com/mojohaus/nbm-shared/issues</url>
     </issueManagement>
-    <!--<prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>-->
     <licenses>
         <license>
             <name>Apache License 2</name>
