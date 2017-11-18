@@ -28,6 +28,7 @@ public abstract class AbstractNetbeansMojo
 
     /**
      * Creates a project initialized with the same logger.
+     * @return project
      */
     protected final Project antProject()
     {
