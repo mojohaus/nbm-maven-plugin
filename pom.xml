@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>mojo-parent</artifactId>
-        <version>38</version>
+        <version>40</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -40,8 +40,7 @@
         <developer>
             <id>mkleint</id>
             <name>Milos Kleint</name>
-            <email>mkleint@codehaus.org</email>
-            <organization>Codehaus</organization>
+            <email>mkleint@gmail.com</email>
             <roles>
                 <role>Developer</role>
             </roles>
@@ -50,7 +49,13 @@
             <id>jglick</id>
             <name>Jesse Glick</name>
             <email>jglick@codehaus.org</email>
-            <organization>Codehaus</organization>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>ebarboni</id>
+            <name>Eric Barboni</name>
             <roles>
                 <role>Developer</role>
             </roles>
