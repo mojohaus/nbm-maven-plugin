@@ -255,11 +255,6 @@
             <artifactId>maven-plugin-api</artifactId>
             <version>3.0.4</version>
         </dependency>
-        <!--<dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>3.0</version>
-        </dependency>-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -272,12 +267,6 @@
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
-        <!--<dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nbm-maven-harness</artifactId>
-            <version>7.4</version>
-        </dependency>-->
-        
     </dependencies>
     <properties>
         <mojo.java.target>1.6</mojo.java.target>
