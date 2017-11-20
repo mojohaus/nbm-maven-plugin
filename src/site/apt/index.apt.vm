@@ -4,7 +4,7 @@
  Milos Kleint
  <mkleint@codehaus.org>
  ------
- Nov 04 2010
+ 2010-11-04
 
 NetBeans Module plugin
 
@@ -45,7 +45,7 @@ or the repository manager you are using. The repository hosts binaries of NetBea
                 <version>3.0.2</version>
                 <configuration>
                     <archive>
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <manifestFile>#[[${project.build.outputDirectory}]]#/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                 </configuration>
             </plugin>
