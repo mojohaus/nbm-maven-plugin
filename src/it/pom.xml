@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>nb-repository-plugin-it-root</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+  
+    <build>
+        <pluginManagement>
+            <plugins>
+               
+                <plugin>  
+                    <groupId>@project.groupId@</groupId>
+                    <artifactId>@project.artifactId@</artifactId>  
+                    <version>@project.version@</version>
+                </plugin>
+                <!--<plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>@compilerPluginVersion@</version>
+                    <configuration>
+                        <source>@testJavaVersion@</source>
+                        <target>@testJavaVersion@</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>@surefirePluginVersion@</version>
+                </plugin>-->
+            </plugins>
+        </pluginManagement>
+    </build>
+    <properties>
+        <jar.plugin.version>3.0.2</jar.plugin.version>
+    </properties>
+</project>
