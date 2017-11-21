@@ -21,7 +21,7 @@
         <url>https://github.com/mojohaus/nb-repository-plugin/issues</url>
     </issueManagement>
     <prerequisites>
-        <maven>3.0.5</maven>
+        <maven>3.1.1</maven>
     </prerequisites>
     <licenses>
         <license>
