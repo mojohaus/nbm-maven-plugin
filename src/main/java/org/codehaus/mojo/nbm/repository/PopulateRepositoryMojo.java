@@ -41,8 +41,9 @@ import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
@@ -287,8 +288,8 @@ public class PopulateRepositoryMojo
         {
             try
             {
-                Directory nexusDir = FSDirectory.open( nexusIndexDirectory );
-                IndexReader nexusReader = IndexReader.open( nexusDir );
+                Directory nexusDir = FSDirectory.open( nexusIndexDirectory.toPath() );
+                IndexReader nexusReader = DirectoryReader.open( nexusDir );
                 searcher = new IndexSearcher( nexusReader );
                 getLog().info( "Opened index with " + nexusReader.numDocs() + " documents" );
             }
@@ -620,7 +621,7 @@ public class PopulateRepositoryMojo
         }
         finally
         {
-            if ( searcher != null )
+            /*if ( searcher != null )
             {
                 try
                 {
@@ -630,7 +631,7 @@ public class PopulateRepositoryMojo
                 {
                     getLog().error( ex );
                 }
-            }
+            }*/
         }
 
         //process collected non-recognized external jars..
@@ -933,14 +934,14 @@ public class PopulateRepositoryMojo
             }
             String sha = encode( shaDig.digest() );
             TermQuery q = new TermQuery( new Term( "1", sha ) );
-            TopScoreDocCollector collector = TopScoreDocCollector.create(5, true);
+            TopScoreDocCollector collector = TopScoreDocCollector.create( 5 );
             searcher.search(q, collector);
             ScoreDoc[] hits = collector.topDocs().scoreDocs;
             if ( hits.length >= 1 )
             {
                 int docId = hits[0].doc;    
                 Document doc = searcher.doc(docId);                
-                Fieldable idField = doc.getFieldable( "u" );
+                IndexableField idField = doc.getField( "u" );
                 if ( idField != null )
                 {
                     String id = idField.stringValue();
