@@ -89,16 +89,16 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * A goal for identifying NetBeans modules from the installation and populating the local
  * repository with them. Optionally you can also deploy to a remote repository.
- * <p/>
+ * <p>
  * If you are looking for an existing remote repository for NetBeans artifacts, check out
  * <a href="http://bits.netbeans.org/nexus/content/groups/netbeans/">http://bits.netbeans.org/nexus/content/groups/netbeans/</a>,
  * it contains API artifacts for multiple releases.
  * <a href="http://bits.netbeans.org/netbeans/trunk/maven-snapshot/">http://bits.netbeans.org/netbeans/trunk/maven-snapshot/</a>
  * may also be used for <code>SNAPSHOT</code> artifacts if you wish to test development builds.
- * <p/>
+ * </p><p>
  * See this <a href="http://mojo.codehaus.org/nbm-maven/nbm-maven-plugin/repository.html">HOWTO</a> on how to generate the NetBeans binaries required
  * by this goal.
- * <p/>
+ * </p>
  *
  * @author <a href="mailto:mkleint@codehaus.org">Milos Kleint</a>
  */
@@ -172,8 +172,9 @@ public class PopulateRepositoryMojo
      * Good when depending on releases. Then you would for example specify RELEASE50 in this parameter and
      * all modules get this version in the repository. If not defined, the maven version is
      * derived from the OpenIDE-Module-Specification-Version manifest attribute.
-     * <p/>
+     * <p>
      * Highly Recommended!
+     * </p>
      */
     @Parameter(property="forcedVersion")
     protected String forcedVersion;
