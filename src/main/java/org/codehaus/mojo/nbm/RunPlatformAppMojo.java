@@ -119,7 +119,16 @@ public class RunPlatformAppMojo
                 String jdkHome = System.getenv( "JAVA_HOME" );
                 if ( jdkHome != null )
                 {
-                    if ( new File( jdkHome, "jre\\lib\\amd64\\jvm.cfg" ).exists() )
+                    /* Detect whether the JDK is 32-bit or 64-bit. Since Oracle has "no plans to ship 32-bit builds of
+                    JDK 9" [1] or beyond, assume 64-bit unless we can positively identify the JDK as 32-bit. The file
+                    below is confirmed to exist on 32-bit Java 8, Java 9, and Java 10 [2], and confirmed _not_ to exist
+                    on 64-bit Oracle Java 10 nor on OpenJDK 8, 9, or 10.
+
+                    [1] Mark Reinhold on 2017-09-25
+                        https://twitter.com/mreinhold/status/912311207935090689
+                    [2] Downloaded from https://www.azul.com/downloads/zulu/zulu-windows on 2018-09-05. */
+                    if (!new File(jdkHome, "jre\\bin\\JavaAccessBridge-32.dll").exists() && // 32-bit Java 8
+                        !new File(jdkHome, "\\bin\\javaaccessbridge-32.dll").exists()) // 32-bit Java 9 or 10
                     {
                         File exec64 = new File( appbasedir, "bin\\" + brandingToken + "64.exe" );
                         if ( exec64.isFile() )
