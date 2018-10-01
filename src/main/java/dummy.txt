@@ -1,0 +1,2 @@
+This jar doesn't have sources or javadoc.
+It contains a multitude of resources from the netbeans IDE, used by the nbm-maven-plugin.
