@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>mojo-parent</artifactId>
+    <version>38</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.codehaus.mojo.archetypes</groupId>
+  <artifactId>netbeans-platform-app-archetype</artifactId>
+  <version>1.21-SNAPSHOT</version>
+  <packaging>maven-archetype</packaging>
+  <name>NetBeans Platform Application Archetype</name>
+  <description>Archetype for sample application based on NetBeans Platform. Creates parent POM with branding and empty NBM project.</description>
+  <scm>
+    <connection>scm:git:https://github.com/mojohaus/netbeans-platform-app-archetype.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/mojohaus/netbeans-platform-app-archetype.git</developerConnection>
+    <url>https://github.com/mojohaus/netbeans-platform-app-archetype/tree/${project.scm.tag}</url>
+    <tag>master</tag>
+  </scm>
+ <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-archetype-plugin</artifactId>
+          <version>2.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-packaging</artifactId>
+        <version>2.0</version>
+      </extension>
+    </extensions>
+  </build>
+</project>
