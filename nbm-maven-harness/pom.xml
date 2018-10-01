@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>mojo-parent</artifactId>
+        <version>37</version>
+    </parent>
+    <artifactId>nbm-maven-harness</artifactId>
+    <version>8.3-SNAPSHOT</version>
+    <name>NBM Harness for Maven</name>
+    <licenses>
+        <license>
+            <name>CDDL + GPL 2 with Classpath Exception</name>
+            <url>http://netbeans.org/cddl-gplv2.html</url>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://github.com/mojohaus/nbm-maven-harness.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/mojohaus/nbm-maven-harness.git</developerConnection>
+        <url>https://github.com/mojohaus/nbm-maven-harness/tree/${project.scm.tag}</url>
+        <tag>master</tag>
+    </scm>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <id>unpack-harness</id>
+                        <goals>
+                            <goal>get</goal>
+                        </goals>
+                        <configuration>
+                            <artifact>org.netbeans.modules:org-netbeans-modules-apisupport-harness:${netbeans.version}:nbm</artifact>
+                            <transitive>false</transitive>
+                            <remoteRepositories>${netbeans.repo}</remoteRepositories>
+                            <destination>${project.build.directory}/harness.nbm</destination>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <id>unpack-installer</id>
+                        <goals>
+                            <goal>get</goal>
+                        </goals>
+                        <configuration>
+                            <artifact>org.netbeans.modules:org-netbeans-libs-nbi-ant:${netbeans.version}:nbm</artifact>
+                            <transitive>false</transitive>
+                            <remoteRepositories>${netbeans.repo}</remoteRepositories>
+                            <destination>${project.build.directory}/nbi-ant.nbm</destination>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <id>unpack-installer-engine</id>
+                        <goals>
+                            <goal>get</goal>
+                        </goals>
+                        <configuration>
+                            <artifact>org.netbeans.modules:org-netbeans-libs-nbi-engine:${netbeans.version}:nbm</artifact>
+                            <transitive>false</transitive>
+                            <remoteRepositories>${netbeans.repo}</remoteRepositories>
+                            <destination>${project.build.directory}/nbi-engine.nbm</destination>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}/classes">
+                                    <patternset>
+                                        <include name="netbeans/etc/app.conf" />
+                                        <include name="netbeans/etc/applicationIcon.icns*" />
+                                        <include name="netbeans/launchers/app*" />
+                                    </patternset>
+                                    <mapper type="glob" from="netbeans/*" to="harness/*" />
+                                </unzip>
+                                <unzip src="${project.build.directory}/harness.nbm" dest="${project.build.directory}">
+                                    <patternset>
+                                        <include name="netbeans/tasks.jar.pack.gz" />
+                                        <include name="netbeans/jnlp/jnlp-launcher.jar.pack.gz" />
+                                    </patternset>
+                                    <flattenmapper />
+                                </unzip>
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/tasks.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/tasks.jar" />
+                                </exec>
+                                <mkdir dir="${project.build.directory}/classes/harness/jnlp" />
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/jnlp-launcher.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/jnlp/jnlp-launcher.jar" />
+                                </exec>
+                                <unzip src="${project.build.directory}/tasks.jar" dest="${project.build.directory}/classes" />
+                                <unzip src="${project.build.directory}/nbi-ant.nbm" dest="${project.build.directory}/classes">
+                                    <patternset>
+                                        <include name="netbeans/modules/" />
+                                        <include name="netbeans/nbi/" />
+                                    </patternset>
+                                    <mapper type="glob" from="netbeans/*" to="harness/*" />
+                                </unzip>
+                                <unzip src="${project.build.directory}/nbi-engine.nbm" dest="${project.build.directory}/classes">
+                                    <patternset>
+                                        <include name="netbeans/modules/" />
+                                    </patternset>
+                                    <mapper type="glob" from="netbeans/*" to="harness/*" />
+                                </unzip>
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-ant.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-ant.jar" />
+                                </exec>
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-engine.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/modules/org-netbeans-libs-nbi-engine.jar" />
+                                </exec>
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-engine.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-engine.jar" />
+                                </exec>
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-registries-management.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-registries-management.jar" />
+                                </exec>
+                                <exec executable="unpack200" failonerror="true">
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-ant-tasks.jar.pack.gz" />
+                                    <arg file="${project.build.directory}/classes/harness/modules/ext/nbi-ant-tasks.jar" />
+                                </exec>
+                                <delete>
+                                    <fileset dir="${project.build.directory}/classes/harness/modules" includes="**/*.pack.gz" />
+                                </delete>
+                                <!-- patch product.xml - unable to delete temp files after build finishes -->
+                                <replace file="${project.build.directory}/classes/harness/nbi/.common/product.xml">
+                                    <replacetoken expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}>"]]></replacetoken>
+                                    <replacevalue expandProperties="false"><![CDATA[<delete dir="${current.temp.dir}" deleteonexit="true">]]></replacevalue>
+                                </replace>
+                                <!-- patch replace exec with ant task in common.xml -->
+                                <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" flags="s" />
+                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml" failOnNoReplacements="true">
+                                    <replacetoken expandProperties="false">@EXEC@</replacetoken>
+                                    <replacevalue expandProperties="false"><![CDATA[ant inheritrefs="false" 
+                dir="${cvs.dir}/${nbproject.path}">
+                  <target name="clean" />
+                  <property name="ignore.native" value="true" />
+                  <property name="no.dependencies" value="true" />
+                  <property name="dont.build.custom.tasks" value="true" /> 
+                  <property name="custom.tasks.cls" value="${custom.tasks.cls}" />
+            </ant]]></replacevalue>
+                                </replace>
+                                <replaceregexp file="${project.build.directory}/classes/harness/nbi/.common/common.xml" match="exec executable=.{3}ant.executable(.+?)/exec" replace="@EXEC@" flags="s" />
+                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml" failOnNoReplacements="true">
+                                    <replacetoken expandProperties="false">@EXEC@</replacetoken>
+                                    <replacevalue expandProperties="false"><![CDATA[condition property="nb.jdk.home.value"
+                   value="${@java.home@}/.."
+                   else="${@java.home@}">
+                <not>
+                    <equals arg1="Apple Inc." arg2="${java.vendor}" />
+                </not>
+        </condition>
+        <condition property="custom.parameter.name" value="reference.NBI_Engine.jar">
+            <contains string="${nb.custom.parameter}" substring="reference.NBI_Engine.jar" />
+        </condition>
+        <condition property="custom.parameter.value" value="${core.engine.dist.file}">
+            <contains string="${nb.custom.parameter}" substring="reference.NBI_Engine.jar" />
+        </condition>
+        <condition property="custom.parameter.name" value="javac.classpath">
+            <contains string="${nb.custom.parameter}" substring="javac.classpath" />
+        </condition>
+        <condition property="custom.parameter.value" value="${engine.dist.file}">
+            <contains string="${nb.custom.parameter}" substring="javac.classpath" />
+        </condition>
+        <echoproperties />
+        <ant inheritRefs="false" dir="${cvs.dir}/${nbproject.path}" > 
+                  <target name="clean" />
+                  <target name="compile" />
+                  <property name="platforms.JDK_1.5.home" value="${nb.jdk.home.value}" />
+                  <property name="ignore.native" value="true" />
+                  <property name="no.dependencies" value="true" />
+                  <property name="dont.build.custom.tasks" value="true" /> 
+                  <property name="custom.tasks.cls" value="${custom.tasks.cls}" />
+                  <property name="${custom.parameter.name}" value="${custom.parameter.value}" />
+        </ant]]></replacevalue>
+                                </replace>
+                                <replace file="${project.build.directory}/classes/harness/nbi/.common/common.xml" failOnNoReplacements="true" token="@java.home@" value="java.home" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- No real effect on the build, but prevents NB IDE from thinking src/main/java should be considered in preference to the JAR: -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <properties>
+        <netbeans.repo>netbeans::default::http://bits.netbeans.org/nexus/content/groups/netbeans/</netbeans.repo>
+        <netbeans.version>RELEASE82</netbeans.version>
+    </properties>
+</project>

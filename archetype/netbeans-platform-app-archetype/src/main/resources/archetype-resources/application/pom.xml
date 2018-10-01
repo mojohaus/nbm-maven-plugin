@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+#set( $D = '$' )
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>${groupId}</groupId>
+        <artifactId>${artifactId}-parent</artifactId>
+        <version>${version}</version>
+    </parent>
+
+    <artifactId>${artifactId}-app</artifactId>
+    <packaging>nbm-application</packaging>
+
+    <name>${artifactId}-app</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <all.clusters>${D}{project.build.directory}/${D}{brandingToken}</all.clusters>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.netbeans.cluster</groupId>
+            <artifactId>platform</artifactId>
+            <version>${D}{netbeans.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>${D}{project.groupId}</groupId>
+            <artifactId>${artifactId}-branding</artifactId>
+            <version>${D}{project.version}</version>
+        </dependency>
+        <!-- NbModuleSuite functional in RELEASE70 or later: -->
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-nbjunit</artifactId>
+            <version>${D}{netbeans.version}</version>
+            <scope>test</scope> <!-- beyond platform cluster, this often needs to be dropped down to compile/runtime, some other modules in IDE clusters depend on it -->
+        </dependency>
+#if (${netbeansVersion} == "RELEASE71")
+        <!-- Cf.: https://netbeans.org/bugzilla/show_bug.cgi?id=207956 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+#end
+        <!-- To use Jelly Tools in your functional tests, add or replace with:
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-jellytools-platform</artifactId>
+            <version>${D}{netbeans.version}</version>
+            <scope>test</scope>
+        </dependency>
+        -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+            </plugin>
+            <!-- Permits NbModuleSuite to be run in integration-test phase: -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12.2</version>
+                <configuration>
+#if (${netbeansVersion} == "RELEASE70" || ${netbeansVersion} == "RELEASE701")
+                    <!-- For RELEASE70 or RELEASE701 only (adding in any other clusters imported by your app); RELEASE71+ uses all.clusters directly, plus branding.token: -->
+                    <systemPropertyVariables>
+                        <cluster.path.final>${D}{all.clusters}/${D}{brandingToken}:${D}{all.clusters}/platform</cluster.path.final>
+                    </systemPropertyVariables>
+#else
+                    <systemPropertyVariables>
+                        <all.clusters>${D}{all.clusters}</all.clusters>
+                        <branding.token>${D}{brandingToken}</branding.token>
+                    </systemPropertyVariables>
+#end
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>deployment</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>nbm-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>extra</id>
+                                <goals>
+                                    <goal>autoupdate</goal>
+                                    <goal>webstart-app</goal>
+                                    <goal>build-installers</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

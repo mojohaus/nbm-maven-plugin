@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
+  partial="false" name="NetBeans module suite archetype">
+  <fileSets>
+    <fileSet filtered="true" packaged="false">
+      <directory></directory>
+      <includes>
+        <include>nbactions.xml</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+  <requiredProperties>
+    <requiredProperty key="netbeansVersion">
+      <defaultValue>RELEASE74</defaultValue>
+    </requiredProperty>
+  </requiredProperties>
+</archetype-descriptor>

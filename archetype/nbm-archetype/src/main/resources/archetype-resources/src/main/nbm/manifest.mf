@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+#set( $slashed = $package.replaceAll("([.])", "/") )
+OpenIDE-Module-Localizing-Bundle: $slashed/Bundle.properties
