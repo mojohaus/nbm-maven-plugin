@@ -1,18 +1,56 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <parent>
-    <groupId>org.codehaus.mojo.archetypes</groupId>
-    <artifactId>mojo-archetypes</artifactId>
-    <version>6</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>nbm-suite-root</artifactId>
-  <version>1.11-SNAPSHOT</version>
-  <packaging>maven-archetype</packaging>
-  <name>NetBeans Module Suite Archetype</name>
-  <description>Root project archetype for creating multi module projects developing NetBeans IDE modules. Approximately similar in functionality to module suites in NetBeans Ant projects.</description>
-  <scm>
-    <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/mojo-archetypes/nbm-suite-root</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/mojo-archetypes/nbm-suite-root</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/mojo-archetypes/nbm-suite-root</url>
-  </scm>
+    <parent>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>mojo-parent</artifactId>
+        <version>38</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>nbm-suite-root</artifactId>
+    <version>1.11-SNAPSHOT</version>
+    <packaging>maven-archetype</packaging>
+    <name>NetBeans Module Suite Archetype</name>
+    <description>Root project archetype for creating multi module projects developing NetBeans IDE modules. Approximately similar in functionality to module suites in NetBeans Ant projects.</description>
+    <licenses>
+        <license>
+            <name>Apache License 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://github.com/mojohaus/nbm-suite-root.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/mojohaus/nbm-suite-root.git</developerConnection>
+        <url>https://github.com/mojohaus/nbm-suite-root/tree/${project.scm.tag}</url>
+    </scm> 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-archetype-plugin</artifactId>
+                    <version>2.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.archetype</groupId>
+                <artifactId>archetype-packaging</artifactId>
+                <version>2.0</version>
+            </extension>
+        </extensions>
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <version>0.12</version>
+                <configuration>
+                    <excludes>
+                        <exclude>src/main/resources/archetype-resources/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>
