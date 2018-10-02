@@ -89,13 +89,13 @@
     <build>
         <plugins>
             <plugin>
-   <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
+                <!-- TODO need to override parent version value... I suppose this will eventually end up in mojo parent pom, check regularly -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.5</version>
                 <configuration>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-                 </configuration>
+                </configuration>
                 <executions>
                     <execution>
                         <id>mojo-descriptor</id>
@@ -160,7 +160,7 @@
                     <execution>
                         <phase>package</phase>
                         <goals>
-                           <goal>check</goal>
+                            <goal>check</goal>
                         </goals>
                         <configuration>
                             <signature>
@@ -353,6 +353,12 @@
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>
                 <version>0.12</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*.mf</exclude>
+                        <exclude>**/*.MF</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </reporting>
