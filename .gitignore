@@ -1,2 +1,9 @@
 /target/
 /nbactions.xml
+/nbm-maven-plugin/target/
+/nb-repository-plugin/target/
+/nbm-shared/target/
+/nbm-maven-harness/target/
+/archetype/nbm-archetype/target/
+/archetype/nbm-suite-root/target/
+/archetype/netbeans-platform-app-archetype/target/
